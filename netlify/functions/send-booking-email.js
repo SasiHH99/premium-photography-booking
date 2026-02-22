@@ -10,13 +10,17 @@ exports.handler = async (event) => {
     const data = JSON.parse(event.body);
     const isGerman = data.lang === "de";
 
-    const subject = isGerman
+    /* =========================
+       1️⃣ ADMIN EMAIL (NEKED)
+    ========================= */
+
+    const adminSubject = isGerman
       ? "Neue Buchungsanfrage eingegangen"
       : "Új időpontfoglalás érkezett";
 
-    const htmlContent = isGerman
+    const adminHtml = isGerman
       ? `
-        <div style="font-family:Arial,sans-serif;background:#111;padding:30px;color:#fff">
+        <div style="font-family:Arial;background:#111;padding:30px;color:#fff">
           <h2 style="color:#d4af37;">Neue Buchung</h2>
           <p><strong>Name:</strong> ${data.name}</p>
           <p><strong>Email:</strong> ${data.email}</p>
@@ -28,7 +32,7 @@ exports.handler = async (event) => {
         </div>
       `
       : `
-        <div style="font-family:Arial,sans-serif;background:#111;padding:30px;color:#fff">
+        <div style="font-family:Arial;background:#111;padding:30px;color:#fff">
           <h2 style="color:#d4af37;">Új foglalás</h2>
           <p><strong>Név:</strong> ${data.name}</p>
           <p><strong>Email:</strong> ${data.email}</p>
@@ -40,7 +44,7 @@ exports.handler = async (event) => {
         </div>
       `;
 
-    const response = await fetch("https://api.resend.com/emails", {
+    await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
@@ -49,16 +53,54 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         from: "Bphoto <busi.sandor@bphoto.at>",
         to: ["busi.sandor@bphoto.at"],
-        subject: subject,
-        html: htmlContent
+        subject: adminSubject,
+        html: adminHtml
       })
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("Resend error:", errText);
-      throw new Error("Email sending failed");
-    }
+    /* =========================
+       2️⃣ CLIENT EMAIL (AUTOREPLY)
+    ========================= */
+
+    const clientSubject = isGerman
+      ? "Deine Buchungsanfrage wurde erhalten"
+      : "Foglalásod megérkezett";
+
+    const clientHtml = isGerman
+      ? `
+        <div style="font-family:Arial;background:#111;padding:30px;color:#fff">
+          <h2 style="color:#d4af37;">Vielen Dank für deine Anfrage!</h2>
+          <p>Hallo ${data.name},</p>
+          <p>Deine Buchungsanfrage für den ${data.booking_date} ist eingegangen.</p>
+          <p>Ich melde mich innerhalb von 24 Stunden bei dir.</p>
+          <br>
+          <p>Liebe Grüße,<br>B. Photography<br>Busi Sandor</p>
+        </div>
+      `
+      : `
+        <div style="font-family:Arial;background:#111;padding:30px;color:#fff">
+          <h2 style="color:#d4af37;">Köszönöm a foglalásod!</h2>
+          <p>Kedves ${data.name},</p>
+          <p>Időpont kérésed (${data.booking_date}) megérkezett.</p>
+          <p>24 órán belül felveszem veled a kapcsolatot.</p>
+          <br>
+          <p>Üdvözlettel,<br>B. Photography<br>Busi Sandor</p>
+        </div>
+      `;
+
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        from: "Bphoto <busi.sandor@bphoto.at>",
+        to: [data.email],
+        subject: clientSubject,
+        html: clientHtml
+      })
+    });
 
     return {
       statusCode: 200,
@@ -67,7 +109,6 @@ exports.handler = async (event) => {
 
   } catch (error) {
     console.error("FUNCTION ERROR:", error);
-
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Email sending failed" }),
