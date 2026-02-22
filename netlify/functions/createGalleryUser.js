@@ -1,19 +1,17 @@
-import { createClient } from "@supabase/supabase-js";
-import crypto from "crypto";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE
-);
+const { createClient } = require("@supabase/supabase-js");
+const crypto = require("crypto");
 
 function generatePassword() {
-  return crypto.randomBytes(9).toString("base64").slice(0, 12);
+  return crypto.randomBytes(8).toString("base64").slice(0, 12);
 }
 
-export const handler = async (event) => {
+exports.handler = async (event) => {
 
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405 };
+    return {
+      statusCode: 405,
+      body: "Method Not Allowed"
+    };
   }
 
   try {
@@ -26,20 +24,14 @@ export const handler = async (event) => {
       };
     }
 
-    // Ellenőrizzük létezik-e már
-    const { data: users } = await supabase.auth.admin.listUsers();
-    const existing = users.users.find(u => u.email === email);
-
-    if (existing) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "User already exists" })
-      };
-    }
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE
+    );
 
     const password = generatePassword();
 
-    const { error } = await supabase.auth.admin.createUser({
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
       email_confirm: true
@@ -52,43 +44,18 @@ export const handler = async (event) => {
       };
     }
 
-    // Email küldés Resend-del
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        from: "B. Photography <noreply@bphoto.at>",
-        to: email,
-        subject: "Online Galéria Hozzáférés",
-        html: `
-          <h2>Online Galéria Hozzáférés</h2>
-          <p>Kedves Ügyfelünk!</p>
-          <p>Az online galériája elkészült.</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Jelszó:</strong> ${password}</p>
-          <p>
-            <a href="https://bphoto.at/hu/galeria-login.html">
-              Belépés a galériába
-            </a>
-          </p>
-          <p>Kérjük első belépés után változtassa meg a jelszavát.</p>
-        `
-      })
-    });
-
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true })
+      body: JSON.stringify({
+        message: "User created",
+        password
+      })
     };
 
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Server error" })
+      body: JSON.stringify({ error: err.message })
     };
   }
-
 };

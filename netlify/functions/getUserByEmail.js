@@ -1,127 +1,49 @@
-document.addEventListener("DOMContentLoaded", async () => {
+const { createClient } = require("@supabase/supabase-js");
 
-  const supabase = window.supabaseClient;
+exports.handler = async (event) => {
 
-  /* =========================
-     AUTH CHECK
-  ========================= */
-
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (!session) {
-    window.location.href = "login.html";
-    return;
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: "Method Not Allowed"
+    };
   }
 
-  const user = session.user;
+  try {
+    const { email } = JSON.parse(event.body);
 
-  /* =========================
-     ROLE CHECK
-  ========================= */
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profileError || !profile || profile.role !== "admin") {
-    await supabase.auth.signOut();
-    window.location.href = "login.html";
-    return;
-  }
-
-  /* =========================
-     ADMIN LOGIC
-  ========================= */
-
-  const table = document.getElementById("bookingTable");
-
-  async function loadBookings() {
-
-    const { data, error } = await supabase
-      .from("bookings_v2")
-      .select("*")
-      .order("booking_date", { ascending: true });
-
-    if (error) {
-      console.error("Load error:", error);
-      return;
+    if (!email) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Email required" })
+      };
     }
 
-    table.innerHTML = "";
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE
+    );
 
-    data.forEach(booking => {
-
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${booking.name}</td>
-        <td>${booking.email}</td>
-        <td>${booking.booking_date}</td>
-        <td>${booking.package}</td>
-        <td>
-          <span class="status ${booking.status}">
-            ${booking.status}
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-confirm">Confirm</button>
-          <button class="btn btn-cancel">Cancel</button>
-          <button class="btn btn-gallery">Galéria</button>
-        </td>
-      `;
-
-      const confirmBtn = tr.querySelector(".btn-confirm");
-      const cancelBtn = tr.querySelector(".btn-cancel");
-      const galleryBtn = tr.querySelector(".btn-gallery");
-
-      confirmBtn.addEventListener("click", async () => {
-        await updateStatus(booking.id, "confirmed");
-      });
-
-      cancelBtn.addEventListener("click", async () => {
-        await updateStatus(booking.id, "cancelled");
-      });
-      console.log("GALERIA GOMB KATT");
-      galleryBtn.addEventListener("click", async () => {
-
-        if (!confirm("Biztosan létrehozod a galéria hozzáférést?")) return;
-
-        const response = await fetch("/.netlify/functions/createGalleryUser", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: booking.email })
-        });
-
-        const result = await response.json();
-
-        if (result.error) {
-          alert(result.error);
-          return;
-        }
-
-        alert("Galéria hozzáférés létrehozva és email elküldve!");
-      });
-
-      table.appendChild(tr);
-    });
-  }
-
-  async function updateStatus(id, newStatus) {
-
-    const { error } = await supabase
-      .from("bookings_v2")
-      .update({ status: newStatus })
-      .eq("id", id);
+    const { data, error } = await supabase.auth.admin.listUsers();
 
     if (error) {
-      console.error("Update error:", error);
-      return;
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: error.message })
+      };
     }
 
-    loadBookings();
-  }
+    const user = data.users.find(u => u.email === email);
 
-  loadBookings();
-});
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ user })
+    };
+
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
+};
