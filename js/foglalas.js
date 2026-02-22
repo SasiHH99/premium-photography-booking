@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const successClose = document.getElementById("successClose");
   const errorClose = document.getElementById("errorClose");
 
+  const lang = window.location.pathname.startsWith("/hu") ? "hu" : "de";
   /* =========================
      CALENDAR
   ========================= */
@@ -182,6 +183,5 @@ form.addEventListener("submit", async (e) => {
 
   successClose.onclick = () => successBox.classList.remove("show");
   errorClose.onclick = () => errorBox.classList.remove("show");
-
 
 });
