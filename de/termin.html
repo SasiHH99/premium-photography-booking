@@ -2,10 +2,9 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Buchung | Premium Fotografie</title>
+  <title>Termin buchen | Premium Fotoshooting</title>
 
-  <meta name="description" content="Premium Porträt-, Paar- und Kreativfotografie in Österreich. Online Terminbuchung.">
-  <meta name="robots" content="index, follow">
+  <meta name="description" content="Premium Portrait-, Paar- und kreative Fotoshootings in Österreich. Online Terminbuchung.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="icon" href="../favicon.png" type="image/x-icon">
@@ -21,78 +20,66 @@
 <section class="booking-section">
 
   <div class="booking-title">
-    <h1>BUCHUNG</h1>
+    <h1>TERMIN BUCHEN</h1>
   </div>
 
-  <!-- ===== CONVERSION INFO BLOCK ===== -->
   <div class="booking-info">
-    <h2>So läuft dein Shooting ab</h2>
+    <h2>So läuft das Fotoshooting ab</h2>
     <ol>
-      <li>Termin auswählen</li>
-      <li>Ich bestätige innerhalb von 24 Stunden</li>
-      <li>Gemeinsame Planung (Outfit & Location)</li>
-      <li>Fotoshooting an vereinbarter Location</li>
-      <li>Professionelle Bildbearbeitung & Online-Galerie</li>
+      <li>Wähle dein gewünschtes Datum</li>
+      <li>Du erhältst innerhalb von 24 Stunden eine Bestätigung</li>
+      <li>Wir planen gemeinsam die Location</li>
+      <li>Fotoshooting am vereinbarten Ort</li>
+      <li>Professionelle Bildbearbeitung</li>
     </ol>
 
     <p class="booking-trust">
-      ✓ Keine Vorauszahlung erforderlich<br>
+      ✓ Keine Anzahlung<br>
       ✓ Persönliche Betreuung<br>
-      ✓ Flexible Location nach Absprache
+      ✓ Flexible Terminvereinbarung
     </p>
 
     <p class="booking-scarcity">
-      Nur begrenzte Termine pro Woche verfügbar.
+      Pro Woche sind nur begrenzte Termine verfügbar.
     </p>
   </div>
-  <!-- ===== END CONVERSION BLOCK ===== -->
 
   <div class="booking-grid booking-grid--calendar">
 
-    <form
-      class="booking-form"
-      id="bookingForm"
-      name="booking"
-      method="POST"
-      data-netlify="true"
-      netlify-honeypot="company"
-    >
-      <input type="hidden" name="form-name" value="booking">
-      <input type="text" name="company" style="display:none">
+    <form class="booking-form" id="bookingForm">
+
       <input type="hidden" name="date" id="selectedDate">
-      <input type="hidden" id="formStart">
 
-      <h3>Termin auswählen</h3>
+      <label>Paket auswählen</label>
 
-      <label>Uhrzeit</label>
-      <div class="select-wrapper">
-        <select name="time" required>
-          <option value="">Uhrzeit wählen</option>
-          <option>09:00</option>
-          <option>10:00</option>
-          <option>11:00</option>
-          <option>12:00</option>
-          <option>13:00</option>
-          <option>14:00</option>
-          <option>15:00</option>
-          <option>16:00</option>
-          <option>17:00</option>
-          <option>18:00</option>
-          <option>19:00</option>
+      <div class="package-dropdown">
+        <select name="package" id="packageSelect" required>
+          <option value="">Paket auswählen</option>
+          <option value="Essence">Essence – 97€</option>
+          <option value="Signature">Signature – 167€ (Am beliebtesten)</option>
+          <option value="Prestige">Prestige – 219€</option>
+          <option value="Event">Individuelles Angebot / Event</option>
+          <option value="Custom">Ich bin mir noch nicht sicher</option>
         </select>
+
+        <div class="package-info" id="packageInfo">
+          Wähle ein Paket aus, um Details zu sehen.
+        </div>
       </div>
 
+      <h3>Buchung</h3>
+
       <label>Name
-        <input type="text" name="name" placeholder="Vollständiger Name" required>
+        <input type="text" name="name" required>
       </label>
 
       <label>E-Mail
-        <input type="email" name="email" placeholder="Deine E-Mail-Adresse" required>
+        <input type="email" name="email" required>
         <small class="form-hint">Hierhin sende ich die Bestätigung</small>
       </label>
 
       <label>Nachricht
-        <textarea name="message" placeholder="Welche Art von Fotoshooting wünschst du?"></textarea>
+        <textarea name="message"></textarea>
       </label>
 
       <div class="gdpr-row">
@@ -110,10 +97,6 @@
         TERMIN ANFRAGEN
       </button>
 
-      <p class="booking-microtrust">
-        Unverbindliche Anfrage · Antwort innerhalb von 24 Stunden · Keine Vorauszahlung
-      </p>
-
     </form>
 
     <div class="calendar-box">
@@ -123,11 +106,6 @@
         <button type="button" id="prevMonth">‹</button>
         <span id="calendarMonth"></span>
         <button type="button" id="nextMonth">›</button>
-      </div>
-
-      <div class="calendar-weekdays">
-        <span>M</span><span>D</span><span>Mi</span>
-        <span>Do</span><span>F</span><span>Sa</span><span>So</span>
       </div>
 
       <div class="calendar-grid" id="calendarGrid"></div>
@@ -144,30 +122,35 @@
   <div class="success-card">
     <div class="success-icon">✓</div>
     <div class="thank-you-title">ANFRAGE ERFOLGREICH GESENDET</div>
-    <div class="thank-you-text" id="successText"></div>
-    <div class="success-note">Ich melde mich innerhalb von 24 Stunden bei dir.</div>
+    <div class="thank-you-text">
+      Deine Terminanfrage ist eingegangen.
+    </div>
+    <div class="success-note">
+      Ich melde mich innerhalb von 24 Stunden bei dir.
+    </div>
     <button class="success-btn" id="successClose">OK</button>
+  </div>
+</div>
+
+<div class="booking-error" id="bookingError">
+  <div class="error-card">
+    <div class="error-icon">!</div>
+    <div class="error-title">FEHLER</div>
+    <div class="error-text">
+      Das Formular konnte nicht gesendet werden.
+    </div>
+    <button class="error-btn" id="errorClose">Schließen</button>
   </div>
 </div>
 
 <footer class="footer">
   <p>© 2026 B. Photography – Alle Rechte vorbehalten.</p>
-  <p style="margin-top:10px;font-size:0.65rem;letter-spacing:0.25em;">
-    <a href="datenschutz.html" style="color:#f5dc9c;">Datenschutzerklärung</a>
-  </p>
 </footer>
 
 <script src="../js/header.js"></script>
 <script src="../js/global.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-  (function () {
-    emailjs.init("PA8wPQtoKWWa31Cst");
-  })();
-</script>
-
 <script src="../js/foglalas.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </body>
 </html>
