@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel – B. Photography</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/global.js"></script>
+<script src="admin.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial;
+      background: linear-gradient(135deg,#0f0f0f,#1c1c1c);
+      color: white;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 60px auto;
+      padding: 40px;
+      background: #181818;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #222;
+    }
+
+    th {
+      text-align: left;
+      padding: 14px;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #bbb;
+    }
+
+    td {
+      padding: 16px 14px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    tr:hover {
+      background: #202020;
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .pending {
+      background: #4a3a00;
+      color: #ffcc00;
+    }
+
+    .confirmed {
+      background: #103d24;
+      color: #00e676;
+    }
+
+    .cancelled {
+      background: #3d1010;
+      color: #ff4c4c;
+    }
+
+    .btn {
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-confirm {
+      background: #1f8b4c;
+      color: white;
+      margin-right: 8px;
+    }
+
+    .btn-confirm:hover {
+      background: #26a65b;
+    }
+
+    .btn-cancel {
+      background: #a12c2c;
+      color: white;
+    }
+
+    .btn-cancel:hover {
+      background: #c0392b;
+    }
+
+    @media (max-width: 900px) {
+      table {
+        font-size: 14px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Admin – Foglalások</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Név</th>
+        <th>Email</th>
+        <th>Dátum</th>
+        <th>Csomag</th>
+        <th>Status</th>
+        <th>Művelet</th>
+      </tr>
+    </thead>
+    <tbody id="bookingTable"></tbody>
+  </table>
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
