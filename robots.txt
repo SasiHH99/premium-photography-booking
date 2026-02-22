@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Jogi oldal kizárása
+Disallow: /privacy.html
+
+# Sitemap
+Sitemap: https://bphoto.at/sitemap.xml

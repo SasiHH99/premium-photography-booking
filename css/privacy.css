@@ -1,0 +1,93 @@
+/* =========================
+   PRIVACY PAGE
+========================= */
+
+body {
+  background: #0b0b0f;
+  color: #e6e6e6;
+  line-height: 1.7;
+}
+
+.privacy-page {
+  padding-top: 140px;
+  padding-bottom: 100px;
+}
+
+.privacy-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 25px;
+}
+
+/* Main title */
+
+.privacy-container h1 {
+  font-size: 2rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #f5dc9c;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+/* Section titles */
+
+.privacy-container h2 {
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #f5dc9c;
+  margin-top: 50px;
+  margin-bottom: 15px;
+}
+
+/* Paragraph */
+
+.privacy-container p {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 18px;
+}
+
+/* List */
+
+.privacy-container ul {
+  margin: 10px 0 20px 20px;
+}
+
+.privacy-container li {
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+/* Links */
+
+.privacy-container a {
+  color: #f5dc9c;
+  text-decoration: none;
+}
+
+.privacy-container a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .privacy-page {
+    padding-top: 120px;
+  }
+
+  .privacy-container h1 {
+    font-size: 1.4rem;
+    letter-spacing: 0.2em;
+  }
+
+  .privacy-container h2 {
+    font-size: 0.75rem;
+  }
+
+}
