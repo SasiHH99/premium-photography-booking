@@ -2,27 +2,101 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Login</title>
+  <title>Admin Login – B. Photography</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/global.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+      font-family: 'Segoe UI', Arial;
+      color: white;
+    }
+
+    .login-card {
+      width: 380px;
+      background: #141414;
+      padding: 50px 40px;
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 8px;
+      background: #1f1f1f;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      background: #252525;
+      box-shadow: 0 0 0 2px #2e7d32;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #2e7d32;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #43a047;
+    }
+
+    .error {
+      color: #ff4c4c;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>Admin Bejelentkezés</h2>
+<div class="login-card">
+  <h2>Admin Login</h2>
 
-<form id="loginForm">
-  <input type="email" id="email" placeholder="Email" required />
-  <br><br>
-  <input type="password" id="password" placeholder="Jelszó" required />
-  <br><br>
-  <button type="submit">Belépés</button>
-</form>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Jelszó" required />
+    <button type="submit">Belépés</button>
+    <div class="error" id="errorMsg"></div>
+  </form>
+</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
   const supabase = window.supabaseClient;
   const form = document.getElementById("loginForm");
+  const errorMsg = document.getElementById("errorMsg");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -36,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (error) {
-      alert("Hibás email vagy jelszó");
+      errorMsg.textContent = "Hibás email vagy jelszó";
       return;
     }
 
