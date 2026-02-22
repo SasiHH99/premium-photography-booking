@@ -15,12 +15,12 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { email, bookingId } = JSON.parse(event.body);
+    const { email } = JSON.parse(event.body);
 
-    if (!email || !bookingId) {
+    if (!email) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Email and bookingId required" })
+        body: JSON.stringify({ error: "Email required" })
       };
     }
 
@@ -29,42 +29,43 @@ exports.handler = async (event) => {
       process.env.SUPABASE_SERVICE_ROLE
     );
 
-    const password = generatePassword();
+    // 🔎 1️⃣ Ellenőrizzük, létezik-e már
+    const { data: existingUsers } =
+      await supabase.auth.admin.listUsers();
 
-    // 1️⃣ Auth user létrehozása
-    const { data: userData, error: userError } =
-      await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true
-      });
+    const existing = existingUsers.users.find(u => u.email === email);
 
-    if (userError) {
+    if (existing) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: userError.message })
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "User already exists",
+          id: existing.id
+        })
       };
     }
 
-    const userId = userData.user.id;
+    // 🆕 2️⃣ Ha nem létezik → létrehozzuk
+    const password = generatePassword();
 
-    // 2️⃣ Booking frissítése gallery_user_id-val
-    const { error: updateError } = await supabase
-      .from("bookings_v2")
-      .update({ gallery_user_id: userId })
-      .eq("id", bookingId);
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true
+    });
 
-    if (updateError) {
+    if (error) {
       return {
-        statusCode: 500,
-        body: JSON.stringify({ error: updateError.message })
+        statusCode: 400,
+        body: JSON.stringify({ error: error.message })
       };
     }
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Gallery user created",
+        message: "User created",
+        id: data.user.id,
         password
       })
     };
