@@ -115,6 +115,30 @@
         font-size: 14px;
       }
     }
+    .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #111;
+  padding: 30px;
+  border-radius: 12px;
+  width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
 
   </style>
 </head>
@@ -137,6 +161,17 @@
     </thead>
     <tbody id="bookingTable"></tbody>
   </table>
+</div>
+
+<!-- GALLERY MODAL -->
+<div id="galleryModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Galéria kezelése</h2>
+    <input type="file" id="galleryFileInput" multiple />
+    <button id="uploadGalleryBtn">Feltöltés</button>
+    <div id="galleryImageList"></div>
+    <button id="closeGalleryModal">Bezárás</button>
+  </div>
 </div>
 
 <script src="admin.js"></script>

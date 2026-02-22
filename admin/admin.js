@@ -32,10 +32,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* =========================
-     ADMIN LOGIC
+     ELEMENTS
   ========================= */
 
   const table = document.getElementById("bookingTable");
+  const modal = document.getElementById("galleryModal");
+  const closeModalBtn = document.getElementById("closeGalleryModal");
+  const uploadBtn = document.getElementById("uploadGalleryBtn");
+  const fileInput = document.getElementById("galleryFileInput");
+  const imageList = document.getElementById("galleryImageList");
+
+  let currentUserId = null;
+
+  closeModalBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
+
+  /* =========================
+     LOAD BOOKINGS
+  ========================= */
 
   async function loadBookings() {
 
@@ -85,28 +100,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       galleryBtn.addEventListener("click", async () => {
-
-        if (!confirm("Biztosan létrehozod a galéria hozzáférést?")) return;
-
-        const response = await fetch("/.netlify/functions/createGalleryUser", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: booking.email })
-        });
-
-        const result = await response.json();
-
-        if (result.error) {
-          alert(result.error);
-          return;
-        }
-
-        alert("Galéria hozzáférés létrehozva és email elküldve!");
+        await openGalleryModal(booking.email);
       });
 
       table.appendChild(tr);
     });
   }
+
+  /* =========================
+     UPDATE STATUS
+  ========================= */
 
   async function updateStatus(id, newStatus) {
 
@@ -122,6 +125,95 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     loadBookings();
   }
+
+  /* =========================
+     OPEN MODAL
+  ========================= */
+
+  async function openGalleryModal(email) {
+
+    const response = await fetch("/.netlify/functions/getUserByEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const result = await response.json();
+
+    if (result.error) {
+      alert("User nem létezik!");
+      return;
+    }
+
+    currentUserId = result.id;
+
+    modal.classList.remove("hidden");
+
+    loadGalleryImages();
+  }
+
+  /* =========================
+     LOAD IMAGES
+  ========================= */
+
+  async function loadGalleryImages() {
+
+    const { data } = await supabase
+      .from("gallery_images")
+      .select("*")
+      .eq("user_id", currentUserId);
+
+    imageList.innerHTML = "";
+
+    data.forEach(img => {
+
+      const { data: publicData } = supabase
+        .storage
+        .from("client-galleries")
+        .getPublicUrl(img.image_path);
+
+      const div = document.createElement("div");
+
+      div.innerHTML = `
+        <img src="${publicData.publicUrl}" width="120" />
+      `;
+
+      imageList.appendChild(div);
+    });
+  }
+
+  /* =========================
+     UPLOAD
+  ========================= */
+
+  uploadBtn.addEventListener("click", async () => {
+
+    const files = fileInput.files;
+
+    if (!files.length) return;
+
+    for (let file of files) {
+
+      const filePath = `${currentUserId}/${Date.now()}_${file.name}`;
+
+      const { error } = await supabase.storage
+        .from("client-galleries")
+        .upload(filePath, file);
+
+      if (error) {
+        console.error(error);
+        continue;
+      }
+
+      await supabase.from("gallery_images").insert({
+        user_id: currentUserId,
+        image_path: filePath
+      });
+    }
+
+    fileInput.value = "";
+    loadGalleryImages();
+  });
 
   loadBookings();
 });
