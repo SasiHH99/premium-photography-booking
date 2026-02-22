@@ -15,12 +15,12 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { email } = JSON.parse(event.body);
+    const { email, bookingId } = JSON.parse(event.body);
 
-    if (!email) {
+    if (!email || !bookingId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Email required" })
+        body: JSON.stringify({ error: "Email and bookingId required" })
       };
     }
 
@@ -31,23 +31,40 @@ exports.handler = async (event) => {
 
     const password = generatePassword();
 
-    const { data, error } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true
-    });
+    // 1️⃣ Auth user létrehozása
+    const { data: userData, error: userError } =
+      await supabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true
+      });
 
-    if (error) {
+    if (userError) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: error.message })
+        body: JSON.stringify({ error: userError.message })
+      };
+    }
+
+    const userId = userData.user.id;
+
+    // 2️⃣ Booking frissítése gallery_user_id-val
+    const { error: updateError } = await supabase
+      .from("bookings_v2")
+      .update({ gallery_user_id: userId })
+      .eq("id", bookingId);
+
+    if (updateError) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: updateError.message })
       };
     }
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "User created",
+        message: "Gallery user created",
         password
       })
     };
