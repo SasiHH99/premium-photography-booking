@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Termin buchen | Premium Fotoshooting</title>
+
+  <meta name="description" content="Premium Portrait-, Paar- und kreative Fotoshootings in Österreich. Online Terminbuchung.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" href="../favicon.png" type="image/x-icon">
+
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/foglalas.css">
+</head>
+
+<body>
+
+<div id="site-header"></div>
+
+<section class="booking-section">
+
+  <div class="booking-title">
+    <h1>TERMIN BUCHEN</h1>
+  </div>
+
+  <div class="booking-info">
+    <h2>So läuft das Fotoshooting ab</h2>
+    <ol>
+      <li>Wähle dein gewünschtes Datum</li>
+      <li>Du erhältst innerhalb von 24 Stunden eine Bestätigung</li>
+      <li>Wir planen gemeinsam die Location</li>
+      <li>Fotoshooting am vereinbarten Ort</li>
+      <li>Professionelle Bildbearbeitung</li>
+    </ol>
+
+    <p class="booking-trust">
+      ✓ Keine Anzahlung<br>
+      ✓ Persönliche Betreuung<br>
+      ✓ Flexible Terminvereinbarung
+    </p>
+
+    <p class="booking-scarcity">
+      Pro Woche sind nur begrenzte Termine verfügbar.
+    </p>
+  </div>
+
+  <div class="booking-grid booking-grid--calendar">
+
+    <form class="booking-form" id="bookingForm">
+
+      <input type="hidden" name="date" id="selectedDate">
+
+      <label>Paket auswählen</label>
+
+      <div class="package-dropdown">
+        <select name="package" id="packageSelect" required>
+          <option value="">Paket auswählen</option>
+          <option value="Essence">Essence – 97€</option>
+          <option value="Signature">Signature – 167€ (Am beliebtesten)</option>
+          <option value="Prestige">Prestige – 219€</option>
+          <option value="Event">Individuelles Angebot / Event</option>
+          <option value="Custom">Ich bin mir noch nicht sicher</option>
+        </select>
+
+        <div class="package-info" id="packageInfo">
+          Wähle ein Paket aus, um Details zu sehen.
+        </div>
+      </div>
+
+      <h3>Buchung</h3>
+
+      <label>Name
+        <input type="text" name="name" required>
+      </label>
+
+      <label>E-Mail
+        <input type="email" name="email" required>
+        <small class="form-hint">Hierhin sende ich die Bestätigung</small>
+      </label>
+
+      <label>Nachricht
+        <textarea name="message"></textarea>
+      </label>
+
+      <div class="gdpr-row">
+        <label class="gdpr-checkbox">
+          <input type="checkbox" id="gdpr" required>
+          <span class="checkmark"></span>
+          <span class="gdpr-text">
+            Ich akzeptiere die
+            <a href="privacy.html" target="_blank">Datenschutzerklärung</a>
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="cta-btn" disabled>
+        TERMIN ANFRAGEN
+      </button>
+
+    </form>
+
+    <div class="calendar-box">
+      <h4>Datum auswählen</h4>
+
+      <div class="calendar-header">
+        <button type="button" id="prevMonth">‹</button>
+        <span id="calendarMonth"></span>
+        <button type="button" id="nextMonth">›</button>
+      </div>
+
+      <div class="calendar-grid" id="calendarGrid"></div>
+
+      <p id="selectedDateText" class="calendar-selected">
+        Kein Datum ausgewählt
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<div class="booking-success" id="bookingSuccess">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <div class="thank-you-title">ANFRAGE ERFOLGREICH GESENDET</div>
+    <div class="thank-you-text">
+      Deine Terminanfrage ist eingegangen.
+    </div>
+    <div class="success-note">
+      Ich melde mich innerhalb von 24 Stunden bei dir.
+    </div>
+    <button class="success-btn" id="successClose">OK</button>
+  </div>
+</div>
+
+<div class="booking-error" id="bookingError">
+  <div class="error-card">
+    <div class="error-icon">!</div>
+    <div class="error-title">FEHLER</div>
+    <div class="error-text">
+      Das Formular konnte nicht gesendet werden.
+    </div>
+    <button class="error-btn" id="errorClose">Schließen</button>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>© 2026 B. Photography – Alle Rechte vorbehalten.</p>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="../js/global.js"></script>
+<script src="../js/foglalas.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</body>
+</html>
