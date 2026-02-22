@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =========================
-     SUPABASE INIT - FIXED
+     SUPABASE INIT
   ========================= */
 
   if (!window.supabase) {
@@ -136,37 +136,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
 
+      const bookingData = {
+        booking_date: selectedDate.value,
+        name: form.name.value,
+        email: form.email.value,
+        package: form.package.value,
+        message: form.message.value,
+        status: "pending",
+        lang: "hu"
+      };
+
+      // 1️⃣ Mentés Supabase-be
       const { error } = await supabase
         .from("bookings_v2")
-        .insert([{
-          booking_date: selectedDate.value,
-          name: form.name.value,
-          email: form.email.value,
-          package: form.package.value,
-          message: form.message.value,
-          status: "pending",
-          lang: "hu"
-        }]);
+        .insert([bookingData]);
 
       if (error) throw error;
 
-      // 🔥 EMAIL KÜLDÉS NETLIFY FUNCTIONÖN KERESZTÜL
+      // 2️⃣ Email küldés Netlify functionnel
       await fetch("/.netlify/functions/send-booking-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          name: form.name.value,
-          email: form.email.value,
-          date: selectedDate.value,
-          package: form.package.value,
-          message: form.message.value
-        })
+        body: JSON.stringify(bookingData)
       });
 
+      // SUCCESS
       successBox.classList.add("show");
-
       form.reset();
       selectedText.textContent = "Nincs kiválasztott dátum";
       ctaBtn.disabled = true;
