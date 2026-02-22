@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = session.user;
 
   /* =========================
-     ROLE CHECK (BACKEND)
+     ROLE CHECK
   ========================= */
 
   const { data: profile, error: profileError } = await supabase
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* =========================
-     ADMIN LOGIC START
+     ADMIN LOGIC
   ========================= */
 
   const table = document.getElementById("bookingTable");
@@ -68,11 +68,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>
           <button class="btn btn-confirm">Confirm</button>
           <button class="btn btn-cancel">Cancel</button>
+          <button class="btn btn-gallery">Galéria</button>
         </td>
       `;
 
       const confirmBtn = tr.querySelector(".btn-confirm");
       const cancelBtn = tr.querySelector(".btn-cancel");
+      const galleryBtn = tr.querySelector(".btn-gallery");
 
       confirmBtn.addEventListener("click", async () => {
         await updateStatus(booking.id, "confirmed");
@@ -80,6 +82,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       cancelBtn.addEventListener("click", async () => {
         await updateStatus(booking.id, "cancelled");
+      });
+
+      galleryBtn.addEventListener("click", async () => {
+
+        if (!confirm("Biztosan létrehozod a galéria hozzáférést?")) return;
+
+        const response = await fetch("/.netlify/functions/createGalleryUser", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: booking.email })
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+          alert(result.error);
+          return;
+        }
+
+        alert("Galéria hozzáférés létrehozva és email elküldve!");
       });
 
       table.appendChild(tr);
@@ -102,5 +124,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   loadBookings();
-
 });
