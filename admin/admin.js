@@ -98,9 +98,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       cancelBtn.addEventListener("click", async () => {
         await updateStatus(booking.id, "cancelled");
       });
-      console.log("GALERIA GOMB KATT");
+
       galleryBtn.addEventListener("click", async () => {
-        await openGalleryModal(booking.email);
+        await openGalleryModal(booking);
       });
 
       table.appendChild(tr);
@@ -130,55 +130,121 @@ document.addEventListener("DOMContentLoaded", async () => {
      OPEN MODAL
   ========================= */
 
-  async function openGalleryModal(email) {
+async function openGalleryModal(booking) {
 
-    const response = await fetch("/.netlify/functions/getUserByEmail", {
+  // Ha még nincs gallery user → létrehozzuk
+  if (!booking.gallery_user_id) {
+
+    const response = await fetch("/.netlify/functions/createGalleryUser", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({
+        email: booking.email,
+        bookingId: booking.id
+      })
     });
 
     const result = await response.json();
 
     if (result.error) {
-      alert("User nem létezik!");
+      alert(result.error);
       return;
     }
 
-    currentUserId = result.id;
+    // ⚠️ FONTOS: kérjük le újra a bookingot friss adatokkal
+    const { data: updatedBooking } = await supabase
+      .from("bookings_v2")
+      .select("gallery_user_id")
+      .eq("id", booking.id)
+      .single();
+
+    if (!updatedBooking?.gallery_user_id) {
+      alert("Nem sikerült lekérni a gallery user ID-t");
+      return;
+    }
+
+    currentUserId = updatedBooking.gallery_user_id;
 
     modal.classList.remove("hidden");
 
     loadGalleryImages();
+    return;
   }
 
+  currentUserId = booking.gallery_user_id;
+
+  modal.classList.remove("hidden");
+
+  loadGalleryImages();
+}
+async function loadGalleryImages() {
+
+  if (!currentUserId) {
+    console.log("Nincs currentUserId");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("gallery_images")
+    .select("*")
+    .eq("user_id", currentUserId);
+
+  if (error) {
+    console.error("Gallery load error:", error);
+    return;
+  }
+
+  imageList.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    imageList.innerHTML = "<p>Nincs feltöltött kép</p>";
+    return;
+  }
+
+  data.forEach(image => {
+    // render
+  });
+}
   /* =========================
      LOAD IMAGES
   ========================= */
 
   async function loadGalleryImages() {
 
-    const { data } = await supabase
+    if (!currentUserId) {
+      console.log("Nincs currentUserId");
+      return;
+    }
+
+    const { data, error } = await supabase
       .from("gallery_images")
       .select("*")
       .eq("user_id", currentUserId);
 
+    if (error) {
+      console.error("Gallery load error:", error);
+      return;
+    }
+
     imageList.innerHTML = "";
 
-    data.forEach(img => {
+    if (!data || data.length === 0) {
+      imageList.innerHTML = "<p>Nincs feltöltött kép</p>";
+      return;
+    }
 
-      const { data: publicData } = supabase
+    data.forEach(image => {
+
+      const { data: publicUrl } = supabase
         .storage
         .from("client-galleries")
-        .getPublicUrl(img.image_path);
+        .getPublicUrl(image.image_path);
 
-      const div = document.createElement("div");
+      const img = document.createElement("img");
+      img.src = publicUrl.publicUrl;
+      img.classList.add("gallery-thumb");
 
-      div.innerHTML = `
-        <img src="${publicData.publicUrl}" width="120" />
-      `;
-
-      imageList.appendChild(div);
+      imageList.appendChild(img);
     });
   }
 
@@ -190,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const files = fileInput.files;
 
-    if (!files.length) return;
+    if (!files.length || !currentUserId) return;
 
     for (let file of files) {
 
