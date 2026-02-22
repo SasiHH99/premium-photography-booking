@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       cancelBtn.addEventListener("click", async () => {
         await updateStatus(booking.id, "cancelled");
       });
-
+      console.log("GALERIA GOMB KATT");
       galleryBtn.addEventListener("click", async () => {
 
         if (!confirm("Biztosan létrehozod a galéria hozzáférést?")) return;
