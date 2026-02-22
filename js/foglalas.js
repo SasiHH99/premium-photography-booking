@@ -131,50 +131,57 @@ document.addEventListener("DOMContentLoaded", () => {
      SUBMIT
   ========================= */
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    try {
+  try {
 
-      const bookingData = {
+    // 🌍 Nyelv automatikus felismerése URL alapján
+    const lang = window.location.pathname.includes("/de") ? "de" : "hu";
+
+    const { error } = await supabase
+      .from("bookings_v2")
+      .insert([{
         booking_date: selectedDate.value,
         name: form.name.value,
         email: form.email.value,
         package: form.package.value,
         message: form.message.value,
         status: "pending",
-        lang: "hu"
-      };
+        lang: lang
+      }]);
 
-      // 1️⃣ Mentés Supabase-be
-      const { error } = await supabase
-        .from("bookings_v2")
-        .insert([bookingData]);
+    if (error) throw error;
 
-      if (error) throw error;
+    await fetch("/.netlify/functions/send-booking-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: form.name.value,
+        email: form.email.value,
+        booking_date: selectedDate.value,
+        package: form.package.value,
+        message: form.message.value,
+        lang: lang
+      })
+    });
 
-      // 2️⃣ Email küldés Netlify functionnel
-      await fetch("/.netlify/functions/send-booking-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(bookingData)
-      });
+    successBox.classList.add("show");
 
-      // SUCCESS
-      successBox.classList.add("show");
-      form.reset();
-      selectedText.textContent = "Nincs kiválasztott dátum";
-      ctaBtn.disabled = true;
+    form.reset();
+    selectedText.textContent = "Nincs kiválasztott dátum";
+    ctaBtn.disabled = true;
 
-    } catch (err) {
-      console.error("HIBA:", err);
-      errorBox.classList.add("show");
-    }
-  });
+  } catch (err) {
+    console.error("HIBA:", err);
+    errorBox.classList.add("show");
+  }
+});
 
   successClose.onclick = () => successBox.classList.remove("show");
   errorClose.onclick = () => errorBox.classList.remove("show");
+
 
 });
