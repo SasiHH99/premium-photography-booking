@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
-import fetch from "node-fetch";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -91,4 +90,5 @@ export const handler = async (event) => {
       body: JSON.stringify({ error: "Server error" })
     };
   }
+
 };
