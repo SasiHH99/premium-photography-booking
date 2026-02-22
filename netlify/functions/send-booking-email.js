@@ -8,6 +8,37 @@ exports.handler = async (event) => {
 
   try {
     const data = JSON.parse(event.body);
+    const isGerman = data.lang === "de";
+
+    const subject = isGerman
+      ? "Neue Buchungsanfrage eingegangen"
+      : "Új időpontfoglalás érkezett";
+
+    const htmlContent = isGerman
+      ? `
+        <div style="font-family:Arial,sans-serif;background:#111;padding:30px;color:#fff">
+          <h2 style="color:#d4af37;">Neue Buchung</h2>
+          <p><strong>Name:</strong> ${data.name}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Datum:</strong> ${data.booking_date}</p>
+          <p><strong>Paket:</strong> ${data.package}</p>
+          <hr style="margin:20px 0;border:1px solid #333">
+          <p><strong>Nachricht:</strong></p>
+          <p>${data.message || "-"}</p>
+        </div>
+      `
+      : `
+        <div style="font-family:Arial,sans-serif;background:#111;padding:30px;color:#fff">
+          <h2 style="color:#d4af37;">Új foglalás</h2>
+          <p><strong>Név:</strong> ${data.name}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Dátum:</strong> ${data.booking_date}</p>
+          <p><strong>Csomag:</strong> ${data.package}</p>
+          <hr style="margin:20px 0;border:1px solid #333">
+          <p><strong>Üzenet:</strong></p>
+          <p>${data.message || "-"}</p>
+        </div>
+      `;
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -18,22 +49,8 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         from: "Bphoto <busi.sandor@bphoto.at>",
         to: ["busi.sandor@bphoto.at"],
-        subject: "Új időpontfoglalás érkezett",
-        html: `
-          <div style="font-family:Arial,sans-serif;background:#111;padding:30px;color:#fff">
-            <h2 style="color:#d4af37;">Új foglalás</h2>
-
-            <p><strong>Név:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Dátum:</strong> ${data.booking_date}</p>
-            <p><strong>Csomag:</strong> ${data.package}</p>
-
-            <hr style="margin:20px 0;border:1px solid #333">
-
-            <p><strong>Üzenet:</strong></p>
-            <p>${data.message || "-"}</p>
-          </div>
-        `
+        subject: subject,
+        html: htmlContent
       })
     });
 
