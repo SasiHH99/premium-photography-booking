@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Időpontfoglalás | Prémium Fotózás</title>
+
+  <meta name="description" content="Prémium portré-, páros- és kreatív fotózás Ausztriában. Online időpontfoglalás.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" href="../favicon.png" type="image/x-icon">
+
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/foglalas.css">
+</head>
+
+<body>
+
+<div id="site-header"></div>
+
+<section class="booking-section">
+
+  <div class="booking-title">
+    <h1>IDŐPONTFOGLALÁS</h1>
+  </div>
+
+  <div class="booking-info">
+    <h2>Így zajlik a fotózás</h2>
+    <ol>
+      <li>Válaszd ki a kívánt dátumot</li>
+      <li>24 órán belül visszaigazolom</li>
+      <li>Közösen megtervezzük a helyszínt</li>
+      <li>Fotózás a megbeszélt helyszínen</li>
+      <li>Professzionális utómunka</li>
+    </ol>
+
+    <p class="booking-trust">
+      ✓ Nincs előleg<br>
+      ✓ Személyes figyelem<br>
+      ✓ Rugalmas egyeztetés
+    </p>
+
+    <p class="booking-scarcity">
+      Hetente csak korlátozott számú időpont elérhető.
+    </p>
+  </div>
+
+  <div class="booking-grid booking-grid--calendar">
+
+    <form class="booking-form" id="bookingForm">
+
+      <input type="hidden" name="date" id="selectedDate">
+
+      <label>Csomag kiválasztása</label>
+
+      <div class="package-dropdown">
+        <select name="package" id="packageSelect" required>
+          <option value="">Válassz csomagot</option>
+          <option value="Essence">Essence – 97€</option>
+          <option value="Signature">Signature – 167€ (Legnépszerűbb)</option>
+          <option value="Prestige">Prestige – 219€</option>
+          <option value="Event">Egyedi ajánlat / Event</option>
+          <option value="Custom">Még nem tudom</option>
+        </select>
+
+        <div class="package-info" id="packageInfo">
+          Válaszd ki a csomagot a részletek megtekintéséhez.
+        </div>
+      </div>
+
+      <h3>Foglalás</h3>
+
+      <label>Név
+        <input type="text" name="name" required>
+      </label>
+
+      <label>E-mail
+        <input type="email" name="email" required>
+        <small class="form-hint">Ide küldöm a visszaigazolást</small>
+      </label>
+
+      <label>Üzenet
+        <textarea name="message"></textarea>
+      </label>
+
+      <div class="gdpr-row">
+        <label class="gdpr-checkbox">
+          <input type="checkbox" id="gdpr" required>
+          <span class="checkmark"></span>
+          <span class="gdpr-text">
+            Elfogadom az
+            <a href="privacy.html" target="_blank">Adatkezelési tájékoztatót</a>
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="cta-btn" disabled>
+        IDŐPONT KÉRÉSE
+      </button>
+
+    </form>
+
+    <div class="calendar-box">
+      <h4>Dátum kiválasztása</h4>
+
+      <div class="calendar-header">
+        <button type="button" id="prevMonth">‹</button>
+        <span id="calendarMonth"></span>
+        <button type="button" id="nextMonth">›</button>
+      </div>
+
+      <div class="calendar-grid" id="calendarGrid"></div>
+
+      <p id="selectedDateText" class="calendar-selected">
+        Nincs kiválasztott dátum
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<div class="booking-success" id="bookingSuccess">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <div class="thank-you-title">SIKERES KÜLDÉS</div>
+    <div class="thank-you-text">
+      Időpont kérésed megérkezett.
+    </div>
+    <div class="success-note">
+      24 órán belül felveszem veled a kapcsolatot.
+    </div>
+    <button class="success-btn" id="successClose">Rendben</button>
+  </div>
+</div>
+
+<div class="booking-error" id="bookingError">
+  <div class="error-card">
+    <div class="error-icon">!</div>
+    <div class="error-title">HIBA TÖRTÉNT</div>
+    <div class="error-text">
+      Nem sikerült elküldeni az űrlapot.
+    </div>
+    <button class="error-btn" id="errorClose">Bezárás</button>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>© 2026 B. Photography – Minden jog fenntartva.</p>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="../js/global.js"></script>
+<script src="../js/foglalas.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</body>
+</html>

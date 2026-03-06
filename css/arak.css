@@ -1,0 +1,287 @@
+/* =========================
+   HERO
+========================= */
+
+.pricing-hero {
+  padding: 140px 20px 70px;
+  text-align: center;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(245,220,156,0.08),
+    rgba(0,0,0,0)
+  );
+}
+
+.pricing-hero h1 {
+  font-size: 2.2rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #f5dc9c;
+  margin-bottom: 18px;
+}
+
+.pricing-hero p {
+  letter-spacing: 0.2em;
+  opacity: 0.7;
+}
+
+/* =========================
+   SECTION
+========================= */
+
+.pricing-section {
+  padding: 80px 40px;
+  box-sizing: border-box;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.price-card {
+  position: relative;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 40px 25px;
+  text-align: center;
+  transition: 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.price-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+}
+
+.price-card h2 {
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #f5dc9c;
+  margin-bottom: 20px;
+}
+
+/* =========================
+   FEATURED
+========================= */
+
+.featured {
+  border: 1px solid #f5dc9c;
+}
+
+.badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f5dc9c;
+  color: #000;
+  padding: 4px 14px;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+}
+
+/* =========================
+   PRICE AREA
+========================= */
+
+.price-wrapper {
+  margin-bottom: 20px;
+}
+
+.original-price {
+  display: block;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.4);
+  text-decoration: line-through;
+  margin-bottom: 6px;
+}
+
+.discount-line {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: rgba(127,224,178,0.12);
+  border: 1px solid rgba(127,224,178,0.35);
+  color: #7fe0b2;
+  padding: 6px 12px;
+}
+
+.current-price {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #f5dc9c;
+}
+
+.price-note {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  margin-top: 8px;
+}
+
+/* =========================
+   LIST
+========================= */
+
+.price-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 30px;
+}
+
+.price-card li {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.price-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border: 1.5px solid #f5dc9c;
+  color: #f5dc9c;
+  text-decoration: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  transition: 0.3s ease;
+}
+
+.price-btn:hover {
+  background: #f5dc9c;
+  color: #000;
+}
+
+/* =========================
+   EVENT CARD
+========================= */
+
+.event-card {
+  border: 1px solid rgba(245,220,156,0.3);
+  background: rgba(245,220,156,0.05);
+}
+
+/* =========================
+   PROMO BAR
+========================= */
+
+.promo-bar {
+  background: linear-gradient(
+    90deg,
+    rgba(245,220,156,0.15),
+    rgba(245,220,156,0.05)
+  );
+  border-bottom: 1px solid rgba(245,220,156,0.3);
+  padding: 14px 20px;
+  text-align: center;
+}
+
+.promo-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.promo-text {
+  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  color: #f5dc9c;
+}
+
+.promo-btn {
+  padding: 8px 20px;
+  border: 1px solid #f5dc9c;
+  color: #f5dc9c;
+  text-decoration: none;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  transition: 0.3s ease;
+}
+
+.promo-btn:hover {
+  background: #f5dc9c;
+  color: #000;
+}
+
+/* =========================
+   NOTE
+========================= */
+
+.pricing-note {
+  text-align: center;
+  padding: 60px 20px;
+  opacity: 0.7;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+/* Tablet */
+@media (max-width: 1200px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .pricing-section {
+    padding: 50px 20px;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .price-card {
+    width: 100%;
+  }
+
+}
+/* =========================
+   MOBILE HERO FIX
+========================= */
+
+@media (max-width: 768px) {
+
+  .pricing-hero {
+    padding: 100px 20px 50px;
+  }
+
+  .pricing-hero h1 {
+    font-size: 1.6rem;
+    letter-spacing: 0.2em;
+    line-height: 1.3;
+  }
+
+  .pricing-hero p {
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+  }
+
+}

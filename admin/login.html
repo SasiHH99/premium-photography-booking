@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/global.js"></script>
+</head>
+<body>
+
+<h2>Admin Bejelentkezés</h2>
+
+<form id="loginForm">
+  <input type="email" id="email" placeholder="Email" required />
+  <br><br>
+  <input type="password" id="password" placeholder="Jelszó" required />
+  <br><br>
+  <button type="submit">Belépés</button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const supabase = window.supabaseClient;
+  const form = document.getElementById("loginForm");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      alert("Hibás email vagy jelszó");
+      return;
+    }
+
+    window.location.href = "index.html";
+  });
+
+});
+</script>
+
+</body>
+</html>

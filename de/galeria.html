@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Online Galerie | B. Photography</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="../css/global.css">
+
+<style>
+body{
+  background:#07090f;
+  color:white;
+  font-family:'Montserrat',sans-serif;
+}
+
+.gallery-wrapper{
+  padding:140px 6% 80px;
+  max-width:1400px;
+  margin:0 auto;
+}
+
+.gallery-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:50px;
+}
+
+.gallery-title{
+  font-size:1.4rem;
+  letter-spacing:.4em;
+  text-transform:uppercase;
+  color:#f5dc9c;
+}
+
+.logout-btn{
+  border:1px solid #f5dc9c;
+  background:transparent;
+  color:#f5dc9c;
+  padding:8px 18px;
+  cursor:pointer;
+  transition:.3s;
+}
+.logout-btn:hover{
+  background:#f5dc9c;
+  color:black;
+}
+
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:22px;
+}
+
+.gallery-item{
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  border:1px solid rgba(255,255,255,.05);
+  transition:.4s;
+}
+
+.gallery-item:hover{
+  border-color:#f5dc9c;
+}
+
+.gallery-item img{
+  width:100%;
+  height:260px;
+  object-fit:cover;
+  transition:.5s ease;
+}
+
+.gallery-item:hover img{
+  transform:scale(1.07);
+  filter:brightness(1.1);
+}
+
+.favorite-btn{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:36px;
+  height:36px;
+  background:rgba(0,0,0,.6);
+  border:1px solid #f5dc9c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f5dc9c;
+  font-size:18px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.favorite-btn.active{
+  background:#f5dc9c;
+  color:black;
+}
+
+.lightbox{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.96);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:9999;
+}
+
+.lightbox.open{
+  display:flex;
+}
+
+.lightbox img{
+  max-width:90%;
+  max-height:80vh;
+  margin-bottom:20px;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+}
+
+.lightbox-controls{
+  display:flex;
+  gap:15px;
+}
+
+.lightbox-btn{
+  border:1px solid #f5dc9c;
+  background:transparent;
+  color:#f5dc9c;
+  padding:8px 18px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.lightbox-btn:hover{
+  background:#f5dc9c;
+  color:black;
+}
+</style>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="gallery-wrapper">
+
+  <div class="gallery-header">
+    <div class="gallery-title">ONLINE GALERIE</div>
+    <button id="logoutBtn" class="logout-btn">Abmelden</button>
+  </div>
+
+  <div class="gallery-grid" id="galleryGrid"></div>
+
+</div>
+
+<div class="lightbox" id="lightbox">
+  <img id="lightboxImage">
+  <div class="lightbox-controls">
+    <button class="lightbox-btn" id="prevBtn">Zurück</button>
+    <button class="lightbox-btn" id="downloadBtn">Download</button>
+    <button class="lightbox-btn" id="nextBtn">Weiter</button>
+    <button class="lightbox-btn" id="closeBtn">Schließen</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/global.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+const supabase = window.supabaseClient;
+const grid = document.getElementById("galleryGrid");
+
+if(!supabase) return;
+
+const { data:userData } = await supabase.auth.getUser();
+if(!userData.user){
+  window.location.href="/de/galeria-login.html";
+  return;
+}
+const user = userData.user;
+
+const { data:files } = await supabase
+  .storage
+  .from("client-galleries")
+  .list(user.id);
+
+if(!files || files.length===0){
+  grid.innerHTML="<p>Keine Bilder vorhanden.</p>";
+  return;
+}
+
+const { data:favorites } = await supabase
+  .from("gallery_favorites")
+  .select("image_path")
+  .eq("user_id", user.id);
+
+let favoritePaths = favorites ? favorites.map(f=>f.image_path) : [];
+
+let images=[];
+let currentIndex=0;
+
+for(const file of files){
+
+  const imagePath = `${user.id}/${file.name}`;
+
+  const { data:signed } = await supabase
+    .storage
+    .from("client-galleries")
+    .createSignedUrl(imagePath,3600);
+
+  if(!signed) continue;
+
+  const url=signed.signedUrl;
+  images.push(url);
+
+  const item=document.createElement("div");
+  item.className="gallery-item";
+  item.innerHTML=`
+    <img src="${url}" loading="lazy">
+    <div class="favorite-btn">❤</div>
+  `;
+
+  const favBtn=item.querySelector(".favorite-btn");
+
+  if(favoritePaths.includes(imagePath)){
+    favBtn.classList.add("active");
+  }
+
+  favBtn.addEventListener("click",async(e)=>{
+    e.stopPropagation();
+
+    if(favBtn.classList.contains("active")){
+      await supabase
+        .from("gallery_favorites")
+        .delete()
+        .eq("user_id",user.id)
+        .eq("image_path",imagePath);
+
+      favBtn.classList.remove("active");
+    }else{
+      await supabase
+        .from("gallery_favorites")
+        .insert({
+          user_id:user.id,
+          image_path:imagePath
+        });
+
+      favBtn.classList.add("active");
+    }
+  });
+
+  item.addEventListener("click",()=>{
+    currentIndex=images.indexOf(url);
+    openLightbox();
+  });
+
+  grid.appendChild(item);
+}
+
+const lightbox=document.getElementById("lightbox");
+const lightboxImage=document.getElementById("lightboxImage");
+
+function openLightbox(){
+  lightbox.classList.add("open");
+  lightboxImage.src=images[currentIndex];
+}
+
+function closeLightbox(){
+  lightbox.classList.remove("open");
+}
+
+document.getElementById("closeBtn").onclick=closeLightbox;
+
+document.getElementById("prevBtn").onclick=()=>{
+  currentIndex=(currentIndex-1+images.length)%images.length;
+  openLightbox();
+};
+
+document.getElementById("nextBtn").onclick=()=>{
+  currentIndex=(currentIndex+1)%images.length;
+  openLightbox();
+};
+
+document.getElementById("downloadBtn").onclick=()=>{
+  window.open(images[currentIndex],"_blank");
+};
+
+document.getElementById("logoutBtn").onclick=async()=>{
+  await supabase.auth.signOut();
+  window.location.href="/de/galeria-login.html";
+};
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") closeLightbox();
+});
+
+});
+</script>
+
+</body>
+</html>

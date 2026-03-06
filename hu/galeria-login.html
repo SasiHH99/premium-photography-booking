@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Online galéria belépés | B. Photography</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/global.css">
+
+  <style>
+    .auth-container {
+      max-width: 420px;
+      margin: 140px auto;
+      padding: 40px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+
+    .brand-logo {
+      font-size: 0.9rem;
+      letter-spacing: 0.35em;
+      color: #f5dc9c;
+      margin-bottom: 25px;
+    }
+
+    .home-link {
+      display: inline-block;
+      margin-bottom: 30px;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+
+    .home-link:hover {
+      color: #f5dc9c;
+    }
+
+    .auth-container h1 {
+      margin-bottom: 30px;
+      letter-spacing: 0.2em;
+      color: #f5dc9c;
+    }
+
+    .auth-container input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: #111;
+      border: 1px solid #333;
+      color: white;
+    }
+
+    .auth-container button {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #f5dc9c;
+      background: transparent;
+      color: #f5dc9c;
+      cursor: pointer;
+      letter-spacing: 0.2em;
+      transition: 0.2s ease;
+    }
+
+    .auth-container button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .auth-error {
+      color: #ff6b6b;
+      margin-top: 15px;
+      min-height: 20px;
+    }
+
+    .auth-info {
+      margin-top: 35px;
+      padding: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(245,220,156,0.2);
+      font-size: 0.75rem;
+      line-height: 1.6;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .auth-info strong {
+      color: #f5dc9c;
+    }
+  </style>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="auth-container">
+
+  <div class="brand-logo">
+    B. PHOTOGRAPHY
+  </div>
+
+  <a href="index.html" class="home-link">
+    Főoldal
+  </a>
+
+  <h1>ONLINE GALÉRIA</h1>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Jelszó">
+
+  <button id="loginBtn">BELÉPÉS</button>
+  <div class="auth-error" id="error"></div>
+
+  <div class="auth-info">
+    Amint elkészülnek a képek, <strong>emailben értesítést kapsz</strong> a foglaláskor megadott email címre.<br><br>
+    Az üzenet tartalmazni fogja a galéria eléréséhez szükséges <strong>egyedi jelszót</strong>.
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/global.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+  const supabase = window.supabaseClient;
+
+  if (!supabase) {
+    console.error("Supabase nincs inicializálva.");
+    return;
+  }
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    window.location.href = "/hu/galeria.html";
+    return;
+  }
+
+  const emailInput = document.getElementById("email");
+  const passInput  = document.getElementById("password");
+  const errorBox   = document.getElementById("error");
+  const loginBtn   = document.getElementById("loginBtn");
+
+  async function handleLogin() {
+
+    const email = emailInput.value.trim();
+    const password = passInput.value.trim();
+
+    errorBox.textContent = "";
+
+    if (!email || !password) {
+      errorBox.textContent = "Kérlek tölts ki minden mezőt.";
+      return;
+    }
+
+    if (!email.includes("@")) {
+      errorBox.textContent = "Érvénytelen email cím.";
+      return;
+    }
+
+    loginBtn.textContent = "Belépés...";
+    loginBtn.disabled = true;
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        errorBox.textContent = "Hibás email vagy jelszó.";
+        return;
+      }
+
+      window.location.href = "/hu/galeria.html";
+
+    } catch (err) {
+      errorBox.textContent = "Váratlan hiba történt.";
+      console.error(err);
+    } finally {
+      loginBtn.textContent = "BELÉPÉS";
+      loginBtn.disabled = false;
+    }
+  }
+
+  loginBtn.addEventListener("click", handleLogin);
+
+  [emailInput, passInput].forEach(input => {
+    input.addEventListener("keypress", e => {
+      if (e.key === "Enter") handleLogin();
+    });
+  });
+
+});
+</script>
+
+</body>
+</html>

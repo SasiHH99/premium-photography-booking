@@ -1,0 +1,590 @@
+/* =========================
+   BOOKING SECTION
+========================= */
+
+.booking-section{
+  padding:120px 8%;
+  background:#0b0b0b;
+  overflow:hidden;
+}
+
+.booking-grid{
+  display:grid;
+  grid-template-columns:1.2fr 0.8fr;
+  gap:80px;
+  max-width:1200px;
+  margin:0 auto;
+  align-items:start;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.booking-title{
+  max-width:1200px;
+  margin:0 auto 60px auto;
+  text-align:center;
+}
+
+.booking-title h1{
+  font-family:'Cinzel',serif;
+  font-size:2.6rem;
+  letter-spacing:0.45em;
+  color:#f5dc9c;
+  text-transform:uppercase;
+}
+
+/* =========================
+   BOOKING INFO
+========================= */
+
+.booking-info{
+  max-width:1100px;
+  margin:0 auto 70px auto;
+  padding:60px 50px;
+  background:linear-gradient(180deg,#0f1218,#0b0d12);
+  border:1px solid rgba(245,220,156,0.15);
+  border-radius:6px;
+}
+
+.booking-info h2{
+  color:#f5dc9c;
+  font-size:1.4rem;
+  letter-spacing:0.18em;
+  margin-bottom:30px;
+  text-transform:uppercase;
+}
+
+.booking-info ol{
+  padding-left:18px;
+  margin-bottom:30px;
+}
+
+.booking-info li{
+  margin-bottom:10px;
+  font-size:0.95rem;
+  line-height:1.6;
+  opacity:0.9;
+}
+
+.booking-trust{
+  margin-top:25px;
+  font-size:0.9rem;
+  line-height:1.7;
+  color:#f5dc9c;
+  opacity:0.85;
+}
+
+.booking-scarcity{
+  margin-top:18px;
+  font-size:0.85rem;
+  opacity:0.65;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.booking-form{
+  background:rgba(255,255,255,0.015);
+  padding:48px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
+  width:100%;
+}
+
+.booking-form h3{
+  font-family:'Cinzel',serif;
+  color:#f5dc9c;
+  letter-spacing:0.15em;
+  margin-bottom:32px;
+}
+
+.booking-form label{
+  display:block;
+  font-size:0.75rem;
+  letter-spacing:0.2em;
+  margin-bottom:22px;
+}
+
+.booking-form input,
+.booking-form textarea,
+.booking-form select{
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid rgba(255,255,255,0.3);
+  padding:12px 0;
+  color:#fff;
+  font-size:0.9rem;
+  box-sizing:border-box;
+}
+
+.booking-form textarea{
+  resize:vertical;
+}
+
+.booking-form input:focus,
+.booking-form textarea:focus,
+.booking-form select:focus{
+  outline:none;
+  border-color:#f5dc9c;
+}
+
+/* =========================
+   PACKAGE DROPDOWN
+========================= */
+
+.package-dropdown{
+  margin-bottom:35px;
+}
+
+.package-dropdown select{
+  width:100%;
+  padding:14px 16px;
+  background:#11141b;
+  border:1px solid rgba(245,220,156,0.3);
+  color:#f5dc9c;
+  font-size:0.9rem;
+  letter-spacing:0.08em;
+  appearance:none;
+  cursor:pointer;
+  transition:all 0.3s ease;
+}
+
+.package-dropdown select:focus{
+  outline:none;
+  border-color:#f5dc9c;
+  box-shadow:0 0 18px rgba(245,220,156,0.25);
+}
+
+.package-info{
+  margin-top:14px;
+  padding:14px 16px;
+  background:rgba(245,220,156,0.06);
+  border-left:3px solid #f5dc9c;
+  font-size:0.8rem;
+  line-height:1.6;
+  opacity:0.9;
+}
+
+/* =========================
+   GDPR
+========================= */
+
+.gdpr-row{
+  margin-top:32px;
+}
+
+.gdpr-checkbox{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  cursor:pointer;
+}
+
+.gdpr-checkbox input{
+  display:none;
+}
+
+.gdpr-checkbox .checkmark{
+  width:20px;
+  height:20px;
+  border:1.5px solid rgba(245,220,156,0.6);
+  border-radius:4px;
+  position:relative;
+  flex-shrink:0;
+}
+
+.gdpr-checkbox input:checked + .checkmark{
+  background:#f5dc9c;
+}
+
+.gdpr-checkbox .checkmark::after{
+  content:"";
+  position:absolute;
+  left:6px;
+  top:2px;
+  width:6px;
+  height:10px;
+  border:solid #000;
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+  opacity:0;
+}
+
+.gdpr-checkbox input:checked + .checkmark::after{
+  opacity:1;
+}
+
+/* =========================
+   CTA
+========================= */
+
+.cta-btn{
+  margin-top:32px;
+  padding:14px 32px;
+  background:transparent;
+  border:1.5px solid #f5dc9c;
+  color:#f5dc9c;
+  font-size:0.7rem;
+  letter-spacing:0.28em;
+  cursor:pointer;
+  transition:all 0.3s ease;
+}
+
+.cta-btn:hover{
+  background:#f5dc9c;
+  color:#000;
+}
+
+.cta-btn:disabled{
+  opacity:0.35;
+  pointer-events:none;
+}
+
+/* =========================
+   CALENDAR
+========================= */
+
+.calendar-box{
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:48px;
+  width:100%;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+
+.calendar-box h4{
+  color:#f5dc9c;
+  letter-spacing:0.25em;
+  margin-bottom:24px;
+  text-align:center;
+}
+
+.calendar-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.calendar-weekdays,
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:8px;
+  text-align:center;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.calendar-day{
+  aspect-ratio:1/1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  background:rgba(255,255,255,0.02);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
+  cursor:pointer;
+  transition:0.25s ease;
+  font-size:0.9rem;
+  min-width:0;
+}
+
+.calendar-day:hover{
+  background:rgba(214,179,106,0.18);
+}
+
+.calendar-day.active{
+  background:#f5dc9c;
+  color:#000;
+  font-weight:700;
+}
+
+.calendar-day.disabled{
+  opacity:0.25;
+  pointer-events:none;
+}
+
+.calendar-selected{
+  margin-top:32px;
+  text-align:center;
+  font-size:0.75rem;
+  letter-spacing:0.22em;
+  color:#f5dc9c;
+  font-weight:700;
+  text-shadow:
+    0 0 6px rgba(245,220,156,0.45),
+    0 0 14px rgba(245,220,156,0.25);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width:900px){
+
+  .booking-section{
+    padding:60px 20px;
+  }
+
+  .booking-grid{
+    grid-template-columns:1fr;
+    gap:48px;
+  }
+
+  .booking-form,
+  .calendar-box{
+    width:100%;
+    max-width:420px;
+    margin:0 auto;
+    padding:32px 24px;
+  }
+
+  .booking-title h1{
+    font-size:1.9rem;
+    letter-spacing:0.28em;
+  }
+
+}
+/* SUCCESS ICON GLOW */
+.booking-success .success-icon {
+  box-shadow:
+    0 0 12px rgba(245, 220, 156, 0.6),
+    0 0 28px rgba(245, 220, 156, 0.45),
+    0 0 60px rgba(245, 220, 156, 0.25);
+  animation: successGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes successGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(245, 220, 156, 0.4),
+      0 0 28px rgba(245, 220, 156, 0.25),
+      0 0 60px rgba(245, 220, 156, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgba(245, 220, 156, 0.8),
+      0 0 40px rgba(245, 220, 156, 0.6),
+      0 0 80px rgba(245, 220, 156, 0.35);
+  }
+}
+/* GDPR TEXT FIX */
+.gdpr-text {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  line-height: 1.6;
+  color: rgba(245,220,156,0.95);
+}
+
+.gdpr-text a {
+  color: #f5dc9c;
+  text-decoration: underline;
+}
+
+.booking-form label.gdpr-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.booking-form .gdpr-checkbox .checkmark {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+}
+/* =========================
+   SUCCESS OVERLAY
+========================= */
+
+.booking-success,
+.booking-error{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(
+    ellipse at center,
+    rgba(0,0,0,0.65),
+    rgba(0,0,0,0.95)
+  );
+  z-index:99999;
+}
+
+.booking-success.show,
+.booking-error.show{
+  display:flex;
+}
+
+/* ================= SUCCESS CARD ================= */
+
+.success-card,
+.error-card{
+  padding:56px 48px;
+  text-align:center;
+  max-width:420px;
+  width:90%;
+  animation:overlayPop 0.45s ease;
+  box-shadow:
+    0 40px 120px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.success-card{
+  background:linear-gradient(
+    180deg,
+    rgba(245,220,156,0.18),
+    rgba(245,220,156,0.05)
+  );
+  border:1px solid rgba(245,220,156,0.35);
+}
+
+.error-card{
+  background:linear-gradient(
+    180deg,
+    rgba(180,60,60,0.25),
+    rgba(120,30,30,0.2)
+  );
+  border:1px solid rgba(200,80,80,0.5);
+}
+
+/* ================= ICONS ================= */
+
+.success-icon,
+.error-icon{
+  width:56px;
+  height:56px;
+  margin:0 auto 22px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.6rem;
+}
+
+.success-icon{
+  background:#f5dc9c;
+  color:#000;
+  box-shadow:
+    0 0 18px rgba(245,220,156,0.6),
+    0 0 40px rgba(245,220,156,0.4);
+  animation:successGlow 2.5s ease-in-out infinite;
+}
+
+.error-icon{
+  background:#ff6b6b;
+  color:#000;
+  box-shadow:
+    0 0 18px rgba(255,80,80,0.6),
+    0 0 40px rgba(255,80,80,0.4);
+}
+
+/* ================= TEXT ================= */
+
+.thank-you-title,
+.error-title{
+  letter-spacing:0.32em;
+  font-size:0.8rem;
+  margin-bottom:16px;
+}
+
+.thank-you-title{ color:#f5dc9c; }
+.error-title{ color:#ff8a8a; }
+
+.thank-you-text,
+.error-text{
+  font-size:0.85rem;
+  margin-bottom:20px;
+}
+
+.success-note,
+.error-note{
+  font-size:0.7rem;
+  letter-spacing:0.22em;
+  opacity:0.8;
+}
+
+/* ================= BUTTONS ================= */
+
+.success-btn,
+.error-btn{
+  margin-top:32px;
+  padding:14px 42px;
+  border:1.5px solid;
+  background:transparent;
+  font-size:0.75rem;
+  letter-spacing:0.32em;
+  cursor:pointer;
+  transition:all 0.3s ease;
+}
+
+.success-btn{
+  border-color:#f5dc9c;
+  color:#f5dc9c;
+}
+
+.success-btn:hover{
+  background:#f5dc9c;
+  color:#000;
+}
+
+.error-btn{
+  border-color:#ff8a8a;
+  color:#ff8a8a;
+}
+
+.error-btn:hover{
+  background:#ff8a8a;
+  color:#000;
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes overlayPop{
+  from{
+    opacity:0;
+    transform:translateY(18px) scale(0.96);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes successGlow{
+  0%,100%{
+    box-shadow:
+      0 0 12px rgba(245,220,156,0.4),
+      0 0 28px rgba(245,220,156,0.25);
+  }
+  50%{
+    box-shadow:
+      0 0 24px rgba(245,220,156,0.8),
+      0 0 60px rgba(245,220,156,0.5);
+  }
+}
+/* =========================
+   MOBILE ORDER FIX – CALENDAR TOP
+========================= */
+
+@media (max-width:900px){
+
+  .booking-grid{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .calendar-box{
+    order:-1;      /* NAPTÁR FELÜL */
+  }
+
+  .booking-form{
+    order:1;       /* FORM ALATTA */
+  }
+
+}
