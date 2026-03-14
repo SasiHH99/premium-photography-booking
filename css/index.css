@@ -307,6 +307,35 @@
   min-height: 220px;
 }
 
+.service-icon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: rgba(214, 179, 106, 0.12);
+  border: 1px solid rgba(214, 179, 106, 0.2);
+  color: #f5dc9c;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.service-link {
+  margin-top: auto;
+  color: #f5dc9c;
+  text-decoration: none;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.service-link:hover {
+  text-decoration: underline;
+}
+
 .service-index {
   display: inline-flex;
   width: fit-content;
@@ -493,11 +522,45 @@
 .testimonial-card {
   margin: 0;
   text-align: left;
+  display: grid;
+  gap: 14px;
 }
 
 .testimonial-card p {
   margin: 0;
   font-size: 1.02rem;
+}
+
+.testimonial-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testimonial-avatar {
+  width: 50px;
+  height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(214, 179, 106, 0.14);
+  border: 1px solid rgba(214, 179, 106, 0.22);
+  color: #f5dc9c;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.testimonial-top strong {
+  display: block;
+  color: #f5dc9c;
+  margin-bottom: 4px;
+}
+
+.testimonial-stars {
+  color: #f5dc9c;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
 }
 
 .testimonial-card footer {
@@ -627,6 +690,7 @@
 
   .hero-actions,
   .pricing-preview-cta,
+  .social-proof-actions,
   .final-cta-actions {
     flex-direction: column;
   }
@@ -662,5 +726,9 @@
   .about-portrait-main,
   .about-portrait-secondary {
     min-height: 280px;
+  }
+
+  .testimonial-top {
+    align-items: flex-start;
   }
 }

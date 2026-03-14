@@ -55,7 +55,7 @@ Wichtig:
 }
 
 function buildInstructions(lang = "de") {
-  return `You are the AI assistant of B. Photography, a premium photographer in Austria. You help visitors with questions about photoshoots, packages, booking, and contact.
+  return `You are the assistant of B. Photography, a premium photographer in Austria. Help visitors with questions about packages, booking, and photoshoots.
 
 ${getKnowledgeBase(lang)}
 
@@ -77,7 +77,7 @@ function extractReply(data) {
   const chunks = [];
   for (const item of data?.output || []) {
     if (item?.type !== "message" || !Array.isArray(item.content)) continue;
-    for (const part of item.content) {
+    for (const part of item.content || []) {
       if (typeof part?.text === "string" && part.text.trim()) {
         chunks.push(part.text.trim());
       }

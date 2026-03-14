@@ -3,7 +3,7 @@ const CHAT_CONFIG = {
     kicker: "AI asszisztens",
     title: "Kérdezz gyorsan a fotózásról",
     welcome:
-      "Szia, itt a B. Photography AI asszisztense. Tudok segíteni csomagokkal, foglalással, helyszínnel, portfólióval és a kapcsolatfelvétellel kapcsolatban.",
+      "Szia, itt a B. Photography AI asszisztense. Tudok segíteni csomagokkal, árakkal, foglalással, helyszínnel, portfólióval és kapcsolatfelvétellel kapcsolatban.",
     placeholder: "Írd ide a kérdésedet...",
     send: "Küldés",
     typing: "Az asszisztens válaszol",
@@ -15,15 +15,15 @@ const CHAT_CONFIG = {
     quickActions: [
       { label: "Árak", prompt: "Milyen csomagok vannak és mennyibe kerülnek?" },
       { label: "Foglalás", prompt: "Hogyan működik a foglalás?" },
-      { label: "Fotózás menete", prompt: "Hogyan zajlik egy fotózás?" },
-      { label: "Portfólió", prompt: "Hol tudom megnézni a portfóliót?" }
+      { label: "Portfólió", prompt: "Hol tudom megnézni a portfóliót?" },
+      { label: "Fotózás menete", prompt: "Hogyan zajlik egy fotózás?" }
     ]
   },
   de: {
     kicker: "AI Assistent",
     title: "Fragen zum Shooting direkt hier",
     welcome:
-      "Hallo, ich bin der AI Assistent von B. Photography. Ich helfe dir bei Paketen, Buchung, Orten, Portfolio und Kontakt.",
+      "Hallo, ich bin der Assistent von B. Photography. Ich helfe dir bei Paketen, Preisen, Buchung, Orten, Portfolio und Kontakt.",
     placeholder: "Schreibe deine Frage...",
     send: "Senden",
     typing: "Der Assistent schreibt",
@@ -34,9 +34,9 @@ const CHAT_CONFIG = {
     quickLabel: "Schnelle Themen",
     quickActions: [
       { label: "Preise ansehen", prompt: "Welche Pakete gibt es und was kosten sie?" },
-      { label: "Termin anfragen", prompt: "Wie läuft eine Buchung ab?" },
-      { label: "Wie läuft ein Shooting ab?", prompt: "Wie läuft ein Shooting ab?" },
-      { label: "Portfolio ansehen", prompt: "Wo kann ich das Portfolio ansehen?" }
+      { label: "Termin anfragen", prompt: "Wie läuft die Buchung ab?" },
+      { label: "Portfolio ansehen", prompt: "Wo kann ich das Portfolio ansehen?" },
+      { label: "Wie läuft ein Shooting ab?", prompt: "Wie läuft ein Shooting ab?" }
     ]
   }
 };
@@ -120,7 +120,6 @@ function initSiteChat() {
   document.body.classList.add("has-site-chat");
 
   const toggle = host.querySelector(".site-chat-toggle");
-  const panel = host.querySelector(".site-chat-panel");
   const close = host.querySelector(".site-chat-close");
   const quickActions = host.querySelector(".site-chat-quick-actions");
   const messages = host.querySelector(".site-chat-messages");
@@ -138,9 +137,7 @@ function initSiteChat() {
 
   function setTyping(visible) {
     typing.hidden = !visible;
-    if (visible) {
-      messages.scrollTop = messages.scrollHeight;
-    }
+    if (visible) messages.scrollTop = messages.scrollHeight;
   }
 
   function addMessage(role, text, cta = null) {
@@ -208,9 +205,7 @@ function initSiteChat() {
 
   toggle.addEventListener("click", () => {
     host.classList.toggle("is-open");
-    if (host.classList.contains("is-open")) {
-      input.focus();
-    }
+    if (host.classList.contains("is-open")) input.focus();
   });
 
   close.addEventListener("click", () => host.classList.remove("is-open"));
