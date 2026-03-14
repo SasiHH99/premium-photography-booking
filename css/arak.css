@@ -44,7 +44,7 @@ body.pricing-page {
 }
 
 .promo-text {
-  color: var(--pricing-accent);
+  color: rgba(246, 242, 232, 0.82);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-size: 0.78rem;
@@ -166,14 +166,15 @@ body.pricing-page {
     linear-gradient(180deg, rgba(214, 179, 106, 0.1), rgba(255, 255, 255, 0.02)),
     var(--pricing-surface);
   border-color: rgba(214, 179, 106, 0.4);
+  transform: translateY(-6px);
 }
 
 .badge {
   align-self: start;
   margin-bottom: 14px;
-  padding: 8px 12px;
+  padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(214, 179, 106, 0.14);
+  background: rgba(214, 179, 106, 0.1);
   color: var(--pricing-accent);
   font-size: 0.74rem;
   text-transform: uppercase;
@@ -194,14 +195,14 @@ body.pricing-page {
 .discount-line {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
+  min-height: 32px;
   margin: 12px 0;
   padding: 0 12px;
   border-radius: 999px;
-  background: rgba(127, 212, 163, 0.1);
-  border: 1px solid rgba(127, 212, 163, 0.18);
-  color: var(--pricing-success);
-  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(214, 179, 106, 0.16);
+  color: rgba(246, 242, 232, 0.78);
+  font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -275,6 +276,12 @@ body.pricing-page {
   text-transform: uppercase;
 }
 
+.price-card.featured .price-btn {
+  background: linear-gradient(135deg, var(--pricing-accent), var(--pricing-accent-strong));
+  color: #17120b;
+  border-color: transparent;
+}
+
 .event-card {
   background:
     linear-gradient(180deg, rgba(65, 104, 158, 0.12), rgba(255, 255, 255, 0.02)),
@@ -311,5 +318,9 @@ body.pricing-page {
 
   .pricing-grid {
     grid-template-columns: 1fr;
+  }
+
+  .price-card.featured {
+    transform: none;
   }
 }

@@ -15,7 +15,7 @@ Fő szolgáltatások: portré, páros, természet, autós, baba/családi fotóz�
 - Prestige: 219 EUR, 90 perc, 25+ retusált kép, több helyszín vagy koncepció, online galéria.
 - Event / egyedi ajánlat: személyre szabott.
 Foglalás menete:
-- a látogató elküldi az igényt a foglalási oldalon,
+- a látogató elküldi az igényét a foglalási oldalon,
 - általában 24 órán belül visszajelzés érkezik,
 - utána egyeztetés történik helyszínről, hangulatról és részletekről.
 Kapcsolat:
@@ -55,7 +55,7 @@ Wichtig:
 }
 
 function buildInstructions(lang = "de") {
-  return `You are the assistant of B. Photography, a premium photographer in Austria. Help visitors with questions about packages, booking, and photoshoots.
+  return `You are the assistant of B. Photography, a premium photographer in Austria. Help visitors with questions about packages, pricing, booking, locations, portfolio, contact, and photoshoots. Keep answers concise, friendly, premium, and conversion-oriented. If a visitor is ready to book, guide them to the booking page.
 
 ${getKnowledgeBase(lang)}
 

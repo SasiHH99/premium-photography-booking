@@ -91,6 +91,31 @@ body.contact-page {
   line-height: 1.72;
 }
 
+.contact-hero-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.contact-hero-points span,
+.contact-info-item small {
+  color: var(--contact-muted);
+}
+
+.contact-hero-points span {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 179, 106, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .contact-grid {
   margin-top: 24px;
   display: grid;
@@ -126,8 +151,29 @@ body.contact-page {
   color: var(--contact-accent);
 }
 
+.contact-info-item small {
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 .contact-info-note {
   margin-top: 18px;
+}
+
+.contact-side-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 20px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--contact-accent), var(--contact-accent-strong));
+  color: #17120b;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
 }
 
 .contact-form {
@@ -265,5 +311,13 @@ body.contact-page {
   .contact-hero,
   .contact-card {
     padding: 24px;
+  }
+
+  .contact-hero-points {
+    display: grid;
+  }
+
+  .contact-side-cta {
+    width: 100%;
   }
 }

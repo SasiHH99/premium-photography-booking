@@ -8,7 +8,7 @@ const CHAT_CONFIG = {
     send: "Küldés",
     typing: "Az asszisztens válaszol",
     error:
-      "Az AI asszisztens most nem elérhető. Használd a kapcsolat oldalt, vagy írj ide: busi.sandor@bphoto.at",
+      "Az AI asszisztens most nem érhető el. Használd a kapcsolat oldalt, vagy írj ide: busi.sandor@bphoto.at",
     ariaOpen: "AI chat megnyitása",
     ariaClose: "Chat bezárása",
     quickLabel: "Gyakori témák",
@@ -16,7 +16,8 @@ const CHAT_CONFIG = {
       { label: "Árak", prompt: "Milyen csomagok vannak és mennyibe kerülnek?" },
       { label: "Foglalás", prompt: "Hogyan működik a foglalás?" },
       { label: "Portfólió", prompt: "Hol tudom megnézni a portfóliót?" },
-      { label: "Fotózás menete", prompt: "Hogyan zajlik egy fotózás?" }
+      { label: "Fotózás menete", prompt: "Hogyan zajlik egy fotózás?" },
+      { label: "Kapcsolat", prompt: "Hol tudok kapcsolatba lépni veled?" }
     ]
   },
   de: {
@@ -36,7 +37,8 @@ const CHAT_CONFIG = {
       { label: "Preise ansehen", prompt: "Welche Pakete gibt es und was kosten sie?" },
       { label: "Termin anfragen", prompt: "Wie läuft die Buchung ab?" },
       { label: "Portfolio ansehen", prompt: "Wo kann ich das Portfolio ansehen?" },
-      { label: "Wie läuft ein Shooting ab?", prompt: "Wie läuft ein Shooting ab?" }
+      { label: "Wie läuft ein Shooting ab?", prompt: "Wie läuft ein Shooting ab?" },
+      { label: "Kontakt aufnehmen", prompt: "Wie kann ich Kontakt aufnehmen?" }
     ]
   }
 };
@@ -89,8 +91,8 @@ function initSiteChat() {
   host.className = "site-chat";
   host.innerHTML = `
     <button type="button" class="site-chat-toggle" aria-label="${copy.ariaOpen}">
-      <span class="site-chat-toggle-icon">✦</span>
-      <span class="site-chat-toggle-text">AI</span>
+      <span class="site-chat-toggle-icon">AI</span>
+      <span class="site-chat-toggle-text">Chat</span>
     </button>
     <div class="site-chat-panel" aria-live="polite">
       <div class="site-chat-head">
@@ -137,7 +139,9 @@ function initSiteChat() {
 
   function setTyping(visible) {
     typing.hidden = !visible;
-    if (visible) messages.scrollTop = messages.scrollHeight;
+    if (visible) {
+      messages.scrollTop = messages.scrollHeight;
+    }
   }
 
   function addMessage(role, text, cta = null) {
@@ -170,7 +174,7 @@ function initSiteChat() {
         throw new Error(body.details || body.error || "AI request failed");
       }
 
-      state.previousResponseId = body.responseId || state.previousResponseId;
+      state.previousResponseId = body.responseId || null;
       addMessage("assistant", body.reply, body.cta || null);
     } catch (error) {
       console.error("AI chat error:", error);
@@ -193,8 +197,10 @@ function initSiteChat() {
   quickActions.addEventListener("click", (event) => {
     const button = event.target.closest("[data-quick-index]");
     if (!button) return;
+
     const action = copy.quickActions[Number(button.dataset.quickIndex)];
     if (!action) return;
+
     sendMessage(action.prompt);
   });
 
@@ -205,10 +211,14 @@ function initSiteChat() {
 
   toggle.addEventListener("click", () => {
     host.classList.toggle("is-open");
-    if (host.classList.contains("is-open")) input.focus();
+    if (host.classList.contains("is-open")) {
+      input.focus();
+    }
   });
 
-  close.addEventListener("click", () => host.classList.remove("is-open"));
+  close.addEventListener("click", () => {
+    host.classList.remove("is-open");
+  });
 
   renderMessages();
 }
