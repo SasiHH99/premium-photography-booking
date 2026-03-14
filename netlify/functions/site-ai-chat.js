@@ -122,6 +122,45 @@ function detectIntent(message = "", lang = "de") {
   return null;
 }
 
+function createFallbackReply(message = "", lang = "de") {
+  const text = String(message).toLowerCase();
+  const isHu = lang === "hu";
+
+  if (/(ár|arak|mennyi|price|preise|paket|csomag)/i.test(text)) {
+    return isHu
+      ? "Jelenleg négy irány van: Essence 97 EUR, Signature 167 EUR, Prestige 219 EUR, illetve Event / egyedi ajánlat. Ha gyors, rövidebb sorozat kell, az Essence jó belépő. Ha többféle kép és erősebb összhatás kell, a Signature a legjobb egyensúly. A Prestige akkor jó, ha nagyobb, tudatosabb képanyagot szeretnél."
+      : "Aktuell gibt es vier Richtungen: Essence 97 EUR, Signature 167 EUR, Prestige 219 EUR sowie Event / individuelles Angebot. Essence ist gut für eine kurze Serie, Signature ist die beste Balance für vielseitiges Material, und Prestige passt, wenn du ein größeres, strategischeres Ergebnis willst.";
+  }
+
+  if (/(foglal|időpont|idopont|book|buch|termin|anfrage)/i.test(text)) {
+    return isHu
+      ? "A foglalás úgy működik, hogy elküldöd az igényedet a foglalási oldalon, én pedig általában 24 órán belül visszajelzek. Utána egyeztetjük a helyszínt, a hangulatot és a részleteket."
+      : "Die Buchung läuft so: Du sendest deine Anfrage über die Buchungsseite, und ich melde mich in der Regel innerhalb von 24 Stunden zurück. Danach stimmen wir Ort, Stimmung und Details gemeinsam ab.";
+  }
+
+  if (/(hol|helysz|wo|ort|location)/i.test(text)) {
+    return isHu
+      ? "Főként Bécsben és környékén dolgozom. Ha a projekt illik hozzá, más helyszín is megoldható egyeztetés alapján."
+      : "Ich arbeite hauptsächlich in Wien und Umgebung. Wenn das Projekt passt, sind auch andere Orte nach Abstimmung möglich.";
+  }
+
+  if (/(portfolio|portfól|munkák|arbeiten|bilder)/i.test(text)) {
+    return isHu
+      ? "A portfólió oldalon portré, páros, természet, autós és családi munkákat is látsz. Ott gyorsan átnézheted a stílust, és utána indíthatod a foglalást."
+      : "Auf der Portfolio-Seite findest du Portrait-, Paar-, Natur-, Auto- und Familienarbeiten. Dort bekommst du schnell ein Gefühl für Stil und Bildsprache.";
+  }
+
+  if (/(kontakt|kapcsolat|email|mail)/i.test(text)) {
+    return isHu
+      ? "Elérsz a kapcsolat oldalon vagy közvetlenül a busi.sandor@bphoto.at email címen. Ha konkrét projekted van, a foglalási oldal a legjobb indulópont."
+      : "Du erreichst mich über die Kontaktseite oder direkt unter busi.sandor@bphoto.at. Wenn du schon ein konkretes Projekt hast, ist die Buchungsseite der beste Start.";
+  }
+
+  return isHu
+    ? "Szívesen segítek csomagokkal, foglalással, helyszínnel, portfólióval és kapcsolattal kapcsolatban. Ha pontos választ szeretnél a saját projektedre, nyisd meg a foglalási vagy kapcsolat oldalt."
+    : "Ich helfe dir gern bei Paketen, Buchung, Ort, Portfolio und Kontakt. Wenn du eine genaue Antwort für dein Projekt willst, öffne bitte die Buchungs- oder Kontaktseite.";
+}
+
 async function createResponse(payload) {
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -145,14 +184,13 @@ export const handler = async (event) => {
     return json(405, { error: "Method not allowed" });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
-    return json(503, { error: "Missing OPENAI_API_KEY env var" });
-  }
+  let lang = "de";
+  let message = "";
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const lang = body.lang === "hu" ? "hu" : "de";
-    const message = String(body.message || "").trim();
+    lang = body.lang === "hu" ? "hu" : "de";
+    message = String(body.message || "").trim();
     const previousResponseId = String(body.previousResponseId || "").trim();
 
     if (!message) {
@@ -161,6 +199,15 @@ export const handler = async (event) => {
 
     if (message.length > 1200) {
       return json(400, { error: "Message is too long" });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return json(200, {
+        reply: createFallbackReply(message, lang),
+        responseId: null,
+        cta: detectIntent(message, lang),
+        fallback: true
+      });
     }
 
     const payload = {
@@ -188,7 +235,13 @@ export const handler = async (event) => {
 
     if (!result.ok) {
       const details = result.data?.error?.message || "OpenAI request failed";
-      throw new Error(details);
+      console.error("OpenAI chat request failed:", details);
+      return json(200, {
+        reply: createFallbackReply(message, lang),
+        responseId: null,
+        cta: detectIntent(message, lang),
+        fallback: true
+      });
     }
 
     const reply = extractReply(result.data);
@@ -202,7 +255,15 @@ export const handler = async (event) => {
       cta: detectIntent(message, lang)
     });
   } catch (error) {
-    return json(500, {
+    console.error("AI chat request failed:", error);
+    return json(200, {
+      reply: createFallbackReply(message, lang),
+      responseId: null,
+      cta: detectIntent(message, lang) || {
+        label: lang === "hu" ? "Kapcsolat oldal" : "Kontaktseite",
+        url: lang === "hu" ? "/hu/kapcsolat.html" : "/de/kontakt.html"
+      },
+      fallback: true,
       error: "AI chat request failed",
       details: String(error?.message || error)
     });
