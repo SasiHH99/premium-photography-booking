@@ -1,4 +1,4 @@
-﻿const GALLERY_COPY = {
+const GALLERY_COPY = {
   hu: {
     heroTitle: "A te képanyagodhoz szabott online galéria.",
     heroCopy:
@@ -71,7 +71,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const lang = shell.dataset.lang === "de" ? "de" : "hu";
   const copy = GALLERY_COPY[lang];
   const loginUrl = lang === "de" ? "/de/galeria-login.html" : "/hu/galeria-login.html";
-
   const supabase = window.supabaseClient;
   if (!supabase) return;
 
@@ -134,6 +133,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  async function callGalleryApi(method = "GET", payload = null) {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      throw new Error("Missing session");
+    }
+
+    const response = await fetch("/.netlify/functions/gallery-client-media", {
+      method,
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        ...(method === "GET" ? {} : { "Content-Type": "application/json" })
+      },
+      ...(payload ? { body: JSON.stringify(payload) } : {})
+    });
+
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok || body.error) {
+      throw new Error(body.details || body.error || "Gallery request failed");
+    }
+
+    return body;
+  }
+
   function updateStats() {
     totalCount.textContent = String(state.allImages.length);
     favoriteCount.textContent = String(state.favoritePaths.size);
@@ -173,25 +198,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function toggleFavorite(imagePath) {
-    const isFavorite = state.favoritePaths.has(imagePath);
+    const shouldFavorite = !state.favoritePaths.has(imagePath);
 
-    if (isFavorite) {
-      const { error } = await supabase
-        .from("gallery_favorites")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("image_path", imagePath);
+    await callGalleryApi("POST", {
+      imagePath,
+      favorite: shouldFavorite
+    });
 
-      if (error) return;
-      state.favoritePaths.delete(imagePath);
-    } else {
-      const { error } = await supabase.from("gallery_favorites").insert({
-        user_id: user.id,
-        image_path: imagePath
-      });
-
-      if (error) return;
+    if (shouldFavorite) {
       state.favoritePaths.add(imagePath);
+    } else {
+      state.favoritePaths.delete(imagePath);
     }
 
     buildVisibleImages();
@@ -244,47 +261,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     errorState.hidden = true;
 
     try {
-      const { data: fileList, error: fileError } = await supabase.storage.from("client-galleries").list(user.id);
-      if (fileError) throw fileError;
-
-      const files = (fileList || []).filter((file) => file.name);
-
-      if (!files.length) {
-        state.allImages = [];
-        buildVisibleImages();
-        render();
-        return;
-      }
-
-      const { data: favorites, error: favoritesError } = await supabase
-        .from("gallery_favorites")
-        .select("image_path")
-        .eq("user_id", user.id);
-
-      if (favoritesError) throw favoritesError;
-
-      state.favoritePaths = new Set((favorites || []).map((item) => item.image_path));
-
-      const signedResults = await Promise.all(
-        files.map(async (file) => {
-          const path = `${user.id}/${file.name}`;
-          const { data: signedData, error } = await supabase
-            .storage
-            .from("client-galleries")
-            .createSignedUrl(path, 3600);
-
-          if (error || !signedData?.signedUrl) return null;
-
-          return {
-            id: path,
-            path,
-            name: file.name,
-            url: signedData.signedUrl
-          };
-        })
-      );
-
-      state.allImages = signedResults.filter(Boolean);
+      const data = await callGalleryApi("GET");
+      state.allImages = Array.isArray(data.images) ? data.images : [];
+      state.favoritePaths = new Set(Array.isArray(data.favorites) ? data.favorites : []);
       buildVisibleImages();
       render();
     } catch (error) {
