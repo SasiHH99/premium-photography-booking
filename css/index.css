@@ -117,6 +117,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
+  align-items: center;
 }
 
 .btn-primary,
@@ -141,13 +142,14 @@
   border: 1px solid rgba(214, 179, 106, 0.3);
   background: linear-gradient(135deg, #d6b36a, #f0ca82);
   color: #17120b;
-  box-shadow: 0 16px 34px rgba(214, 179, 106, 0.24);
+  box-shadow: 0 18px 38px rgba(214, 179, 106, 0.28);
 }
 
 .btn-secondary {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
   color: #f7f4eb;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .btn-primary:hover,
@@ -271,6 +273,13 @@
 .footer-copy {
   color: rgba(255, 255, 255, 0.78);
   line-height: 1.7;
+}
+
+.trust-mini-card,
+.service-card,
+.pricing-preview-card,
+.testimonial-card {
+  height: 100%;
 }
 
 .section-heading {
@@ -610,6 +619,7 @@
   grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 0.8fr));
   gap: 18px;
   text-align: left;
+  align-items: start;
 }
 
 .footer-brand {

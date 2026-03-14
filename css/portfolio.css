@@ -113,6 +113,42 @@ body.portfolio-page {
   font-size: 0.78rem;
 }
 
+.portfolio-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.portfolio-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--portfolio-text);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.portfolio-hero-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(214, 179, 106, 0.3);
+}
+
+.portfolio-hero-btn.is-primary {
+  color: #16120c;
+  background: linear-gradient(135deg, var(--portfolio-accent), var(--portfolio-accent-strong));
+  border-color: transparent;
+}
+
 .portfolio-hero-meta {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -167,6 +203,10 @@ body.portfolio-page {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 14px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .portfolio-filter-btn,
@@ -219,7 +259,7 @@ body.portfolio-page {
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 18px;
+  gap: 20px;
 }
 
 .portfolio-grid:empty {
@@ -305,7 +345,7 @@ body.portfolio-page {
 }
 
 .portfolio-cta {
-  margin-top: 24px;
+  margin-top: 32px;
   padding: 34px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -314,6 +354,7 @@ body.portfolio-page {
   background:
     linear-gradient(135deg, rgba(214, 179, 106, 0.1), transparent 42%),
     var(--portfolio-surface);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.34);
 }
 
 .portfolio-cta h2 {
@@ -342,7 +383,7 @@ body.portfolio-page {
   z-index: 9999;
   display: none;
   padding: 20px;
-  background: rgba(5, 6, 10, 0.94);
+  background: rgba(5, 6, 10, 0.96);
   backdrop-filter: blur(10px);
 }
 
@@ -362,6 +403,7 @@ body.portfolio-page {
   justify-content: space-between;
   gap: 14px;
   align-items: center;
+  padding: 8px 6px 0;
 }
 
 .portfolio-lightbox-meta {
@@ -375,6 +417,10 @@ body.portfolio-page {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.portfolio-lightbox-btn {
+  min-height: 46px;
 }
 
 .portfolio-lightbox-frame {
@@ -458,6 +504,16 @@ body.portfolio-page {
     overflow-x: auto;
     padding-bottom: 6px;
     scrollbar-width: thin;
+  }
+
+  .portfolio-hero-actions,
+  .portfolio-cta-actions {
+    display: grid;
+  }
+
+  .portfolio-hero-btn,
+  .portfolio-cta-btn {
+    width: 100%;
   }
 
   .portfolio-filter-btn {
