@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+ï»¿document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("bookingForm");
   if (!form) return;
 
@@ -17,41 +17,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const TEXT = {
     hu: {
-      packagePlaceholder: "A csomag kiválasztása után itt látod röviden, milyen igényhez illik a legjobban.",
-      invalidDate: "Kérlek legalább két nappal késõbbi dátumot válassz.",
-      dateEmpty: "Még nincs kiválasztott dátum.",
-      datePrefix: "Kiválasztott dátum:"
+      packagePlaceholder: "A csomag kivÃ¡lasztÃ¡sa utÃ¡n itt lÃ¡tod rÃ¶viden, milyen igÃ©nyhez illik a legjobban.",
+      invalidDate: "KÃ©rlek legalÃ¡bb kÃ©t nappal kÃ©sÅ‘bbi dÃ¡tumot vÃ¡lassz.",
+      dateEmpty: "MÃ©g nincs kivÃ¡lasztott dÃ¡tum.",
+      datePrefix: "KivÃ¡lasztott dÃ¡tum:"
     },
     de: {
-      packagePlaceholder: "Nach der Paketauswahl siehst du hier kurz, wofür es am besten passt.",
-      invalidDate: "Bitte wähle ein Datum, das mindestens zwei Tage in der Zukunft liegt.",
-      dateEmpty: "Noch kein Datum ausgewählt.",
-      datePrefix: "Gewähltes Datum:"
+      packagePlaceholder: "Nach der Paketauswahl siehst du hier kurz, wofÃ¼r es am besten passt.",
+      invalidDate: "Bitte wÃ¤hle ein Datum, das mindestens zwei Tage in der Zukunft liegt.",
+      dateEmpty: "Noch kein Datum ausgewÃ¤hlt.",
+      datePrefix: "GewÃ¤hltes Datum:"
     }
   };
 
   const PACKAGE_TEXT = {
     hu: {
       Essence:
-        "Rövid, lendületes fotózás egy gyors portré- vagy páros sorozathoz, ha tiszta és használható képeket szeretnél rövid idõ alatt.",
+        "RÃ¶vid, lendÃ¼letes fotÃ³zÃ¡s egy gyors portrÃ©- vagy pÃ¡ros sorozathoz, ha tiszta Ã©s hasznÃ¡lhatÃ³ kÃ©peket szeretnÃ©l rÃ¶vid idÅ‘ alatt.",
       Signature:
-        "A legerõsebb középcsomag többféle beállításhoz, több outfithez vagy tudatosabb online megjelenéshez.",
+        "A legerÅ‘sebb kÃ¶zÃ©pcsomag tÃ¶bbfÃ©le beÃ¡llÃ­tÃ¡shoz, tÃ¶bb outfithez vagy tudatosabb online megjelenÃ©shez.",
       Prestige:
-        "Hosszabb, kreatívabb fotózás márkához, kampányhoz vagy prémium megjelenéshez, amikor nagyobb súlyú anyagra van szükség.",
+        "Hosszabb, kreatÃ­vabb fotÃ³zÃ¡s mÃ¡rkÃ¡hoz, kampÃ¡nyhoz vagy prÃ©mium megjelenÃ©shez, amikor nagyobb sÃºlyÃº anyagra van szÃ¼ksÃ©g.",
       Event:
-        "Nem fix dobozcsomag, hanem külön ajánlat eseményre, céges jelenlétre vagy egyedi projektre.",
+        "Nem fix dobozcsomag, hanem kÃ¼lÃ¶n ajÃ¡nlat esemÃ©nyre, cÃ©ges jelenlÃ©tre vagy egyedi projektre.",
       Custom:
-        "Ha még nem döntötted el, melyik irány a jó, írd meg a célodat, és segítek kiválasztani a megfelelõ csomagot."
+        "Ha mÃ©g nem dÃ¶ntÃ¶tted el, melyik irÃ¡ny a jÃ³, Ã­rd meg a cÃ©lodat, Ã©s segÃ­tek kivÃ¡lasztani a megfelelÅ‘ csomagot."
     },
     de: {
       Essence:
-        "Kurzes, klares Shooting für eine schnelle Porträt- oder Paarserie mit sauberem Ergebnis.",
+        "Kurzes, klares Shooting fÃ¼r eine schnelle PortrÃ¤t- oder Paarserie mit sauberem Ergebnis.",
       Signature:
-        "Das stärkste Gesamtpaket, wenn du mehr Variation, mehrere Looks oder vielseitig nutzbares Material willst.",
+        "Das stÃ¤rkste Gesamtpaket, wenn du mehr Variation, mehrere Looks oder vielseitig nutzbares Material willst.",
       Prestige:
-        "Mehr Zeit, mehr kreative Führung und deutlich größeres Bildmaterial für Branding, Kampagne oder Premium-Auftritt.",
+        "Mehr Zeit, mehr kreative FÃ¼hrung und deutlich grÃ¶ÃŸeres Bildmaterial fÃ¼r Branding, Kampagne oder Premium-Auftritt.",
       Event:
-        "Kein starres Paket, sondern ein individuelles Angebot für Event, Firmenanfrage oder besonderes Projekt.",
+        "Kein starres Paket, sondern ein individuelles Angebot fÃ¼r Event, Firmenanfrage oder besonderes Projekt.",
       Custom:
         "Wenn du noch unsicher bist, beschreibe einfach dein Ziel und ich helfe dir bei der passenden Wahl."
     }
@@ -175,3 +175,4 @@ document.addEventListener("DOMContentLoaded", () => {
   successClose.addEventListener("click", () => successBox.classList.remove("show"));
   errorClose.addEventListener("click", () => errorBox.classList.remove("show"));
 });
+
