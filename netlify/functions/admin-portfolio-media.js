@@ -1,6 +1,20 @@
-﻿import { CORS_HEADERS, json, verifyAdminFromEvent } from "./_admin.js";
+import { CORS_HEADERS, json, verifyAdminFromEvent } from "./_admin.js";
 
 const BUCKET = "portfolio-media";
+const TABLE_SETUP_ERROR =
+  "Hiányzik a portfolio_items tábla. Futtasd a supabase/admin_tables.sql fájlt a Supabase SQL Editorban.";
+const BUCKET_SETUP_ERROR =
+  "Hiányzik a portfolio-media storage bucket. Hozd létre Supabase-ben vagy futtasd a frissített supabase/admin_tables.sql fájlt.";
+
+function isMissingRelation(error, relation) {
+  const message = String(error?.message || "");
+  return error?.code === "42P01" || message.includes(`relation "public.${relation}" does not exist`);
+}
+
+function isMissingBucket(error) {
+  const message = String(error?.message || "").toLowerCase();
+  return message.includes("bucket") && (message.includes("not found") || message.includes("does not exist"));
+}
 
 async function listItemsWithUrls(supabase) {
   const { data, error } = await supabase
@@ -8,6 +22,10 @@ async function listItemsWithUrls(supabase) {
     .select("*")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
+
+  if (isMissingRelation(error, "portfolio_items")) {
+    throw new Error(TABLE_SETUP_ERROR);
+  }
 
   if (error) throw error;
 
@@ -55,6 +73,11 @@ export const handler = async (event) => {
       const fileName = String(body.fileName || "image.webp").replace(/[^a-zA-Z0-9._-]/g, "-");
       const path = `${body.category || "portre"}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${fileName}`;
       const { data, error } = await supabase.storage.from(BUCKET).createSignedUploadUrl(path);
+
+      if (isMissingBucket(error)) {
+        return json(500, { error: BUCKET_SETUP_ERROR });
+      }
+
       if (error || !data?.token) return json(400, { error: error?.message || "Upload URL creation failed" });
       return json(200, { upload: { path, token: data.token } });
     }
@@ -106,10 +129,17 @@ export const handler = async (event) => {
         error = insertError;
       }
 
+      if (isMissingRelation(error, "portfolio_items")) {
+        return json(500, { error: TABLE_SETUP_ERROR });
+      }
+
       if (error) return json(400, { error: error.message });
 
       if (payload.previousPath && payload.previousPath !== payload.path) {
-        await supabase.storage.from(BUCKET).remove([payload.previousPath]);
+        const { error: removeError } = await supabase.storage.from(BUCKET).remove([payload.previousPath]);
+        if (isMissingBucket(removeError)) {
+          return json(500, { error: BUCKET_SETUP_ERROR });
+        }
       }
 
       const items = await listItemsWithUrls(supabase);
@@ -122,9 +152,15 @@ export const handler = async (event) => {
       if (!id || !path) return json(400, { error: "ID and path required" });
 
       const { error: storageError } = await supabase.storage.from(BUCKET).remove([path]);
+      if (isMissingBucket(storageError)) {
+        return json(500, { error: BUCKET_SETUP_ERROR });
+      }
       if (storageError) return json(400, { error: storageError.message });
 
       const { error: rowError } = await supabase.from("portfolio_items").delete().eq("id", id);
+      if (isMissingRelation(rowError, "portfolio_items")) {
+        return json(500, { error: TABLE_SETUP_ERROR });
+      }
       if (rowError) return json(400, { error: rowError.message });
 
       const items = await listItemsWithUrls(supabase);

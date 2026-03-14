@@ -1,4 +1,12 @@
-﻿import { CORS_HEADERS, json, verifyAdminFromEvent } from "./_admin.js";
+import { CORS_HEADERS, json, verifyAdminFromEvent } from "./_admin.js";
+
+function isMissingRelation(error, relation) {
+  const message = String(error?.message || "");
+  return error?.code === "42P01" || message.includes(`relation "public.${relation}" does not exist`);
+}
+
+const SETUP_ERROR =
+  "Hiányzik a contact_messages tábla. Futtasd a supabase/admin_tables.sql fájlt a Supabase SQL Editorban.";
 
 export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
@@ -16,6 +24,10 @@ export const handler = async (event) => {
         .from("contact_messages")
         .select("*")
         .order("created_at", { ascending: false });
+
+      if (isMissingRelation(error, "contact_messages")) {
+        return json(500, { error: SETUP_ERROR });
+      }
 
       if (error) return json(400, { error: error.message });
       return json(200, { messages: data || [] });
@@ -36,6 +48,10 @@ export const handler = async (event) => {
       .from("contact_messages")
       .update({ status, admin_note: adminNote || null })
       .eq("id", id);
+
+    if (isMissingRelation(error, "contact_messages")) {
+      return json(500, { error: SETUP_ERROR });
+    }
 
     if (error) return json(400, { error: error.message });
 
