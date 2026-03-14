@@ -41,10 +41,6 @@ const CHAT_CONFIG = {
   }
 };
 
-function getChatStorageKey(lang) {
-  return `bphoto-ai-chat:${lang}`;
-}
-
 function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -78,48 +74,16 @@ function createBubble(role, text, cta = null) {
   return item;
 }
 
-function loadState(lang, welcome) {
-  try {
-    const raw = sessionStorage.getItem(getChatStorageKey(lang));
-    if (!raw) {
-      return {
-        messages: [{ role: "assistant", text: welcome }],
-        previousResponseId: null
-      };
-    }
-
-    const parsed = JSON.parse(raw);
-    return {
-      messages: Array.isArray(parsed.messages) && parsed.messages.length
-        ? parsed.messages
-        : [{ role: "assistant", text: welcome }],
-      previousResponseId: parsed.previousResponseId || null
-    };
-  } catch {
-    return {
-      messages: [{ role: "assistant", text: welcome }],
-      previousResponseId: null
-    };
-  }
-}
-
-function saveState(lang, state) {
-  sessionStorage.setItem(
-    getChatStorageKey(lang),
-    JSON.stringify({
-      previousResponseId: state.previousResponseId,
-      messages: state.messages.slice(-12)
-    })
-  );
-}
-
 function initSiteChat() {
   if (document.querySelector(".site-chat")) return;
   if (window.location.pathname.startsWith("/admin")) return;
 
   const lang = window.location.pathname.startsWith("/hu") ? "hu" : "de";
   const copy = CHAT_CONFIG[lang];
-  const state = loadState(lang, copy.welcome);
+  const state = {
+    messages: [{ role: "assistant", text: copy.welcome }],
+    previousResponseId: null
+  };
 
   const host = document.createElement("section");
   host.className = "site-chat";
@@ -182,7 +146,6 @@ function initSiteChat() {
   function addMessage(role, text, cta = null) {
     state.messages.push({ role, text, cta });
     state.messages = state.messages.slice(-12);
-    saveState(lang, state);
     renderMessages();
   }
 
@@ -211,7 +174,6 @@ function initSiteChat() {
       }
 
       state.previousResponseId = body.responseId || state.previousResponseId;
-      saveState(lang, state);
       addMessage("assistant", body.reply, body.cta || null);
     } catch (error) {
       console.error("AI chat error:", error);
