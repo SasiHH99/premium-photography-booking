@@ -1,83 +1,127 @@
-﻿const CHAT_COPY = {
+const CHAT_CONFIG = {
   hu: {
-    kicker: "Gyors segítség",
-    title: "Kérdezz gyorsan, és kapsz azonnali választ.",
-    intro: "Válassz egy gyakori kérdést. Ha többre van szükséged, megnyithatod a kapcsolat oldalt vagy kimásolhatod az email címet.",
-    mailLabel: "Kapcsolat oldal megnyitása",
-    copyLabel: "Email cím másolása",
-    copied: "Az email cím a vágólapra került.",
-    copyFail: "Az email cím: busi.sandor@bphoto.at",
-    ariaOpen: "Segéd megnyitása",
-    ariaClose: "Bezárás",
-    options: [
-      {
-        id: "prices",
-        label: "Melyik csomag való nekem?",
-        answer: "Az Essence rövid és gyors sorozatra jó, a Signature a legerősebb középcsomag, a Prestige pedig akkor működik igazán jól, ha nagyobb, tudatosabb képanyagot szeretnél."
-      },
-      {
-        id: "booking",
-        label: "Hogyan működik a foglalás?",
-        answer: "Kiválasztod a dátumot, elküldöd az igényt, én pedig általában 24 órán belül visszajelzek, és pontosítjuk a részleteket."
-      },
-      {
-        id: "gallery",
-        label: "Mikor kapom meg a galériát?",
-        answer: "A kész képeket online galériában adom át. Ha a galéria elkészült, emailben megkapod a hozzáférést és a belépési adatokat."
-      },
-      {
-        id: "location",
-        label: "Hol vállalsz fotózást?",
-        answer: "Főként Bécsben és környékén dolgozom, de megfelelő projekt esetén más helyszín is megoldható."
-      }
+    kicker: "AI asszisztens",
+    title: "Kérdezz gyorsan a fotózásról",
+    welcome:
+      "Szia, itt a B. Photography AI asszisztense. Tudok segíteni csomagokkal, foglalással, helyszínnel, portfólióval és a kapcsolatfelvétellel kapcsolatban.",
+    placeholder: "Írd ide a kérdésedet...",
+    send: "Küldés",
+    typing: "Az asszisztens válaszol",
+    error:
+      "Az AI asszisztens most nem elérhető. Használd a kapcsolat oldalt, vagy írj ide: busi.sandor@bphoto.at",
+    ariaOpen: "AI chat megnyitása",
+    ariaClose: "Chat bezárása",
+    quickLabel: "Gyakori témák",
+    quickActions: [
+      { label: "Árak", prompt: "Milyen csomagok vannak és mennyibe kerülnek?" },
+      { label: "Foglalás", prompt: "Hogyan működik a foglalás?" },
+      { label: "Fotózás menete", prompt: "Hogyan zajlik egy fotózás?" },
+      { label: "Portfólió", prompt: "Hol tudom megnézni a portfóliót?" }
     ]
   },
   de: {
-    kicker: "Schnelle Hilfe",
-    title: "Kurze Frage, direkte Antwort.",
-    intro: "Wähle eine häufige Frage aus. Für alles Weitere kannst du die Kontaktseite öffnen oder die E-Mail-Adresse kopieren.",
-    mailLabel: "Kontaktseite öffnen",
-    copyLabel: "E-Mail kopieren",
-    copied: "Die E-Mail-Adresse wurde kopiert.",
-    copyFail: "Die E-Mail-Adresse lautet: busi.sandor@bphoto.at",
-    ariaOpen: "Hilfe öffnen",
-    ariaClose: "Schließen",
-    options: [
-      {
-        id: "prices",
-        label: "Welches Paket passt zu mir?",
-        answer: "Essence ist gut für eine kurze, klare Serie, Signature ist das stärkste Gesamtpaket, und Prestige passt, wenn du ein größeres, strategischeres Bildmaterial brauchst."
-      },
-      {
-        id: "booking",
-        label: "Wie läuft die Buchung ab?",
-        answer: "Du wählst ein Datum, sendest deine Anfrage und ich melde mich in der Regel innerhalb von 24 Stunden zurück, damit wir alles konkret abstimmen."
-      },
-      {
-        id: "gallery",
-        label: "Wann erhalte ich die Galerie?",
-        answer: "Die finalen Bilder bekommst du über eine Online-Galerie. Sobald sie fertig ist, erhältst du den Zugang per E-Mail."
-      },
-      {
-        id: "location",
-        label: "Wo fotografierst du?",
-        answer: "Hauptsächlich in Wien und Umgebung. Für passende Projekte plane ich auch andere Orte ein."
-      }
+    kicker: "AI Assistent",
+    title: "Fragen zum Shooting direkt hier",
+    welcome:
+      "Hallo, ich bin der AI Assistent von B. Photography. Ich helfe dir bei Paketen, Buchung, Orten, Portfolio und Kontakt.",
+    placeholder: "Schreibe deine Frage...",
+    send: "Senden",
+    typing: "Der Assistent schreibt",
+    error:
+      "Der AI Assistent ist gerade nicht erreichbar. Nutze bitte die Kontaktseite oder schreibe an busi.sandor@bphoto.at",
+    ariaOpen: "AI Chat öffnen",
+    ariaClose: "Chat schließen",
+    quickLabel: "Schnelle Themen",
+    quickActions: [
+      { label: "Preise ansehen", prompt: "Welche Pakete gibt es und was kosten sie?" },
+      { label: "Termin anfragen", prompt: "Wie läuft eine Buchung ab?" },
+      { label: "Wie läuft ein Shooting ab?", prompt: "Wie läuft ein Shooting ab?" },
+      { label: "Portfolio ansehen", prompt: "Wo kann ich das Portfolio ansehen?" }
     ]
   }
 };
+
+function getChatStorageKey(lang) {
+  return `bphoto-ai-chat:${lang}`;
+}
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatMessageText(text = "") {
+  return escapeHtml(text).replace(/\n/g, "<br>");
+}
+
+function createBubble(role, text, cta = null) {
+  const item = document.createElement("article");
+  item.className = `site-chat-message is-${role}`;
+  item.innerHTML = `
+    <div class="site-chat-bubble">
+      <p>${formatMessageText(text)}</p>
+    </div>
+  `;
+
+  if (cta?.url && cta?.label) {
+    const action = document.createElement("a");
+    action.className = "site-chat-inline-cta";
+    action.href = cta.url;
+    action.textContent = cta.label;
+    item.appendChild(action);
+  }
+
+  return item;
+}
+
+function loadState(lang, welcome) {
+  try {
+    const raw = sessionStorage.getItem(getChatStorageKey(lang));
+    if (!raw) {
+      return {
+        messages: [{ role: "assistant", text: welcome }],
+        previousResponseId: null
+      };
+    }
+
+    const parsed = JSON.parse(raw);
+    return {
+      messages: Array.isArray(parsed.messages) && parsed.messages.length
+        ? parsed.messages
+        : [{ role: "assistant", text: welcome }],
+      previousResponseId: parsed.previousResponseId || null
+    };
+  } catch {
+    return {
+      messages: [{ role: "assistant", text: welcome }],
+      previousResponseId: null
+    };
+  }
+}
+
+function saveState(lang, state) {
+  sessionStorage.setItem(
+    getChatStorageKey(lang),
+    JSON.stringify({
+      previousResponseId: state.previousResponseId,
+      messages: state.messages.slice(-12)
+    })
+  );
+}
 
 function initSiteChat() {
   if (document.querySelector(".site-chat")) return;
   if (window.location.pathname.startsWith("/admin")) return;
 
   const lang = window.location.pathname.startsWith("/hu") ? "hu" : "de";
-  const copy = CHAT_COPY[lang];
-  const contactUrl = lang === "hu"
-    ? "/hu/kapcsolat.html?source=chatbot"
-    : "/de/kontakt.html?source=chatbot";
+  const copy = CHAT_CONFIG[lang];
+  const state = loadState(lang, copy.welcome);
 
-  const host = document.createElement("div");
+  const host = document.createElement("section");
   host.className = "site-chat";
   host.innerHTML = `
     <button type="button" class="site-chat-toggle" aria-label="${copy.ariaOpen}">
@@ -92,16 +136,19 @@ function initSiteChat() {
         </div>
         <button type="button" class="site-chat-close" aria-label="${copy.ariaClose}">×</button>
       </div>
-      <p class="site-chat-intro">${copy.intro}</p>
-      <div class="site-chat-options"></div>
-      <div class="site-chat-answer-box">
-        <p class="site-chat-answer">${copy.options[0].answer}</p>
+      <div class="site-chat-quick-shell">
+        <p class="site-chat-quick-label">${copy.quickLabel}</p>
+        <div class="site-chat-quick-actions"></div>
       </div>
-      <div class="site-chat-actions">
-        <a class="site-chat-mail" href="${contactUrl}">${copy.mailLabel}</a>
-        <button type="button" class="site-chat-copy">${copy.copyLabel}</button>
+      <div class="site-chat-messages"></div>
+      <div class="site-chat-typing" hidden>
+        <span></span><span></span><span></span>
+        <strong>${copy.typing}</strong>
       </div>
-      <p class="site-chat-feedback" aria-live="polite"></p>
+      <form class="site-chat-form">
+        <input type="text" class="site-chat-input" maxlength="600" placeholder="${copy.placeholder}" autocomplete="off">
+        <button type="submit" class="site-chat-send">${copy.send}</button>
+      </form>
     </div>
   `;
 
@@ -109,43 +156,104 @@ function initSiteChat() {
   document.body.classList.add("has-site-chat");
 
   const toggle = host.querySelector(".site-chat-toggle");
+  const panel = host.querySelector(".site-chat-panel");
   const close = host.querySelector(".site-chat-close");
-  const options = host.querySelector(".site-chat-options");
-  const answer = host.querySelector(".site-chat-answer");
-  const copyButton = host.querySelector(".site-chat-copy");
-  const feedback = host.querySelector(".site-chat-feedback");
+  const quickActions = host.querySelector(".site-chat-quick-actions");
+  const messages = host.querySelector(".site-chat-messages");
+  const typing = host.querySelector(".site-chat-typing");
+  const form = host.querySelector(".site-chat-form");
+  const input = host.querySelector(".site-chat-input");
 
-  options.innerHTML = copy.options
-    .map((item, index) => `<button type="button" class="site-chat-option" data-answer-index="${index}">${item.label}</button>`)
+  function renderMessages() {
+    messages.innerHTML = "";
+    state.messages.forEach((message) => {
+      messages.appendChild(createBubble(message.role, message.text, message.cta || null));
+    });
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function setTyping(visible) {
+    typing.hidden = !visible;
+    if (visible) {
+      messages.scrollTop = messages.scrollHeight;
+    }
+  }
+
+  function addMessage(role, text, cta = null) {
+    state.messages.push({ role, text, cta });
+    state.messages = state.messages.slice(-12);
+    saveState(lang, state);
+    renderMessages();
+  }
+
+  async function sendMessage(rawText) {
+    const text = String(rawText || "").trim();
+    if (!text) return;
+
+    addMessage("user", text);
+    input.value = "";
+    setTyping(true);
+
+    try {
+      const response = await fetch("/.netlify/functions/site-ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          previousResponseId: state.previousResponseId,
+          lang
+        })
+      });
+
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || !body.reply) {
+        throw new Error(body.details || body.error || "AI request failed");
+      }
+
+      state.previousResponseId = body.responseId || state.previousResponseId;
+      saveState(lang, state);
+      addMessage("assistant", body.reply, body.cta || null);
+    } catch (error) {
+      console.error("AI chat error:", error);
+      addMessage("assistant", copy.error, {
+        label: lang === "hu" ? "Kapcsolat oldal" : "Kontaktseite",
+        url: lang === "hu" ? "/hu/kapcsolat.html" : "/de/kontakt.html"
+      });
+    } finally {
+      setTyping(false);
+    }
+  }
+
+  quickActions.innerHTML = copy.quickActions
+    .map(
+      (action, index) =>
+        `<button type="button" class="site-chat-quick-btn" data-quick-index="${index}">${action.label}</button>`
+    )
     .join("");
+
+  quickActions.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-quick-index]");
+    if (!button) return;
+    const action = copy.quickActions[Number(button.dataset.quickIndex)];
+    if (!action) return;
+    sendMessage(action.prompt);
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendMessage(input.value);
+  });
 
   toggle.addEventListener("click", () => {
     host.classList.toggle("is-open");
-  });
-
-  close.addEventListener("click", () => {
-    host.classList.remove("is-open");
-  });
-
-  options.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-answer-index]");
-    if (!button) return;
-
-    const item = copy.options[Number(button.dataset.answerIndex)];
-    if (!item) return;
-
-    answer.textContent = item.answer;
-    feedback.textContent = "";
-  });
-
-  copyButton.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText("busi.sandor@bphoto.at");
-      feedback.textContent = copy.copied;
-    } catch {
-      feedback.textContent = copy.copyFail;
+    if (host.classList.contains("is-open")) {
+      input.focus();
     }
   });
+
+  close.addEventListener("click", () => host.classList.remove("is-open"));
+
+  renderMessages();
 }
 
 if (document.readyState === "loading") {

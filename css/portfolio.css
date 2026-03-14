@@ -453,6 +453,18 @@ body.portfolio-page {
     padding: 14px;
   }
 
+  .portfolio-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+  }
+
+  .portfolio-filter-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
   .portfolio-lightbox {
     padding: 12px;
   }
@@ -463,5 +475,17 @@ body.portfolio-page {
 
   .portfolio-lightbox-frame {
     min-height: 58vh;
+  }
+
+  .portfolio-lightbox-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .portfolio-lightbox-btn {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 12px;
+    font-size: 0.82rem;
   }
 }
