@@ -1,4 +1,4 @@
-const CACHE_NAME = "bphoto-static-v1";
+const CACHE_NAME = "bphoto-static-v2";
 const OFFLINE_FALLBACK = "/de/index.html";
 const PRE_CACHE = [
   OFFLINE_FALLBACK,
@@ -70,6 +70,24 @@ async function handleNavigation(request) {
 }
 
 async function handleAsset(request) {
+  const destination = request.destination || "";
+  const isDynamicAsset = ["script", "style", "document"].includes(destination);
+
+  if (isDynamicAsset) {
+    try {
+      const networkResponse = await fetch(request);
+      if (networkResponse && networkResponse.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    } catch {
+      const cached = await caches.match(request);
+      if (cached) return cached;
+      throw new Error("Dynamic asset request failed and no cache fallback exists.");
+    }
+  }
+
   const cached = await caches.match(request);
   if (cached) return cached;
 
