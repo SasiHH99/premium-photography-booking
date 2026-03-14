@@ -1,20 +1,4 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
-  if (!window.supabase?.createClient) {
-    console.error("Supabase CDN nincs betöltve");
-    return;
-  }
-
-  const supabase =
-    window.supabaseClient ||
-    window.supabase.createClient(
-      "https://hxvhsxppmdzcbklcberm.supabase.co",
-      "sb_publishable_feNwyFggYsuxRqOr85cIng_h2pP4zn8"
-    );
-
-  if (!window.supabaseClient) {
-    window.supabaseClient = supabase;
-  }
-
+document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("bookingForm");
   if (!form) return;
 
@@ -33,35 +17,38 @@
   const TEXT = {
     hu: {
       packagePlaceholder: "A csomag kiválasztása után itt látod röviden, milyen igényhez illik a legjobban.",
-      invalidDate: "Kérlek legalább két nappal későbbi dátumot válassz.",
-      packages: {
-        Essence:
-          "Rövid, lendületes fotózás egy gyors portré- vagy páros sorozathoz, ha tiszta és használható képeket szeretnél rövid idő alatt.",
-        Signature:
-          "A legerősebb középcsomag többféle beállításhoz, több outfithez vagy tudatosabb online megjelenéshez.",
-        Prestige:
-          "Hosszabb, kreatívabb fotózás márkának, kampányhoz vagy prémium megjelenéshez, amikor nagyobb súlyú anyagra van szükség.",
-        Event:
-          "Nem fix dobozcsomag, hanem külön ajánlat eseményre, céges jelenlétre vagy egyedi projektre.",
-        Custom:
-          "Ha még nem döntötted el, melyik irány a jó, írd meg a célodat, és segítek kiválasztani a megfelelő csomagot."
-      }
+      invalidDate: "Kérlek legalább két nappal későbbi dátumot válassz."
     },
     de: {
       packagePlaceholder: "Nach der Paketauswahl siehst du hier kurz, wofür es am besten passt.",
-      invalidDate: "Bitte wähle ein Datum, das mindestens zwei Tage in der Zukunft liegt.",
-      packages: {
-        Essence:
-          "Kurzes, klares Shooting für eine schnelle Porträt- oder Paarserie mit sauberem Ergebnis.",
-        Signature:
-          "Das stärkste Gesamtpaket, wenn du mehr Variation, mehrere Looks oder vielseitig nutzbares Material willst.",
-        Prestige:
-          "Mehr Zeit, mehr kreative Führung und deutlich größeres Bildmaterial für Branding, Kampagne oder Premium-Auftritt.",
-        Event:
-          "Kein starres Paket, sondern ein individuelles Angebot für Event, Firmenanfrage oder besonderes Projekt.",
-        Custom:
-          "Wenn du noch unsicher bist, beschreibe einfach dein Ziel und ich helfe dir bei der passenden Wahl."
-      }
+      invalidDate: "Bitte wähle ein Datum, das mindestens zwei Tage in der Zukunft liegt."
+    }
+  };
+
+  const PACKAGE_TEXT = {
+    hu: {
+      Essence:
+        "Rövid, lendületes fotózás egy gyors portré- vagy páros sorozathoz, ha tiszta és használható képeket szeretnél rövid idő alatt.",
+      Signature:
+        "A legerősebb középcsomag többféle beállításhoz, több outfithez vagy tudatosabb online megjelenéshez.",
+      Prestige:
+        "Hosszabb, kreatívabb fotózás márkának, kampányhoz vagy prémium megjelenéshez, amikor nagyobb súlyú anyagra van szükség.",
+      Event:
+        "Nem fix dobozcsomag, hanem külön ajánlat eseményre, céges jelenlétre vagy egyedi projektre.",
+      Custom:
+        "Ha még nem döntötted el, melyik irány a jó, írd meg a célodat, és segítek kiválasztani a megfelelő csomagot."
+    },
+    de: {
+      Essence:
+        "Kurzes, klares Shooting für eine schnelle Porträt- oder Paarserie mit sauberem Ergebnis.",
+      Signature:
+        "Das stärkste Gesamtpaket, wenn du mehr Variation, mehrere Looks oder vielseitig nutzbares Material willst.",
+      Prestige:
+        "Mehr Zeit, mehr kreative Führung und deutlich größeres Bildmaterial für Branding, Kampagne oder Premium-Auftritt.",
+      Event:
+        "Kein starres Paket, sondern ein individuelles Angebot für Event, Firmenanfrage oder besonderes Projekt.",
+      Custom:
+        "Wenn du noch unsicher bist, beschreibe einfach dein Ziel und ich helfe dir bei der passenden Wahl."
     }
   };
 
@@ -87,14 +74,13 @@
 
   function updatePackageInfo() {
     const selectedPackage = packageSelect.value;
-    packageInfo.textContent = TEXT[lang].packages[selectedPackage] || TEXT[lang].packagePlaceholder;
+    packageInfo.textContent = PACKAGE_TEXT[lang][selectedPackage] || TEXT[lang].packagePlaceholder;
   }
 
   function isDateValid(value) {
     if (!value) return false;
     const selected = new Date(`${value}T12:00:00`);
-    const minDate = getMinBookingDate();
-    return selected >= minDate;
+    return selected >= getMinBookingDate();
   }
 
   const minDate = getMinBookingDate();
@@ -119,7 +105,7 @@
     updateSubmitState();
 
     try {
-      const bookingData = {
+      const payload = {
         booking_date: dateInput.value,
         name: form.name.value.trim(),
         email: form.email.value.trim(),
@@ -129,22 +115,15 @@
         lang
       };
 
-      const { error: insertError } = await supabase.from("bookings_v2").insert([bookingData]);
-      if (insertError) throw insertError;
+      const response = await fetch("/.netlify/functions/send-booking-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-      try {
-        const mailResp = await fetch("/.netlify/functions/send-booking-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(bookingData)
-        });
-
-        if (!mailResp.ok) {
-          const body = await mailResp.text();
-          console.warn("Booking email error:", body);
-        }
-      } catch (mailErr) {
-        console.warn("Booking email request error:", mailErr);
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || body.error) {
+        throw new Error(body.details || body.error || "Booking request failed");
       }
 
       successBox.classList.add("show");
