@@ -1,70 +1,98 @@
-ï»¿const PORTFOLIO_TEXT = {
+const PORTFOLIO_TEXT = {
   hu: {
-    heroTitle: "MunkÃ¡k, amelyeknek sÃºlya van a kÃ©pen is.",
-    heroCopy: "PortrÃ©k, pÃ¡ros sorozatok, baba-, autÃ³s- Ã©s kreatÃ­v fotÃ³k BÃ©csbÅ‘l Ã©s kÃ¶rnyÃ©kÃ©rÅ‘l, valÃ³di fÃ©nyekkel Ã©s tÃºlstilizÃ¡lÃ¡s nÃ©lkÃ¼l.",
-    allLabel: "Ã–sszes kategÃ³ria",
-    totalLabel: "VÃ¡logatott kÃ©pek",
-    ctaTitle: "Ha ezt a vilÃ¡got szeretnÃ©d a sajÃ¡t kÃ©peidhez is, itt kezdjÃ¼k.",
-    ctaCopy: "A fotÃ³zÃ¡s nem sabloncsomag. ElÅ‘szÃ¶r megbeszÃ©ljÃ¼k, mire van szÃ¼ksÃ©ged, utÃ¡na talÃ¡lunk idÅ‘pontot, helyszÃ­nt Ã©s megfelelÅ‘ csomagot.",
-    ctaButton: "IdÅ‘pontot szeretnÃ©k",
-    open: "MegnyitÃ¡s",
-    empty: "Ebben a kategÃ³riÃ¡ban most nincs megjelenÃ­thetÅ‘ kÃ©p.",
+    heroTitle: "Munkák, amelyeknek súlya van a képen is.",
+    heroCopy: "Portrék, páros sorozatok, természetes, autós, baba-családi és kreatív képek Bécsbõl és környékérõl, valódi fényekkel és túlstilizálás nélkül.",
+    allLabel: "Összes kategória",
+    totalLabel: "Válogatott képek",
+    ctaTitle: "Ha ezt a vizuális minõséget a saját képeidnél is szeretnéd, innen megyünk tovább.",
+    ctaCopy: "A fotózás nem sabloncsomag. Elõször megbeszéljük, mire van szükséged, utána állítjuk össze az idõpontot, a helyszínt és a legerõsebb irányt.",
+    ctaButton: "Foglalási kérést indítok",
+    open: "Megnyitás",
+    empty: "Ebben a kategóriában most nincs megjeleníthetõ kép.",
+    lightboxSeparator: " | ",
     categories: {
-      all: "Ã–sszes",
-      termeszet: "TermÃ©szet",
-      varos: "VÃ¡ros",
-      portre: "PortrÃ©",
-      paros: "PÃ¡ros",
-      baba: "Baba",
-      autos: "AutÃ³s",
-      "ejszakai-kreativ": "Ã‰jszakai / KreatÃ­v"
+      all: "Összes",
+      termeszet: "Természet",
+      varos: "Város",
+      portre: "Portré",
+      paros: "Páros",
+      baba: "Baba / családi",
+      autos: "Autós",
+      "ejszakai-kreativ": "Éjszakai / Kreatív"
     },
     categoryNotes: {
-      termeszet: "Puha, termÃ©szetes fÃ©nykÃ¶rÃ¼lmÃ©nyek",
-      varos: "Ã‰rzÃ©s, ritmus, urbÃ¡nus karakter",
-      portre: "Letisztult, erÅ‘s szemÃ©lyes jelenlÃ©t",
-      paros: "Kapcsolat, kÃ¶zÃ¶s dinamika, valÃ³di gesztusok",
+      termeszet: "Puha, természetes fénykörülmények",
+      varos: "Érzés, ritmus, urbánus karakter",
+      portre: "Letisztult, erõs személyes jelenlét",
+      paros: "Kapcsolat, közös dinamika, valódi gesztusok",
       baba: "Finom, meleg, nyugodt pillanatok",
-      autos: "FÃ©ny, forma, felÃ¼let, jelenlÃ©t",
+      autos: "Fény, forma, felület, jelenlét",
       "ejszakai-kreativ": "Hangulat, kontraszt, karakter"
+    },
+    altTemplates: {
+      termeszet: "Természetes fényû fotózás Bécs környékén: {title}",
+      varos: "Városi fotózás Bécsben: {title}",
+      portre: "Portréfotózás Bécsben: {title}",
+      paros: "Páros fotózás Bécsben: {title}",
+      baba: "Baba és családi fotózás: {title}",
+      autos: "Autós fotózás részlete: {title}",
+      "ejszakai-kreativ": "Éjszakai kreatív fotózás: {title}"
     }
   },
   de: {
     heroTitle: "Arbeiten mit klarer Bildsprache und echter Wirkung.",
-    heroCopy: "PortrÃ¤ts, Paare, Baby-, Auto- und kreative Serien aus Wien und Umgebung mit echtem Licht, klarer Stimmung und ohne kÃ¼nstlichen Ãœberstil.",
+    heroCopy: "Porträts, Paare, Natur, Auto, Baby-Familie und kreative Serien aus Wien und Umgebung mit echtem Licht, ruhiger Stimmung und ohne künstlichen Überstil.",
     allLabel: "Alle Kategorien",
     totalLabel: "Kuratiertes Bildmaterial",
-    ctaTitle: "Wenn du genau diese Bildwelt fÃ¼r deine eigenen Fotos willst, geht es hier weiter.",
-    ctaCopy: "Das Shooting ist kein Standardslot. Wir klÃ¤ren zuerst Ziel, Stimmung und Ort und legen dann das passende Paket fest.",
-    ctaButton: "Termin anfragen",
-    open: "Ã–ffnen",
+    ctaTitle: "Wenn du genau diese Bildqualität für deine eigenen Fotos willst, geht es hier weiter.",
+    ctaCopy: "Das Shooting ist kein Standardslot. Wir klären zuerst Ziel, Stimmung und Ort und legen danach den passenden Ablauf und das stärkste Paket fest.",
+    ctaButton: "Anfrage starten",
+    open: "Öffnen",
     empty: "In dieser Kategorie sind aktuell keine Bilder sichtbar.",
+    lightboxSeparator: " | ",
     categories: {
       all: "Alle",
       termeszet: "Natur",
       varos: "Stadt",
-      portre: "PortrÃ¤t",
+      portre: "Porträt",
       paros: "Paar",
-      baba: "Baby",
+      baba: "Baby / Familie",
       autos: "Auto",
       "ejszakai-kreativ": "Nacht / Kreativ"
     },
     categoryNotes: {
       termeszet: "Weiches Licht und ruhige Bildstimmung",
       varos: "Urbaner Rhythmus und echte Umgebung",
-      portre: "Klar, nahbar, prÃ¤sent",
+      portre: "Klar, nahbar, präsent",
       paros: "Beziehung, Dynamik, echte Momente",
       baba: "Warm, weich, unaufgeregt",
-      autos: "Linien, Licht, PrÃ¤senz",
-      "ejszakai-kreativ": "AtmosphÃ¤re, Kontrast, Charakter"
+      autos: "Linien, Licht, Präsenz",
+      "ejszakai-kreativ": "Atmosphäre, Kontrast, Charakter"
+    },
+    altTemplates: {
+      termeszet: "Natürliches Shooting in Wien Umgebung: {title}",
+      varos: "Urbanes Shooting in Wien: {title}",
+      portre: "Porträtshooting in Wien: {title}",
+      paros: "Paarshooting in Wien: {title}",
+      baba: "Baby- und Familienshooting: {title}",
+      autos: "Auto Shooting Detail: {title}",
+      "ejszakai-kreativ": "Kreatives Nachtshooting: {title}"
     }
   }
 };
+
+function buildAltText(item, copy) {
+  const title = String(item.title || copy.categories[item.category] || "Portfolio").trim();
+  const template = copy.altTemplates[item.category] || title;
+  return template.replace("{title}", title);
+}
 
 function buildPortfolioCard(item, copy) {
   const card = document.createElement("article");
   card.className = "portfolio-card";
   card.dataset.category = item.category;
+  card.dataset.title = item.title || "";
+  card.dataset.note = item.note || "";
   card.innerHTML = `
     <img src="${item.src}" loading="lazy" alt="${item.alt}">
     <div class="portfolio-card-overlay">
@@ -125,17 +153,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const response = await fetch(`/.netlify/functions/portfolio-feed?lang=${lang}`);
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     const items = Array.isArray(data.items) ? data.items : [];
 
     items.forEach((item) => {
       if (!item?.url || !item?.category || !item?.title) return;
-      const card = buildPortfolioCard({
-        category: item.category,
-        src: item.url,
-        alt: item.title,
-        note: item.note || copy.categoryNotes[item.category] || item.title
-      }, copy);
+      const card = buildPortfolioCard(
+        {
+          category: item.category,
+          src: item.url,
+          alt: buildAltText(item, copy),
+          title: item.title,
+          note: item.note || copy.categoryNotes[item.category] || item.title
+        },
+        copy
+      );
       grid.appendChild(card);
     });
   } catch (error) {
@@ -186,10 +218,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const image = card.querySelector("img");
     const category = card.dataset.category;
-    const note = card.querySelector(".portfolio-card-copy strong")?.textContent || copy.categoryNotes[category] || "";
+    const title = card.dataset.title || image.getAttribute("alt") || copy.categories[category] || "";
+    const note = card.dataset.note || card.querySelector(".portfolio-card-copy strong")?.textContent || copy.categoryNotes[category] || "";
     lightboxImage.src = image.getAttribute("src");
     lightboxImage.alt = image.getAttribute("alt") || copy.categories[category];
-    lightboxMeta.textContent = `${copy.categories[category] || category} | ${note}`;
+    lightboxMeta.textContent = `${copy.categories[category] || category}${copy.lightboxSeparator}${title}${note ? `${copy.lightboxSeparator}${note}` : ""}`;
     lightbox.classList.add("is-open");
   }
 

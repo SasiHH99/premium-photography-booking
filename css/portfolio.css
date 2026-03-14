@@ -1,6 +1,7 @@
 :root {
   --portfolio-bg: #090b10;
-  --portfolio-surface: rgba(14, 18, 26, 0.86);
+  --portfolio-surface: rgba(14, 18, 26, 0.88);
+  --portfolio-surface-strong: #111723;
   --portfolio-border: rgba(214, 179, 106, 0.18);
   --portfolio-text: #f6f2e8;
   --portfolio-muted: rgba(246, 242, 232, 0.68);
@@ -18,14 +19,14 @@ body.portfolio-page {
 }
 
 .portfolio-shell {
-  width: min(1400px, calc(100% - 32px));
+  width: min(1420px, calc(100% - 32px));
   margin: 0 auto;
   padding: 128px 0 40px;
 }
 
 .portfolio-hero,
 .portfolio-panel,
-.portfolio-grid,
+.portfolio-gallery-shell,
 .portfolio-cta {
   border-radius: 30px;
   border: 1px solid var(--portfolio-border);
@@ -37,7 +38,7 @@ body.portfolio-page {
   position: relative;
   overflow: hidden;
   display: grid;
-  gap: 22px;
+  gap: 24px;
   padding: 36px;
   background:
     linear-gradient(135deg, rgba(214, 179, 106, 0.12), transparent 42%),
@@ -59,7 +60,9 @@ body.portfolio-page {
 
 .portfolio-kicker,
 .portfolio-stat-label,
-.portfolio-note-title {
+.portfolio-note-title,
+.portfolio-filter-label,
+.portfolio-gallery-kicker {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.76rem;
@@ -68,7 +71,8 @@ body.portfolio-page {
 
 .portfolio-hero h1,
 .portfolio-note-value,
-.portfolio-cta h2 {
+.portfolio-cta h2,
+.portfolio-gallery-head h2 {
   margin: 0;
   font-family: "Cinzel", Georgia, serif;
   font-weight: 600;
@@ -83,10 +87,30 @@ body.portfolio-page {
 
 .portfolio-hero p,
 .portfolio-note-copy,
-.portfolio-cta p {
+.portfolio-cta p,
+.portfolio-gallery-copy {
   margin: 0;
   color: var(--portfolio-muted);
   line-height: 1.72;
+}
+
+.portfolio-proof-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.portfolio-proof-strip span {
+  min-height: 38px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
 }
 
 .portfolio-hero-meta {
@@ -111,17 +135,17 @@ body.portfolio-page {
 .portfolio-layout {
   margin-top: 24px;
   display: grid;
-  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
 
 .portfolio-panel {
+  position: sticky;
+  top: 108px;
   padding: 22px;
-}
-
-.portfolio-note-title {
-  color: var(--portfolio-muted);
+  display: grid;
+  gap: 22px;
 }
 
 .portfolio-note-value {
@@ -132,6 +156,11 @@ body.portfolio-page {
 
 .portfolio-note-copy {
   margin-top: 12px;
+}
+
+.portfolio-filter-shell {
+  display: grid;
+  gap: 12px;
 }
 
 .portfolio-filters {
@@ -169,11 +198,28 @@ body.portfolio-page {
   border-color: transparent;
 }
 
+.portfolio-gallery-shell {
+  padding: 24px;
+  display: grid;
+  gap: 20px;
+}
+
+.portfolio-gallery-head {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  align-items: end;
+}
+
+.portfolio-gallery-head h2 {
+  margin-top: 10px;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+}
+
 .portfolio-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 18px;
-  padding: 18px;
 }
 
 .portfolio-grid:empty {
@@ -187,6 +233,12 @@ body.portfolio-page {
   border-radius: 24px;
   background: #111723;
   cursor: pointer;
+  grid-column: span 4;
+}
+
+.portfolio-card:nth-child(5n + 1),
+.portfolio-card:nth-child(9n + 4) {
+  grid-column: span 8;
 }
 
 .portfolio-card::after {
@@ -194,7 +246,7 @@ body.portfolio-page {
   position: absolute;
   inset: auto 0 0;
   height: 46%;
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.82));
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.84));
 }
 
 .portfolio-card img {
@@ -245,7 +297,6 @@ body.portfolio-page {
 }
 
 .portfolio-empty {
-  margin-top: 20px;
   padding: 22px;
   border-radius: 24px;
   border: 1px dashed rgba(255, 255, 255, 0.12);
@@ -256,7 +307,13 @@ body.portfolio-page {
 .portfolio-cta {
   margin-top: 24px;
   padding: 34px;
-  text-align: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(214, 179, 106, 0.1), transparent 42%),
+    var(--portfolio-surface);
 }
 
 .portfolio-cta h2 {
@@ -265,7 +322,7 @@ body.portfolio-page {
 
 .portfolio-cta p {
   max-width: 760px;
-  margin: 16px auto 28px;
+  margin-top: 16px;
 }
 
 .portfolio-cta-btn {
@@ -337,14 +394,20 @@ body.portfolio-page {
   object-fit: contain;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1120px) {
   .portfolio-shell {
-    width: min(100% - 20px, 1400px);
+    width: min(100% - 20px, 1420px);
     padding-top: 108px;
   }
 
-  .portfolio-layout {
+  .portfolio-layout,
+  .portfolio-gallery-head,
+  .portfolio-cta {
     grid-template-columns: 1fr;
+  }
+
+  .portfolio-panel {
+    position: static;
   }
 
   .portfolio-filters {
@@ -353,9 +416,22 @@ body.portfolio-page {
   }
 }
 
+@media (max-width: 860px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portfolio-card,
+  .portfolio-card:nth-child(5n + 1),
+  .portfolio-card:nth-child(9n + 4) {
+    grid-column: span 1;
+  }
+}
+
 @media (max-width: 768px) {
   .portfolio-hero,
   .portfolio-panel,
+  .portfolio-gallery-shell,
   .portfolio-cta {
     padding: 24px;
   }
@@ -365,13 +441,12 @@ body.portfolio-page {
   }
 
   .portfolio-grid {
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    grid-template-columns: 1fr;
     gap: 14px;
-    padding: 14px;
   }
 
   .portfolio-card {
-    min-height: 220px;
+    min-height: 260px;
   }
 
   .portfolio-card-overlay {

@@ -4,30 +4,26 @@ import {
   normalizeEmail,
   isValidEmail,
   createServiceClient,
-  escapeHtml,
-  sendResendMail
+  sendResendMail,
+  createMailLayout,
+  createInfoTable,
+  createNoteBlock
 } from "./_admin.js";
 
 function createMailHtml({ heading, intro, name, email, bookingDate, packageName, message }) {
-  return `
-    <div style="font-family:Arial,sans-serif;background:#0f1117;color:#f3efe5;padding:32px;">
-      <div style="max-width:640px;margin:0 auto;background:#171a22;border:1px solid rgba(214,179,106,.18);border-radius:20px;padding:28px;">
-        <p style="margin:0 0 12px;color:#d6b36a;letter-spacing:.18em;text-transform:uppercase;font-size:12px;">B. Photography</p>
-        <h2 style="margin:0 0 18px;font-size:28px;color:#f3efe5;">${heading}</h2>
-        <p style="margin:0 0 24px;line-height:1.7;color:#ddd7ca;">${intro}</p>
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:10px 0;color:#a9a396;">Név / Name</td><td style="padding:10px 0;color:#f3efe5;">${escapeHtml(name)}</td></tr>
-          <tr><td style="padding:10px 0;color:#a9a396;">Email</td><td style="padding:10px 0;color:#f3efe5;">${escapeHtml(email)}</td></tr>
-          <tr><td style="padding:10px 0;color:#a9a396;">Dátum / Date</td><td style="padding:10px 0;color:#f3efe5;">${escapeHtml(bookingDate)}</td></tr>
-          <tr><td style="padding:10px 0;color:#a9a396;">Csomag / Package</td><td style="padding:10px 0;color:#f3efe5;">${escapeHtml(packageName)}</td></tr>
-        </table>
-        <div style="margin-top:20px;padding:16px;border-radius:14px;background:#10131a;border:1px solid rgba(255,255,255,.06);">
-          <p style="margin:0 0 8px;color:#a9a396;text-transform:uppercase;letter-spacing:.12em;font-size:12px;">Üzenet / Nachricht</p>
-          <p style="margin:0;line-height:1.7;color:#f3efe5;">${escapeHtml(message || "-")}</p>
-        </div>
-      </div>
-    </div>
-  `;
+  return createMailLayout({
+    heading,
+    intro,
+    sections: `
+      ${createInfoTable([
+        { label: "Név / Name", value: name },
+        { label: "Email", value: email },
+        { label: "Dátum / Datum", value: bookingDate },
+        { label: "Csomag / Paket", value: packageName }
+      ])}
+      ${createNoteBlock("Üzenet / Nachricht", message || "-")}
+    `
+  });
 }
 
 export const handler = async (event) => {

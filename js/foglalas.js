@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitButton = document.getElementById("bookingSubmit");
   const packageSelect = document.getElementById("packageSelect");
   const packageInfo = document.getElementById("packageInfo");
+  const dateDisplay = document.getElementById("bookingDateDisplay");
   const successBox = document.getElementById("bookingSuccess");
   const errorBox = document.getElementById("bookingError");
   const successClose = document.getElementById("successClose");
@@ -16,41 +17,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const TEXT = {
     hu: {
-      packagePlaceholder: "A csomag kivÃ¡lasztÃ¡sa utÃ¡n itt lÃ¡tod rÃ¶viden, milyen igÃ©nyhez illik a legjobban.",
-      invalidDate: "KÃ©rlek legalÃ¡bb kÃ©t nappal kÃ©sÅ‘bbi dÃ¡tumot vÃ¡lassz."
+      packagePlaceholder: "A csomag kiválasztása után itt látod röviden, milyen igényhez illik a legjobban.",
+      invalidDate: "Kérlek legalább két nappal késõbbi dátumot válassz.",
+      dateEmpty: "Még nincs kiválasztott dátum.",
+      datePrefix: "Kiválasztott dátum:"
     },
     de: {
-      packagePlaceholder: "Nach der Paketauswahl siehst du hier kurz, wofÃ¼r es am besten passt.",
-      invalidDate: "Bitte wÃ¤hle ein Datum, das mindestens zwei Tage in der Zukunft liegt."
+      packagePlaceholder: "Nach der Paketauswahl siehst du hier kurz, wofür es am besten passt.",
+      invalidDate: "Bitte wähle ein Datum, das mindestens zwei Tage in der Zukunft liegt.",
+      dateEmpty: "Noch kein Datum ausgewählt.",
+      datePrefix: "Gewähltes Datum:"
     }
   };
 
   const PACKAGE_TEXT = {
     hu: {
       Essence:
-        "RÃ¶vid, lendÃ¼letes fotÃ³zÃ¡s egy gyors portrÃ©- vagy pÃ¡ros sorozathoz, ha tiszta Ã©s hasznÃ¡lhatÃ³ kÃ©peket szeretnÃ©l rÃ¶vid idÅ‘ alatt.",
+        "Rövid, lendületes fotózás egy gyors portré- vagy páros sorozathoz, ha tiszta és használható képeket szeretnél rövid idõ alatt.",
       Signature:
-        "A legerÅ‘sebb kÃ¶zÃ©pcsomag tÃ¶bbfÃ©le beÃ¡llÃ­tÃ¡shoz, tÃ¶bb outfithez vagy tudatosabb online megjelenÃ©shez.",
+        "A legerõsebb középcsomag többféle beállításhoz, több outfithez vagy tudatosabb online megjelenéshez.",
       Prestige:
-        "Hosszabb, kreatÃ­vabb fotÃ³zÃ¡s mÃ¡rkÃ¡nak, kampÃ¡nyhoz vagy prÃ©mium megjelenÃ©shez, amikor nagyobb sÃºlyÃº anyagra van szÃ¼ksÃ©g.",
+        "Hosszabb, kreatívabb fotózás márkához, kampányhoz vagy prémium megjelenéshez, amikor nagyobb súlyú anyagra van szükség.",
       Event:
-        "Nem fix dobozcsomag, hanem kÃ¼lÃ¶n ajÃ¡nlat esemÃ©nyre, cÃ©ges jelenlÃ©tre vagy egyedi projektre.",
+        "Nem fix dobozcsomag, hanem külön ajánlat eseményre, céges jelenlétre vagy egyedi projektre.",
       Custom:
-        "Ha mÃ©g nem dÃ¶ntÃ¶tted el, melyik irÃ¡ny a jÃ³, Ã­rd meg a cÃ©lodat, Ã©s segÃ­tek kivÃ¡lasztani a megfelelÅ‘ csomagot."
+        "Ha még nem döntötted el, melyik irány a jó, írd meg a célodat, és segítek kiválasztani a megfelelõ csomagot."
     },
     de: {
       Essence:
-        "Kurzes, klares Shooting fÃ¼r eine schnelle PortrÃ¤t- oder Paarserie mit sauberem Ergebnis.",
+        "Kurzes, klares Shooting für eine schnelle Porträt- oder Paarserie mit sauberem Ergebnis.",
       Signature:
-        "Das stÃ¤rkste Gesamtpaket, wenn du mehr Variation, mehrere Looks oder vielseitig nutzbares Material willst.",
+        "Das stärkste Gesamtpaket, wenn du mehr Variation, mehrere Looks oder vielseitig nutzbares Material willst.",
       Prestige:
-        "Mehr Zeit, mehr kreative FÃ¼hrung und deutlich grÃ¶ÃŸeres Bildmaterial fÃ¼r Branding, Kampagne oder Premium-Auftritt.",
+        "Mehr Zeit, mehr kreative Führung und deutlich größeres Bildmaterial für Branding, Kampagne oder Premium-Auftritt.",
       Event:
-        "Kein starres Paket, sondern ein individuelles Angebot fÃ¼r Event, Firmenanfrage oder besonderes Projekt.",
+        "Kein starres Paket, sondern ein individuelles Angebot für Event, Firmenanfrage oder besonderes Projekt.",
       Custom:
         "Wenn du noch unsicher bist, beschreibe einfach dein Ziel und ich helfe dir bei der passenden Wahl."
     }
   };
+
+  const dateFormatter = new Intl.DateTimeFormat(lang === "hu" ? "hu-HU" : "de-DE", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long"
+  });
 
   let isSubmitting = false;
 
@@ -77,6 +89,21 @@ document.addEventListener("DOMContentLoaded", () => {
     packageInfo.textContent = PACKAGE_TEXT[lang][selectedPackage] || TEXT[lang].packagePlaceholder;
   }
 
+  function updateDateDisplay() {
+    if (!dateInput.value) {
+      dateDisplay.textContent = TEXT[lang].dateEmpty;
+      return;
+    }
+
+    const selected = new Date(`${dateInput.value}T12:00:00`);
+    if (Number.isNaN(selected.getTime())) {
+      dateDisplay.textContent = TEXT[lang].dateEmpty;
+      return;
+    }
+
+    dateDisplay.textContent = `${TEXT[lang].datePrefix} ${dateFormatter.format(selected)}`;
+  }
+
   function isDateValid(value) {
     if (!value) return false;
     const selected = new Date(`${value}T12:00:00`);
@@ -86,10 +113,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const minDate = getMinBookingDate();
   dateInput.min = formatIsoDate(minDate);
   updatePackageInfo();
+  updateDateDisplay();
   updateSubmitState();
 
   gdprCheck.addEventListener("change", updateSubmitState);
-  dateInput.addEventListener("input", updateSubmitState);
+  dateInput.addEventListener("input", () => {
+    updateDateDisplay();
+    updateSubmitState();
+  });
   packageSelect.addEventListener("change", updatePackageInfo);
 
   form.addEventListener("submit", async (event) => {
@@ -130,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       form.reset();
       dateInput.min = formatIsoDate(getMinBookingDate());
       updatePackageInfo();
+      updateDateDisplay();
       updateSubmitState();
     } catch (error) {
       console.error("Booking error:", error);
