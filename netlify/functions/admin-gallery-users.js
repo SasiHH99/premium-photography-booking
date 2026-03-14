@@ -14,8 +14,8 @@ function toGalleryCopy(lang, password) {
   return {
     subject: isDe ? "Dein Zugang zur Online-Galerie" : "Hozzáférés az online galériához",
     intro: isDe
-      ? "Deine Galerie ist bereit. Mit den folgenden Zugangsdaten kannst du dich sofort einloggen."
-      : "A galériád elkészült. Az alábbi adatokkal azonnal beléphetsz.",
+      ? "Deine Galerie ist bereit. Mit diesem temporären Passwort kannst du dich sofort einloggen. Beim ersten Login legst du direkt dein eigenes Passwort fest."
+      : "A galériád elkészült. Ezzel az ideiglenes jelszóval azonnal be tudsz lépni. Az első belépés után rögtön beállítod a saját jelszavadat.",
     ctaText: isDe ? "Zur Galerie" : "Galéria megnyitása",
     ctaUrl: isDe ? "https://bphoto.at/de/galeria-login.html" : "https://bphoto.at/hu/galeria-login.html",
     password
@@ -32,7 +32,8 @@ function mapUser(user) {
     note: user.user_metadata?.admin_note || "",
     lang: user.user_metadata?.lang || "hu",
     role: user.user_metadata?.role || "client",
-    passwordUpdatedAt: user.user_metadata?.password_updated_at || null
+    passwordUpdatedAt: user.user_metadata?.password_updated_at || null,
+    mustChangePassword: user.user_metadata?.must_change_password === true
   };
 }
 
@@ -99,7 +100,8 @@ export const handler = async (event) => {
           lang,
           role: "client",
           admin_note: note,
-          password_updated_at: new Date().toISOString()
+          password_updated_at: new Date().toISOString(),
+          must_change_password: true
         }
       });
 
@@ -166,7 +168,10 @@ export const handler = async (event) => {
 
       const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
         password,
-        user_metadata: nextMetadata
+        user_metadata: {
+          ...nextMetadata,
+          must_change_password: true
+        }
       });
       if (updateError) return json(400, { error: updateError.message });
 
@@ -178,8 +183,8 @@ export const handler = async (event) => {
         html: createGalleryMailHtml({
           heading: copy.subject,
           intro: lang === "de"
-            ? "Dein Passwort wurde zurückgesetzt. Mit diesen Daten kannst du dich wieder einloggen."
-            : "A jelszavad újra lett állítva. Ezekkel az adatokkal újra be tudsz lépni.",
+            ? "Dein Passwort wurde zurückgesetzt. Mit diesem temporären Passwort kannst du dich wieder einloggen und direkt ein eigenes neues Passwort setzen."
+            : "A jelszavad újra lett állítva. Ezzel az ideiglenes jelszóval újra be tudsz lépni, majd rögtön beállíthatod a sajátodat.",
           email: data.user.email,
           password,
           ctaText: copy.ctaText,

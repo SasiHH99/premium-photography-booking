@@ -1,4 +1,4 @@
-﻿const GALLERY_LOGIN_COPY = {
+const GALLERY_LOGIN_COPY = {
   hu: {
     heroTitle: "A galériád itt érhető el privát és kényelmes formában.",
     heroCopy: "A foglaláskor megadott emaillel és az általunk küldött jelszóval tudsz belépni. Itt tudod végignézni az összes átadott képet és kijelölni a kedvenceidet.",
@@ -13,6 +13,10 @@
     forgotLoading: "Küldés...",
     forgotMissing: "Az új jelszó kéréséhez add meg az email címedet.",
     forgotSuccess: "Küldtem egy jelszó-visszaállító emailt. Nyisd meg a benne lévő linket ugyanazon az eszközön.",
+    forgotTitle: "Új jelszó kérése",
+    forgotCopy: "Írd be azt az email címet, amivel a privát galériádhoz tartozó fiók készült. A rendszer küld egy linket az új jelszó beállításához.",
+    forgotSubmit: "Új jelszó link küldése",
+    forgotClose: "Bezárás",
     missingFields: "Kérlek tölts ki minden mezőt.",
     invalidEmail: "Adj meg érvényes email címet.",
     invalidLogin: "Hibás email vagy jelszó.",
@@ -33,6 +37,10 @@
     forgotLoading: "Senden...",
     forgotMissing: "Für ein neues Passwort brauche ich deine E-Mail-Adresse.",
     forgotSuccess: "Ich habe dir eine E-Mail zum Zurücksetzen geschickt. Öffne den Link am besten auf demselben Gerät.",
+    forgotTitle: "Neues Passwort anfordern",
+    forgotCopy: "Gib die E-Mail-Adresse ein, mit der dein Galerie-Zugang erstellt wurde. Danach sendet das System einen Link zum Setzen eines neuen Passworts.",
+    forgotSubmit: "Passwort-Link senden",
+    forgotClose: "Schließen",
     missingFields: "Bitte alle Felder ausfüllen.",
     invalidEmail: "Bitte eine gültige E-Mail-Adresse eingeben.",
     invalidLogin: "Falsche E-Mail oder falsches Passwort.",
@@ -49,7 +57,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const copy = GALLERY_LOGIN_COPY[lang];
   const redirectUrl = lang === "de" ? "/de/galeria.html" : "/hu/galeria.html";
   const homeUrl = lang === "de" ? "/de/index.html" : "/hu/index.html";
-  const resetUrl = `${window.location.origin}${lang === "de" ? "/de/galeria-jelszo.html" : "/hu/galeria-jelszo.html"}`;
+  const siteOrigin = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+    ? "https://bphoto.at"
+    : window.location.origin;
+  const resetUrl = `${siteOrigin}${lang === "de" ? "/de/galeria-jelszo.html" : "/hu/galeria-jelszo.html"}`;
+  const firstLoginResetUrl = `${resetUrl}?flow=first-login`;
   const supabase = window.supabaseClient;
   if (!supabase) return;
 
@@ -67,6 +79,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const forgotButton = document.getElementById("galleryForgotBtn");
   const errorBox = document.getElementById("galleryLoginError");
   const successBox = document.getElementById("galleryLoginSuccess");
+  const forgotModal = document.getElementById("galleryForgotModal");
+  const forgotClose = document.getElementById("galleryForgotClose");
+  const forgotKicker = document.getElementById("galleryForgotModalKicker");
+  const forgotTitle = document.getElementById("galleryForgotModalTitle");
+  const forgotCopy = document.getElementById("galleryForgotModalCopy");
+  const forgotEmailLabel = document.getElementById("galleryForgotEmailLabel");
+  const forgotEmailInput = document.getElementById("galleryForgotEmail");
+  const forgotSubmit = document.getElementById("galleryForgotSubmit");
+  const forgotSuccess = document.getElementById("galleryForgotSuccess");
+  const forgotError = document.getElementById("galleryForgotError");
+  const modalCloseAreas = Array.from(document.querySelectorAll("[data-gallery-modal-close]"));
 
   heroTitle.textContent = copy.heroTitle;
   heroCopy.textContent = copy.heroCopy;
@@ -81,13 +104,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   passwordInput.placeholder = copy.password;
   button.textContent = copy.submit;
   forgotButton.textContent = copy.forgot;
+  forgotKicker.textContent = copy.forgot;
+  forgotTitle.textContent = copy.forgotTitle;
+  forgotCopy.textContent = copy.forgotCopy;
+  forgotEmailLabel.textContent = copy.email;
+  forgotEmailInput.placeholder = copy.email;
+  forgotSubmit.textContent = copy.forgotSubmit;
+  forgotClose.setAttribute("aria-label", copy.forgotClose);
+
+  function getPostLoginUrl(user) {
+    if (user?.user_metadata?.must_change_password === true) {
+      return firstLoginResetUrl;
+    }
+    return redirectUrl;
+  }
 
   const {
     data: { session }
   } = await supabase.auth.getSession();
 
   if (session) {
-    window.location.href = redirectUrl;
+    window.location.href = getPostLoginUrl(session.user);
     return;
   }
 
@@ -100,8 +137,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     successBox.classList.toggle("is-visible", Boolean(message));
   }
 
+  function setForgotError(message = "") {
+    forgotError.textContent = message;
+  }
+
+  function setForgotSuccess(message = "") {
+    forgotSuccess.textContent = message;
+    forgotSuccess.classList.toggle("is-visible", Boolean(message));
+  }
+
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function openForgotModal() {
+    forgotModal.hidden = false;
+    forgotEmailInput.value = emailInput.value.trim();
+    setForgotError("");
+    setForgotSuccess("");
+    window.setTimeout(() => forgotEmailInput.focus(), 30);
+  }
+
+  function closeForgotModal() {
+    forgotModal.hidden = true;
+    setForgotError("");
+    setForgotSuccess("");
+    forgotSubmit.disabled = false;
+    forgotSubmit.textContent = copy.forgotSubmit;
   }
 
   async function handleLogin() {
@@ -125,12 +187,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     button.textContent = copy.loading;
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         setError(copy.invalidLogin);
         return;
       }
-      window.location.href = redirectUrl;
+      window.location.href = getPostLoginUrl(data.user || data.session?.user);
     } catch (error) {
       console.error("Gallery login error:", error);
       setError(copy.unexpected);
@@ -141,46 +203,61 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function handleForgotPassword() {
-    const email = emailInput.value.trim();
+    const email = forgotEmailInput.value.trim();
 
-    setError("");
-    setSuccess("");
+    setForgotError("");
+    setForgotSuccess("");
 
     if (!email) {
-      setError(copy.forgotMissing);
+      setForgotError(copy.forgotMissing);
       return;
     }
 
     if (!isValidEmail(email)) {
-      setError(copy.invalidEmail);
+      setForgotError(copy.invalidEmail);
       return;
     }
 
-    forgotButton.disabled = true;
-    forgotButton.textContent = copy.forgotLoading;
+    forgotSubmit.disabled = true;
+    forgotSubmit.textContent = copy.forgotLoading;
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
       if (error) {
-        setError(copy.unexpected);
+        setForgotError(copy.unexpected);
         return;
       }
-      setSuccess(copy.forgotSuccess);
+      setForgotSuccess(copy.forgotSuccess);
+      emailInput.value = email;
     } catch (error) {
       console.error("Gallery forgot password error:", error);
-      setError(copy.unexpected);
+      setForgotError(copy.unexpected);
     } finally {
-      forgotButton.disabled = false;
-      forgotButton.textContent = copy.forgot;
+      forgotSubmit.disabled = false;
+      forgotSubmit.textContent = copy.forgotSubmit;
     }
   }
 
   button.addEventListener("click", handleLogin);
-  forgotButton.addEventListener("click", handleForgotPassword);
+  forgotButton.addEventListener("click", openForgotModal);
+  forgotSubmit.addEventListener("click", handleForgotPassword);
+  forgotClose.addEventListener("click", closeForgotModal);
+  modalCloseAreas.forEach((item) => item.addEventListener("click", closeForgotModal));
 
   [emailInput, passwordInput].forEach((input) => {
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") handleLogin();
     });
+  });
+
+  forgotEmailInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") handleForgotPassword();
+    if (event.key === "Escape") closeForgotModal();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !forgotModal.hidden) {
+      closeForgotModal();
+    }
   });
 });

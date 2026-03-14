@@ -94,7 +94,13 @@ export const handler = async (event) => {
     const { data: created, error: createError } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: true
+      email_confirm: true,
+      user_metadata: {
+        lang,
+        role: "client",
+        must_change_password: true,
+        password_updated_at: new Date().toISOString()
+      }
     });
 
     if (createError) {
@@ -117,8 +123,8 @@ export const handler = async (event) => {
     const subject = lang === "de" ? "Dein Zugang zur Online Galerie" : "Hozzáférés az online galériához";
     const intro =
       lang === "de"
-        ? "Deine Galerie ist bereit. Mit den folgenden Zugangsdaten kannst du dich sofort einloggen."
-        : "A galériád elkészült. Az alábbi adatokkal azonnal beléphetsz.";
+        ? "Deine Galerie ist bereit. Mit diesem temporären Passwort kannst du dich sofort einloggen. Beim ersten Login legst du direkt dein eigenes Passwort fest."
+        : "A galériád elkészült. Ezzel az ideiglenes jelszóval azonnal be tudsz lépni. Az első belépés után rögtön beállítod a saját jelszavadat.";
     const ctaText = lang === "de" ? "Zur Galerie" : "Galéria megnyitása";
     const ctaUrl =
       lang === "de" ? "https://bphoto.at/de/galeria-login.html" : "https://bphoto.at/hu/galeria-login.html";

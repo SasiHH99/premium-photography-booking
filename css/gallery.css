@@ -264,17 +264,42 @@ body.gallery-page {
 .gallery-favorite-btn {
   width: 46px;
   height: 46px;
+  display: grid;
+  place-items: center;
   border-radius: 50%;
   border: 1px solid rgba(214, 179, 106, 0.4);
   background: rgba(8, 10, 14, 0.76);
   color: var(--gallery-accent);
-  font-size: 1.05rem;
   cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.gallery-favorite-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(214, 179, 106, 0.7);
+}
+
+.gallery-favorite-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.gallery-favorite-btn svg path {
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .gallery-favorite-btn.is-active {
   color: #16120c;
   background: linear-gradient(135deg, var(--gallery-accent), var(--gallery-accent-strong));
+}
+
+.gallery-favorite-btn.is-active svg path {
+  fill: currentColor;
 }
 
 .gallery-state {

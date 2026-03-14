@@ -49,6 +49,23 @@
     </section>
   </main>
 
+  <div class="gallery-modal" id="galleryForgotModal" hidden>
+    <div class="gallery-modal-backdrop" data-gallery-modal-close></div>
+    <section class="gallery-modal-card" role="dialog" aria-modal="true" aria-labelledby="galleryForgotModalTitle">
+      <button type="button" class="gallery-modal-close" id="galleryForgotClose" aria-label="Bezárás">×</button>
+      <p class="gallery-login-kicker" id="galleryForgotModalKicker"></p>
+      <h2 id="galleryForgotModalTitle"></h2>
+      <p id="galleryForgotModalCopy"></p>
+      <label class="gallery-login-field">
+        <span id="galleryForgotEmailLabel"></span>
+        <input type="email" id="galleryForgotEmail" autocomplete="email">
+      </label>
+      <button type="button" class="gallery-login-btn" id="galleryForgotSubmit"></button>
+      <div class="gallery-login-success" id="galleryForgotSuccess"></div>
+      <div class="gallery-login-error" id="galleryForgotError"></div>
+    </section>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/global.js"></script>
   <script src="../js/gallery-login.js"></script>

@@ -213,6 +213,58 @@ body.gallery-login-page {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.gallery-modal[hidden] {
+  display: none;
+}
+
+.gallery-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.gallery-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 10, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.gallery-modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 28px;
+  border: 1px solid var(--gl-border);
+  background: rgba(13, 17, 25, 0.96);
+  box-shadow: var(--gl-shadow);
+}
+
+.gallery-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--gl-text);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gallery-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 @media (max-width: 920px) {
   .gallery-login-shell {
     width: min(100% - 20px, 1320px);
@@ -230,5 +282,9 @@ body.gallery-login-page {
 
   .gallery-login-card {
     padding: 26px;
+  }
+
+  .gallery-modal-card {
+    padding: 22px;
   }
 }
