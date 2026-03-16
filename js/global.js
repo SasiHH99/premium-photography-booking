@@ -1,6 +1,7 @@
 const SUPABASE_URL = "https://hxvhsxppmdzcbklcberm.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_feNwyFggYsuxRqOr85cIng_h2pP4zn8";
 const PWA_THEME_COLOR = "#0f0f12";
+const GOOGLE_ADS_ID = "AW-18017270066";
 
 function initSupabaseClient() {
   if (window.supabaseClient || !window.supabase?.createClient) return;
@@ -44,12 +45,52 @@ function ensureChatbotAssets() {
   document.body.appendChild(script);
 }
 
+function ensureGoogleAdsTag() {
+  if (window.location.pathname.startsWith("/admin")) return;
+  if (document.querySelector(`script[src*="${GOOGLE_ADS_ID}"]`)) return;
+
+  const externalScript = document.createElement("script");
+  externalScript.async = true;
+  externalScript.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`;
+  document.head.appendChild(externalScript);
+
+  if (!window.dataLayer) {
+    window.dataLayer = [];
+  }
+
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+
+  window.gtag = window.gtag || gtag;
+  window.gtag("js", new Date());
+  window.gtag("config", GOOGLE_ADS_ID);
+}
+
 function appendHeadTag(selector, createTag) {
   if (!document.head || document.head.querySelector(selector)) return;
   document.head.appendChild(createTag());
 }
 
 function ensurePwaHead() {
+  appendHeadTag('link[rel="icon"][sizes="192x192"]', () => {
+    const el = document.createElement("link");
+    el.rel = "icon";
+    el.type = "image/png";
+    el.sizes = "192x192";
+    el.href = "/images/pwa/icon-192.png";
+    return el;
+  });
+
+  appendHeadTag('link[rel="icon"][sizes="512x512"]', () => {
+    const el = document.createElement("link");
+    el.rel = "icon";
+    el.type = "image/png";
+    el.sizes = "512x512";
+    el.href = "/images/pwa/icon-512.png";
+    return el;
+  });
+
   appendHeadTag('link[rel="manifest"]', () => {
     const el = document.createElement("link");
     el.rel = "manifest";
@@ -114,8 +155,10 @@ function registerServiceWorker() {
   );
 }
 
+ensureGoogleAdsTag();
+ensurePwaHead();
+
 document.addEventListener("DOMContentLoaded", () => {
-  ensurePwaHead();
   ensureChatbotAssets();
   registerServiceWorker();
   initSupabaseClient();
