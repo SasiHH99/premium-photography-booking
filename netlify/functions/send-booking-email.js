@@ -10,7 +10,22 @@ import {
   createNoteBlock
 } from "./_admin.js";
 
-function createMailHtml({ heading, intro, name, email, bookingDate, packageName, message }) {
+function getBookingMailConfig() {
+  const from =
+    process.env.CONTACT_FROM_EMAIL ||
+    process.env.BOOKING_FROM_EMAIL ||
+    process.env.GALLERY_FROM_EMAIL ||
+    "B. Photography <noreply@bphoto.at>";
+
+  const adminTo =
+    process.env.CONTACT_TO_EMAIL ||
+    process.env.BOOKING_TO_EMAIL ||
+    "busi.sandor@bphoto.at";
+
+  return { from, adminTo };
+}
+
+function createAdminMailHtml({ heading, intro, name, email, bookingDate, packageName, message }) {
   return createMailLayout({
     heading,
     intro,
@@ -26,6 +41,34 @@ function createMailHtml({ heading, intro, name, email, bookingDate, packageName,
   });
 }
 
+function createClientMailHtml({ lang, name, bookingDate, packageName }) {
+  const isHu = lang === "hu";
+
+  return createMailLayout({
+    heading: isHu ? "Megérkezett a foglalási kérésed" : "Deine Buchungsanfrage ist eingegangen",
+    intro: isHu
+      ? `Szia ${name}! Megkaptam a foglalási kérésedet. A következő lépésben átnézem a részleteket, és általában 24 órán belül visszajelzek.`
+      : `Hallo ${name}! Deine Buchungsanfrage ist angekommen. Ich prüfe jetzt die Details und melde mich in der Regel innerhalb von 24 Stunden persönlich zurück.`,
+    sections: `
+      ${createInfoTable([
+        { label: isHu ? "Dátum" : "Datum", value: bookingDate },
+        { label: isHu ? "Csomag" : "Paket", value: packageName }
+      ])}
+      ${createNoteBlock(
+        isHu ? "Mi következik?" : "Wie geht es weiter?",
+        isHu
+          ? "Egyeztetjük a pontos irányt, a helyszínt és a részleteket, hogy a fotózás valóban hozzád illő és jól előkészített legyen."
+          : "Als Nächstes stimmen wir Richtung, Location und Details ab, damit das Shooting wirklich zu dir passt und sauber vorbereitet ist."
+      )}
+    `,
+    ctaText: isHu ? "Kapcsolat oldal" : "Kontaktseite",
+    ctaUrl: isHu ? "https://bphoto.at/hu/kapcsolat.html" : "https://bphoto.at/de/kontakt.html",
+    footerNote: isHu
+      ? "Ha időközben pontosítanál valamit, nyugodtan válaszolj erre az emailre."
+      : "Wenn du in der Zwischenzeit etwas ergänzen möchtest, antworte einfach auf diese E-Mail."
+  });
+}
+
 export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 204, headers: CORS_HEADERS, body: "" };
@@ -35,9 +78,8 @@ export const handler = async (event) => {
     return json(405, { error: "Method not allowed" });
   }
 
-  const from = process.env.BOOKING_FROM_EMAIL || "B. Photography <noreply@bphoto.at>";
-  const to = process.env.BOOKING_TO_EMAIL || "busi.sandor@bphoto.at";
   const supabase = createServiceClient();
+  const { from, adminTo } = getBookingMailConfig();
 
   try {
     const data = JSON.parse(event.body || "{}");
@@ -56,8 +98,8 @@ export const handler = async (event) => {
       return json(400, { error: "Invalid email format" });
     }
 
-    const heading = lang === "hu" ? "Új foglalási kérés" : "Neue Buchungsanfrage";
-    const intro =
+    const adminHeading = lang === "hu" ? "Új foglalási kérés" : "Neue Buchungsanfrage";
+    const adminIntro =
       lang === "hu"
         ? "Érkezett egy új foglalási kérés a weboldalról."
         : "Es ist eine neue Buchungsanfrage über die Website eingegangen.";
@@ -82,12 +124,12 @@ export const handler = async (event) => {
 
     await sendResendMail({
       from,
-      to,
+      to: adminTo,
       replyTo: email,
-      subject: `${heading} - ${name}`,
-      html: createMailHtml({
-        heading,
-        intro,
+      subject: `${adminHeading} - ${name}`,
+      html: createAdminMailHtml({
+        heading: adminHeading,
+        intro: adminIntro,
         name,
         email,
         bookingDate,
@@ -96,8 +138,30 @@ export const handler = async (event) => {
       })
     });
 
-    return json(200, { success: true, bookingId: insertedBooking?.id || null });
+    await sendResendMail({
+      from,
+      to: email,
+      replyTo: adminTo,
+      subject:
+        lang === "hu"
+          ? "Megérkezett a foglalási kérésed - B. Photography"
+          : "Deine Buchungsanfrage ist eingegangen - B. Photography",
+      html: createClientMailHtml({
+        lang,
+        name,
+        bookingDate,
+        packageName
+      })
+    });
+
+    return json(200, {
+      success: true,
+      bookingId: insertedBooking?.id || null,
+      adminNotification: adminTo,
+      clientNotification: email
+    });
   } catch (error) {
+    console.error("send-booking-email failed:", error);
     return json(500, {
       error: "Server error",
       details: String(error?.message || error)
