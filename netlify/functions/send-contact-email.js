@@ -3,6 +3,7 @@ import {
   json,
   normalizeEmail,
   isValidEmail,
+  parseEmailRecipients,
   createServiceClient,
   sendResendMail,
   createMailLayout,
@@ -34,7 +35,7 @@ export const handler = async (event) => {
   }
 
   const from = process.env.CONTACT_FROM_EMAIL || "B. Photography <noreply@bphoto.at>";
-  const to = process.env.CONTACT_TO_EMAIL || "busi.sandor@bphoto.at";
+  const recipients = parseEmailRecipients(process.env.CONTACT_TO_EMAIL, "busi.sandor@bphoto.at");
   const supabase = createServiceClient();
 
   try {
@@ -71,15 +72,34 @@ export const handler = async (event) => {
       console.error("contact_messages insert failed", insertError);
     }
 
-    await sendResendMail({
-      from,
-      to,
-      replyTo: email,
-      subject: `${heading} - ${name}`,
-      html: createMailHtml({ heading, intro, name, email, message })
-    });
+    const results = [];
 
-    return json(200, { success: true, stored: !insertError });
+    for (const recipient of recipients) {
+      try {
+        await sendResendMail({
+          from,
+          to: recipient,
+          replyTo: email,
+          subject: `${heading} - ${name}`,
+          html: createMailHtml({ heading, intro, name, email, message })
+        });
+
+        results.push({ recipient, ok: true });
+      } catch (mailError) {
+        console.error(`contact email failed for ${recipient}:`, mailError);
+        results.push({
+          recipient,
+          ok: false,
+          error: String(mailError?.message || mailError).slice(0, 400)
+        });
+      }
+    }
+
+    return json(200, {
+      success: true,
+      stored: !insertError,
+      notifications: results
+    });
   } catch (error) {
     return json(500, {
       error: "Server error",

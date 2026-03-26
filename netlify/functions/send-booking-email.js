@@ -3,6 +3,7 @@ import {
   json,
   normalizeEmail,
   isValidEmail,
+  parseEmailRecipients,
   createServiceClient,
   sendResendMail,
   createMailLayout,
@@ -12,17 +13,18 @@ import {
 
 function getBookingMailConfig() {
   const from =
-    process.env.CONTACT_FROM_EMAIL ||
     process.env.BOOKING_FROM_EMAIL ||
+    process.env.CONTACT_FROM_EMAIL ||
     process.env.GALLERY_FROM_EMAIL ||
     "B. Photography <noreply@bphoto.at>";
 
-  const adminTo =
-    process.env.BOOKING_TO_EMAIL ||
-    process.env.CONTACT_TO_EMAIL ||
-    "busi.sandor@bphoto.at";
+  const adminRecipients = parseEmailRecipients(
+    process.env.BOOKING_TO_EMAIL,
+    process.env.CONTACT_TO_EMAIL,
+    "busi.sandor@bphoto.at"
+  );
 
-  return { from, adminTo };
+  return { from, adminRecipients };
 }
 
 function createAdminMailHtml({ heading, intro, name, email, bookingDate, packageName, message }) {
@@ -47,7 +49,7 @@ function createClientMailHtml({ lang, name, bookingDate, packageName }) {
   return createMailLayout({
     heading: isHu ? "Megérkezett a foglalási kérésed" : "Deine Buchungsanfrage ist eingegangen",
     intro: isHu
-      ? `Szia ${name}! Megkaptam a foglalási kérésedet. A következő lépésben átnézem a részleteket, és általában 24 órán belül visszajelzek.`
+      ? `Szia ${name}! Megkaptam a foglalási kérésedet. Átnézem a részleteket, és általában 24 órán belül visszajelzek.`
       : `Hallo ${name}! Deine Buchungsanfrage ist angekommen. Ich prüfe jetzt die Details und melde mich in der Regel innerhalb von 24 Stunden persönlich zurück.`,
     sections: `
       ${createInfoTable([
@@ -64,9 +66,36 @@ function createClientMailHtml({ lang, name, bookingDate, packageName }) {
     ctaText: isHu ? "Kapcsolat oldal" : "Kontaktseite",
     ctaUrl: isHu ? "https://bphoto.at/hu/kapcsolat.html" : "https://bphoto.at/de/kontakt.html",
     footerNote: isHu
-      ? "Ha időközben pontosítanál valamit, nyugodtan válaszolj erre az emailre."
+      ? "Ha időközben pontosítanál valamit, nyugodtan válaszolj erre az e-mailre."
       : "Wenn du in der Zwischenzeit etwas ergänzen möchtest, antworte einfach auf diese E-Mail."
   });
+}
+
+async function notifyAdmins({ from, replyTo, recipients, subject, html }) {
+  const results = [];
+
+  for (const recipient of recipients) {
+    try {
+      await sendResendMail({
+        from,
+        to: recipient,
+        replyTo,
+        subject,
+        html
+      });
+
+      results.push({ recipient, ok: true });
+    } catch (error) {
+      console.error(`booking admin email failed for ${recipient}:`, error);
+      results.push({
+        recipient,
+        ok: false,
+        error: String(error?.message || error).slice(0, 400)
+      });
+    }
+  }
+
+  return results;
 }
 
 export const handler = async (event) => {
@@ -79,7 +108,7 @@ export const handler = async (event) => {
   }
 
   const supabase = createServiceClient();
-  const { from, adminTo } = getBookingMailConfig();
+  const { from, adminRecipients } = getBookingMailConfig();
 
   try {
     const data = JSON.parse(event.body || "{}");
@@ -122,43 +151,57 @@ export const handler = async (event) => {
       throw new Error(`Booking insert failed: ${insertError.message}`);
     }
 
-    await sendResendMail({
-      from,
-      to: adminTo,
-      replyTo: email,
-      subject: `${adminHeading} - ${name}`,
-      html: createAdminMailHtml({
-        heading: adminHeading,
-        intro: adminIntro,
-        name,
-        email,
-        bookingDate,
-        packageName,
-        message
-      })
+    const adminHtml = createAdminMailHtml({
+      heading: adminHeading,
+      intro: adminIntro,
+      name,
+      email,
+      bookingDate,
+      packageName,
+      message
     });
 
-    await sendResendMail({
+    const adminResults = await notifyAdmins({
       from,
-      to: email,
-      replyTo: adminTo,
-      subject:
-        lang === "hu"
-          ? "Megérkezett a foglalási kérésed - B. Photography"
-          : "Deine Buchungsanfrage ist eingegangen - B. Photography",
-      html: createClientMailHtml({
-        lang,
-        name,
-        bookingDate,
-        packageName
-      })
+      replyTo: email,
+      recipients: adminRecipients,
+      subject: `${adminHeading} - ${name}`,
+      html: adminHtml
     });
+
+    let clientNotification = { ok: false, recipient: email };
+    try {
+      await sendResendMail({
+        from,
+        to: email,
+        replyTo: adminRecipients[0] || process.env.CONTACT_TO_EMAIL || "busi.sandor@bphoto.at",
+        subject:
+          lang === "hu"
+            ? "Megérkezett a foglalási kérésed - B. Photography"
+            : "Deine Buchungsanfrage ist eingegangen - B. Photography",
+        html: createClientMailHtml({
+          lang,
+          name,
+          bookingDate,
+          packageName
+        })
+      });
+
+      clientNotification = { ok: true, recipient: email };
+    } catch (error) {
+      console.error("booking client email failed:", error);
+      clientNotification = {
+        ok: false,
+        recipient: email,
+        error: String(error?.message || error).slice(0, 400)
+      };
+    }
 
     return json(200, {
       success: true,
       bookingId: insertedBooking?.id || null,
-      adminNotification: adminTo,
-      clientNotification: email
+      adminNotifications: adminResults,
+      clientNotification
     });
   } catch (error) {
     console.error("send-booking-email failed:", error);

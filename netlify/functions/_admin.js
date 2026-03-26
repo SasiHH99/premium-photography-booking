@@ -38,6 +38,20 @@ export function isValidEmail(email = "") {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+export function parseEmailRecipients(...values) {
+  const recipients = values
+    .flatMap((value) => {
+      if (Array.isArray(value)) return value;
+      return String(value || "")
+        .split(/[,\n;]+/g)
+        .map((part) => part.trim());
+    })
+    .map((value) => normalizeEmail(value))
+    .filter((value) => value && isValidEmail(value));
+
+  return [...new Set(recipients)];
+}
+
 export function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
