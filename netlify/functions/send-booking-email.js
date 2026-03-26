@@ -18,8 +18,8 @@ function getBookingMailConfig() {
     "B. Photography <noreply@bphoto.at>";
 
   const adminTo =
-    process.env.CONTACT_TO_EMAIL ||
     process.env.BOOKING_TO_EMAIL ||
+    process.env.CONTACT_TO_EMAIL ||
     "busi.sandor@bphoto.at";
 
   return { from, adminTo };
