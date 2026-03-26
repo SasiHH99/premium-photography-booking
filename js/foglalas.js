@@ -12,6 +12,9 @@
   const errorBox = document.getElementById("bookingError");
   const successClose = document.getElementById("successClose");
   const errorClose = document.getElementById("errorClose");
+  const successTitle = successBox?.querySelector(".thank-you-title");
+  const successText = successBox?.querySelector(".thank-you-text");
+  const successNote = successBox?.querySelector(".success-note");
 
   const lang = window.location.pathname.startsWith("/hu") ? "hu" : "de";
 
@@ -20,13 +23,27 @@
       packagePlaceholder: "A csomag kiválasztása után itt látod röviden, milyen igényhez illik a legjobban.",
       invalidDate: "Kérlek legalább két nappal későbbi dátumot válassz.",
       dateEmpty: "Még nincs kiválasztott dátum.",
-      datePrefix: "Kiválasztott dátum:"
+      datePrefix: "Kiválasztott dátum:",
+      successTitle: "Kérés elküldve",
+      successText: "A foglalási kérésed beérkezett. Hamarosan jelentkezem a következő lépésekkel.",
+      successNote: "Általában 24 órán belül válaszolok.",
+      partialTitle: "Kérés rögzítve",
+      partialText:
+        "A foglalási kérésed elmentődött, de az admin értesítés nem ment át minden címre. A visszaigazolás ettől még megérkezhetett.",
+      partialNote: "Ha biztosra akarsz menni, írj a kapcsolat oldalon is."
     },
     de: {
       packagePlaceholder: "Nach der Paketauswahl siehst du hier kurz, wofür es am besten passt.",
       invalidDate: "Bitte wähle ein Datum, das mindestens zwei Tage in der Zukunft liegt.",
       dateEmpty: "Noch kein Datum ausgewählt.",
-      datePrefix: "Gewähltes Datum:"
+      datePrefix: "Gewähltes Datum:",
+      successTitle: "Anfrage gesendet",
+      successText: "Deine Buchungsanfrage ist eingegangen. Ich melde mich mit den nächsten Schritten.",
+      successNote: "In der Regel antworte ich innerhalb von 24 Stunden.",
+      partialTitle: "Anfrage gespeichert",
+      partialText:
+        "Deine Buchungsanfrage wurde gespeichert, aber die Admin-Benachrichtigung konnte nicht an alle Empfänger zugestellt werden.",
+      partialNote: "Wenn du sicher gehen willst, schreib zusätzlich über die Kontaktseite."
     }
   };
 
@@ -87,6 +104,30 @@
   function updatePackageInfo() {
     const selectedPackage = packageSelect.value;
     packageInfo.textContent = PACKAGE_TEXT[lang][selectedPackage] || TEXT[lang].packagePlaceholder;
+  }
+
+  function showSuccessState(kind = "success") {
+    if (!successTitle || !successText || !successNote) {
+      successBox.classList.add("show");
+      return;
+    }
+
+    const copy = kind === "partial"
+      ? {
+          title: TEXT[lang].partialTitle,
+          text: TEXT[lang].partialText,
+          note: TEXT[lang].partialNote
+        }
+      : {
+          title: TEXT[lang].successTitle,
+          text: TEXT[lang].successText,
+          note: TEXT[lang].successNote
+        };
+
+    successTitle.textContent = copy.title;
+    successText.textContent = copy.text;
+    successNote.textContent = copy.note;
+    successBox.classList.add("show");
   }
 
   function updateDateDisplay() {
@@ -157,7 +198,11 @@
         throw new Error(body.details || body.error || "Booking request failed");
       }
 
-      successBox.classList.add("show");
+      const adminNotifications = Array.isArray(body.adminNotifications) ? body.adminNotifications : [];
+      const hasWorkingAdminNotification =
+        adminNotifications.length === 0 || adminNotifications.some((item) => item && item.ok);
+
+      showSuccessState(hasWorkingAdminNotification ? "success" : "partial");
       form.reset();
       dateInput.min = formatIsoDate(getMinBookingDate());
       updatePackageInfo();
