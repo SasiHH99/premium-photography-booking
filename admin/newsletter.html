@@ -124,6 +124,91 @@
           </div>
         </aside>
       </section>
+
+      <section class="split-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Kampány</p>
+              <h2>Kézi küldés előkészítése</h2>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="split-grid">
+              <label class="field">
+                <span>Nyelv</span>
+                <select id="newsletterCampaignLang">
+                  <option value="de">DE</option>
+                  <option value="hu">HU</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Teszt email</span>
+                <input type="email" id="newsletterCampaignTestEmail" placeholder="teszt@email.hu">
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Tárgy</span>
+              <input type="text" id="newsletterCampaignSubject" placeholder="Freie Termine und neue Serien | B. Photography">
+            </label>
+
+            <label class="field">
+              <span>Heading</span>
+              <input type="text" id="newsletterCampaignHeading" placeholder="Neue freie Termine und frische Bildserien">
+            </label>
+
+            <label class="field">
+              <span>Bevezető</span>
+              <textarea id="newsletterCampaignIntro" rows="3" placeholder="Rövid összefoglaló a levél elejére."></textarea>
+            </label>
+
+            <label class="field">
+              <span>Törzs</span>
+              <textarea id="newsletterCampaignBody" rows="8" placeholder="A kampány fő szövege. Üres sorral új bekezdést adhatsz."></textarea>
+            </label>
+
+            <div class="split-grid">
+              <label class="field">
+                <span>CTA szöveg</span>
+                <input type="text" id="newsletterCampaignCtaText" placeholder="Termin anfragen">
+              </label>
+              <label class="field">
+                <span>CTA URL</span>
+                <input type="url" id="newsletterCampaignCtaUrl" placeholder="https://bphoto.at/de/termin.html">
+              </label>
+            </div>
+
+            <div class="campaign-meta-strip">
+              <div class="campaign-meta-card">
+                <span class="detail-meta-label">Célközönség</span>
+                <strong class="detail-value" id="newsletterCampaignAudience">0 megerősített feliratkozó</strong>
+              </div>
+              <div class="campaign-meta-card">
+                <span class="detail-meta-label">Follow-up</span>
+                <strong class="detail-value" id="newsletterFollowupAudience">0 esedékes feliratkozó</strong>
+              </div>
+            </div>
+
+            <div class="detail-actions">
+              <button type="button" class="ghost-btn" id="newsletterCampaignTestBtn">Tesztküldés</button>
+              <button type="button" class="primary-btn" id="newsletterCampaignSendBtn">Kampány küldése</button>
+              <button type="button" class="ghost-btn" id="newsletterFollowupSendBtn">Follow-up küldése</button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Előzmények</p>
+              <h2>Legutóbbi küldések</h2>
+            </div>
+          </div>
+          <div class="detail-placeholder" id="newsletterCampaignLogEmpty">Még nincs rögzített kampányküldés.</div>
+          <div class="campaign-log-list hidden" id="newsletterCampaignLogList"></div>
+        </aside>
+      </section>
     </main>
   </div>
 

@@ -332,3 +332,65 @@ export function createNewsletterWelcomeHtml({ lang = "de", email, unsubscribeUrl
       : `Wenn du später keine Updates mehr möchtest, kannst du dich hier abmelden: <a href="${unsubscribeUrl}" style="color:#f0ca82;text-decoration:underline;">Abmelden</a>.`
   });
 }
+
+function nl2br(text = "") {
+  return escapeHtml(text).replace(/\n{2,}/g, "</p><p style=\"margin:0 0 16px;line-height:1.75;color:#f3efe5;font-size:15px;\">").replace(/\n/g, "<br>");
+}
+
+export function createNewsletterCampaignHtml({
+  lang = "de",
+  heading,
+  intro,
+  body,
+  ctaText = "",
+  ctaUrl = "",
+  unsubscribeUrl = "",
+  isTest = false
+}) {
+  const footerNote = isTest
+    ? lang === "hu"
+      ? "Tesztküldés a B. Photography hírlevél kampányából."
+      : "Testversand aus der B. Photography Newsletter-Kampagne."
+    : lang === "hu"
+      ? `Ha később mégsem szeretnél ilyen leveleket kapni, itt le tudsz iratkozni: <a href="${unsubscribeUrl}" style="color:#f0ca82;text-decoration:underline;">Leiratkozás</a>.`
+      : `Wenn du später keine Updates mehr möchtest, kannst du dich hier abmelden: <a href="${unsubscribeUrl}" style="color:#f0ca82;text-decoration:underline;">Abmelden</a>.`;
+
+  return createMailLayout({
+    eyebrow: "B. Photography Updates",
+    heading,
+    intro,
+    sections: `
+      <div style="padding:20px 22px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);">
+        <p style="margin:0 0 16px;line-height:1.75;color:#f3efe5;font-size:15px;">${nl2br(body || "")}</p>
+      </div>
+    `,
+    ctaText,
+    ctaUrl,
+    footerNote
+  });
+}
+
+export function createNewsletterFollowupHtml({ lang = "de", unsubscribeUrl }) {
+  const isHu = lang === "hu";
+
+  return createMailLayout({
+    eyebrow: "B. Photography Updates",
+    heading: isHu ? "Van már elképzelésed a következő fotózásról?" : "Planst du schon dein nächstes Shooting?",
+    intro: isHu
+      ? "Ha már tudod, hogy portrét, páros vagy családi anyagot szeretnél, most érdemes elindítani az egyeztetést."
+      : "Wenn du schon weißt, dass du ein Portrait-, Paar- oder Familienshooting planst, ist jetzt ein guter Moment für die erste Anfrage.",
+    sections: `
+      ${createNoteBlock(
+        isHu ? "Miért most?" : "Warum jetzt?",
+        isHu
+          ? "A szabad időpontok gyorsan telnek, és a jobb képi anyag mindig átgondolt előkészítéssel indul."
+          : "Freie Termine sind schnell vergeben, und starke Bildserien beginnen fast immer mit einer klaren Vorbereitung."
+      )}
+    `,
+    ctaText: isHu ? "Időpontot kérek" : "Termin anfragen",
+    ctaUrl: isHu ? "https://bphoto.at/hu/foglalas.html" : "https://bphoto.at/de/termin.html",
+    footerNote: isHu
+      ? `Ha később mégsem szeretnél ilyen leveleket kapni, itt le tudsz iratkozni: <a href="${unsubscribeUrl}" style="color:#f0ca82;text-decoration:underline;">Leiratkozás</a>.`
+      : `Wenn du später keine Updates mehr möchtest, kannst du dich hier abmelden: <a href="${unsubscribeUrl}" style="color:#f0ca82;text-decoration:underline;">Abmelden</a>.`
+  });
+}

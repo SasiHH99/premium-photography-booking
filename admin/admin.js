@@ -164,7 +164,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterDetailWelcomeSent: document.getElementById("newsletterDetailWelcomeSent"),
     newsletterDetailResendId: document.getElementById("newsletterDetailResendId"),
     newsletterEmailLink: document.getElementById("newsletterEmailLink"),
-    newsletterResendBtn: document.getElementById("newsletterResendBtn")
+    newsletterResendBtn: document.getElementById("newsletterResendBtn"),
+    newsletterCampaignLang: document.getElementById("newsletterCampaignLang"),
+    newsletterCampaignSubject: document.getElementById("newsletterCampaignSubject"),
+    newsletterCampaignHeading: document.getElementById("newsletterCampaignHeading"),
+    newsletterCampaignIntro: document.getElementById("newsletterCampaignIntro"),
+    newsletterCampaignBody: document.getElementById("newsletterCampaignBody"),
+    newsletterCampaignCtaText: document.getElementById("newsletterCampaignCtaText"),
+    newsletterCampaignCtaUrl: document.getElementById("newsletterCampaignCtaUrl"),
+    newsletterCampaignTestEmail: document.getElementById("newsletterCampaignTestEmail"),
+    newsletterCampaignAudience: document.getElementById("newsletterCampaignAudience"),
+    newsletterFollowupAudience: document.getElementById("newsletterFollowupAudience"),
+    newsletterCampaignTestBtn: document.getElementById("newsletterCampaignTestBtn"),
+    newsletterCampaignSendBtn: document.getElementById("newsletterCampaignSendBtn"),
+    newsletterFollowupSendBtn: document.getElementById("newsletterFollowupSendBtn"),
+    newsletterCampaignLogList: document.getElementById("newsletterCampaignLogList"),
+    newsletterCampaignLogEmpty: document.getElementById("newsletterCampaignLogEmpty")
   };
 
   if (!ui.refreshAllBtn) return;
@@ -177,6 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     galleryFiles: [],
     portfolioItems: [],
     newsletterSubscribers: [],
+    newsletterCampaignLogs: [],
     selectedBookingId: null,
     selectedContactId: null,
     selectedGalleryUserId: null,
@@ -315,6 +331,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = await callAdmin("/.netlify/functions/admin-newsletter-subscribers", { method: "GET" });
     state.newsletterSubscribers = data.subscribers || [];
     state.selectedNewsletterId = ensureSelection(state.newsletterSubscribers, state.selectedNewsletterId, (subscriber) => subscriber.id);
+  }
+
+  async function loadNewsletterCampaignLogs() {
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", { method: "GET" });
+    state.newsletterCampaignLogs = data.logs || [];
   }
 
   async function loadGalleryFiles(userId) {
@@ -506,6 +527,68 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  function getNewsletterCampaignDefaults(lang = "de") {
+    if (lang === "hu") {
+      return {
+        subject: "Szabad időpontok és új sorozatok | B. Photography",
+        heading: "Új szabad időpontok és friss képi anyagok",
+        intro: "Rövid frissítés a nyitott időpontokról, új sorozatokról és válogatott fotózási lehetőségekről.",
+        body: "Ha szeretnél időben értesülni az új időpontokról és az új képi anyagokról, ez a lista erre szolgál.\n\nHa már most tudod, hogy fotózást szeretnél, elindíthatod a foglalást is.",
+        ctaText: "Időpontot kérek",
+        ctaUrl: "https://bphoto.at/hu/foglalas.html"
+      };
+    }
+
+    return {
+      subject: "Freie Termine und neue Serien | B. Photography",
+      heading: "Neue freie Termine und frische Bildserien",
+      intro: "Kurzes Update zu aktuellen Verfügbarkeiten, neuen Serien und ausgewählten Shooting-Möglichkeiten.",
+      body: "Wenn du früh über neue Termine und neue Arbeiten informiert werden möchtest, ist diese Liste genau dafür da.\n\nWenn du schon weißt, dass du ein Shooting planst, kannst du auch direkt eine Anfrage senden.",
+      ctaText: "Termin anfragen",
+      ctaUrl: "https://bphoto.at/de/termin.html"
+    };
+  }
+
+  function applyNewsletterCampaignDefaults(force = false) {
+    if (!ui.newsletterCampaignLang || !ui.newsletterCampaignSubject) return;
+
+    const defaults = getNewsletterCampaignDefaults(ui.newsletterCampaignLang.value === "hu" ? "hu" : "de");
+    const fields = [
+      [ui.newsletterCampaignSubject, defaults.subject],
+      [ui.newsletterCampaignHeading, defaults.heading],
+      [ui.newsletterCampaignIntro, defaults.intro],
+      [ui.newsletterCampaignBody, defaults.body],
+      [ui.newsletterCampaignCtaText, defaults.ctaText],
+      [ui.newsletterCampaignCtaUrl, defaults.ctaUrl]
+    ];
+
+    fields.forEach(([field, value]) => {
+      if (!field) return;
+      if (force || !String(field.value || "").trim()) {
+        field.value = value;
+      }
+    });
+  }
+
+  function getCampaignAudienceCount(lang) {
+    return state.newsletterSubscribers.filter((subscriber) => subscriber.status === "confirmed" && subscriber.lang === lang).length;
+  }
+
+  function getFollowupAudienceCount(lang) {
+    const now = Date.now();
+
+    return state.newsletterSubscribers.filter((subscriber) => {
+      if (subscriber.status !== "confirmed" || subscriber.lang !== lang || subscriber.followup_sent_at) {
+        return false;
+      }
+
+      const sourceDate = subscriber.welcome_sent_at || subscriber.confirmed_at;
+      if (!sourceDate) return false;
+
+      return now - new Date(sourceDate).getTime() >= 1000 * 60 * 60 * 24 * 2;
+    }).length;
+  }
+
   function renderNewsletter() {
     if (!ui.newsletterRows) return;
 
@@ -544,6 +627,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.newsletterResendBtn.disabled = subscriber.status !== "pending";
   }
 
+  function renderNewsletterCampaigns() {
+    if (!ui.newsletterCampaignAudience || !ui.newsletterCampaignLogList || !ui.newsletterCampaignLogEmpty || !ui.newsletterCampaignLang) return;
+
+    const lang = ui.newsletterCampaignLang.value === "hu" ? "hu" : "de";
+    ui.newsletterCampaignAudience.textContent = `${getCampaignAudienceCount(lang)} megerősített feliratkozó`;
+
+    if (ui.newsletterFollowupAudience) {
+      ui.newsletterFollowupAudience.textContent = `${getFollowupAudienceCount(lang)} esedékes feliratkozó`;
+    }
+
+    ui.newsletterCampaignLogList.innerHTML = state.newsletterCampaignLogs.map((log) => `
+      <article class="campaign-log-item">
+        <p class="panel-kicker">${escapeHtml(log.type === "followup" ? "Follow-up" : "Kampány")} · ${escapeHtml((LANG_LABELS[log.lang] || log.lang || "-").toUpperCase())}</p>
+        <h3>${escapeHtml(log.subject || "-")}</h3>
+        <p class="campaign-log-meta">${escapeHtml(formatDateTime(log.created_at))}</p>
+        <p class="campaign-log-meta">Címzett: ${escapeHtml(String(log.recipient_count || 0))} · Sikeres: ${escapeHtml(String(log.sent_count || 0))} · Hiba: ${escapeHtml(String(log.failed_count || 0))}</p>
+      </article>
+    `).join("");
+
+    ui.newsletterCampaignLogEmpty.classList.toggle("hidden", state.newsletterCampaignLogs.length > 0);
+    ui.newsletterCampaignLogList.classList.toggle("hidden", state.newsletterCampaignLogs.length === 0);
+  }
+
   function render() {
     updateStats();
     renderBookings();
@@ -551,6 +657,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderGalleryUsers();
     renderPortfolio();
     renderNewsletter();
+    renderNewsletterCampaigns();
   }
 
   function updatePortfolioFormMode(mode = "create", item = null) {
@@ -611,7 +718,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       ["kapcsolati üzenetek", loadContacts],
       ["galéria ügyfelek", loadGalleryUsers],
       ["portfólió elemek", loadPortfolioItems],
-      ["hírlevél feliratkozók", loadNewsletterSubscribers]
+      ["hírlevél feliratkozók", loadNewsletterSubscribers],
+      ["hírlevél kampányok", loadNewsletterCampaignLogs]
     ];
 
     for (const [label, run] of steps) {
@@ -924,6 +1032,84 @@ document.addEventListener("DOMContentLoaded", async () => {
     showFeedback("A megerősítő levél újraküldve.");
   }
 
+  function getNewsletterCampaignPayload() {
+    const lang = ui.newsletterCampaignLang?.value === "hu" ? "hu" : "de";
+    return {
+      lang,
+      subject: ui.newsletterCampaignSubject?.value.trim() || "",
+      heading: ui.newsletterCampaignHeading?.value.trim() || "",
+      intro: ui.newsletterCampaignIntro?.value.trim() || "",
+      body: ui.newsletterCampaignBody?.value.trim() || "",
+      ctaText: ui.newsletterCampaignCtaText?.value.trim() || "",
+      ctaUrl: ui.newsletterCampaignCtaUrl?.value.trim() || ""
+    };
+  }
+
+  async function sendNewsletterTest() {
+    const testEmail = ui.newsletterCampaignTestEmail?.value.trim() || "";
+    if (!testEmail) {
+      throw new Error("Adj meg egy teszt email címet.");
+    }
+
+    await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "send_test",
+        testEmail,
+        ...getNewsletterCampaignPayload()
+      })
+    });
+
+    showFeedback("A teszt hírlevél elküldve.");
+  }
+
+  async function sendNewsletterCampaign() {
+    const payload = getNewsletterCampaignPayload();
+    const recipientCount = getCampaignAudienceCount(payload.lang);
+
+    if (!recipientCount) {
+      throw new Error("Nincs megerősített feliratkozó ehhez a nyelvhez.");
+    }
+
+    if (!window.confirm(`Biztosan elküldöd ezt a kampányt ${recipientCount} feliratkozónak?`)) {
+      return;
+    }
+
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "send_campaign",
+        ...payload
+      })
+    });
+
+    await loadNewsletterCampaignLogs();
+    renderNewsletterCampaigns();
+    showFeedback(`Kampány elküldve. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
+  }
+
+  async function sendNewsletterFollowup() {
+    const lang = ui.newsletterCampaignLang?.value === "hu" ? "hu" : "de";
+    const recipientCount = getFollowupAudienceCount(lang);
+
+    if (!recipientCount) {
+      throw new Error("Nincs esedékes follow-up küldés ehhez a nyelvhez.");
+    }
+
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "send_followup",
+        lang
+      })
+    });
+
+    await loadNewsletterSubscribers();
+    await loadNewsletterCampaignLogs();
+    render();
+    showFeedback(`Follow-up küldés kész. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
+  }
+
   function exportNewsletterCsv() {
     const rows = getFilteredNewsletterSubscribers();
     if (!rows.length) {
@@ -994,6 +1180,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     [ui.newsletterSearch, ui.newsletterStatusFilter, ui.newsletterLangFilter].filter(Boolean).forEach((element) => {
       element.addEventListener("input", renderNewsletter);
       element.addEventListener("change", renderNewsletter);
+    });
+
+    ui.newsletterCampaignLang?.addEventListener("change", () => {
+      applyNewsletterCampaignDefaults(true);
+      renderNewsletterCampaigns();
     });
 
     ui.galleryUserSearch?.addEventListener("input", renderGalleryUsers);
@@ -1196,6 +1387,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterExportBtn?.addEventListener("click", exportNewsletterCsv);
 
+    ui.newsletterCampaignTestBtn?.addEventListener("click", async () => {
+      try {
+        await sendNewsletterTest();
+      } catch (error) {
+        console.error(error);
+        showFeedback(error.message || "Nem sikerült elküldeni a teszt hírlevelet.", "error");
+      }
+    });
+
+    ui.newsletterCampaignSendBtn?.addEventListener("click", async () => {
+      try {
+        await sendNewsletterCampaign();
+      } catch (error) {
+        console.error(error);
+        showFeedback(error.message || "Nem sikerült elküldeni a kampányt.", "error");
+      }
+    });
+
+    ui.newsletterFollowupSendBtn?.addEventListener("click", async () => {
+      try {
+        await sendNewsletterFollowup();
+      } catch (error) {
+        console.error(error);
+        showFeedback(error.message || "Nem sikerült elküldeni a follow-up levelet.", "error");
+      }
+    });
+
     ui.refreshAllBtn.addEventListener("click", () => {
       refreshAll();
     });
@@ -1228,6 +1446,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   bindEvents();
+  applyNewsletterCampaignDefaults(true);
   setActiveTab("bookings");
   await refreshAll();
   updatePortfolioFormMode("create");
