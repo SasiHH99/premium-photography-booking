@@ -250,7 +250,7 @@ img {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 99998;
+  z-index: 100010;
   background: rgba(5, 6, 10, 0.52);
   opacity: 0;
   visibility: hidden;
@@ -269,7 +269,7 @@ img {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 99999;
+  z-index: 100020;
   justify-content: flex-end;
   visibility: hidden;
   opacity: 0;
