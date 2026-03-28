@@ -1,4 +1,4 @@
-import {
+﻿import {
   CORS_HEADERS,
   json,
   verifyAdminFromEvent,
@@ -20,9 +20,9 @@ function buildCampaignDefaults(lang = "de") {
     return {
       subject: "Szabad időpontok és új sorozatok | B. Photography",
       heading: "Új szabad időpontok és friss képi anyagok",
-      intro: "Rövid frissítés a nyitott időpontokról, új sorozatokról és válogatott fotózási lehetőségekről.",
+      intro: "Rövid frissítés az aktuális időpontokról, új sorozatokról és kiválasztott fotózási lehetőségekről.",
       body:
-        "Ha szeretnél időben értesülni az új időpontokról és az új képi anyagokról, ez a lista erre szolgál.\n\nHa már most tudod, hogy fotózást szeretnél, elindíthatod a foglalást is.",
+        "Ha korán szeretnél értesülni az új időpontokról és friss anyagokról, ez a lista erre való.\n\nHa már most tudod, hogy fotózást szeretnél, innen rögtön tovább is mehetsz a foglalásra.",
       ctaText: "Időpontot kérek",
       ctaUrl: "https://bphoto.at/hu/foglalas.html"
     };
@@ -33,7 +33,7 @@ function buildCampaignDefaults(lang = "de") {
     heading: "Neue freie Termine und frische Bildserien",
     intro: "Kurzes Update zu aktuellen Verfügbarkeiten, neuen Serien und ausgewählten Shooting-Möglichkeiten.",
     body:
-      "Wenn du früh über neue Termine und neue Arbeiten informiert werden möchtest, ist diese Liste genau dafür da.\n\nWenn du schon weißt, dass du ein Shooting planst, kannst du auch direkt eine Anfrage senden.",
+      "Wenn du früh über neue Termine und frische Arbeiten informiert werden möchtest, ist diese Liste genau dafür da.\n\nWenn du schon weißt, dass du ein Shooting planst, kannst du direkt deine Anfrage senden.",
     ctaText: "Termin anfragen",
     ctaUrl: "https://bphoto.at/de/termin.html"
   };
@@ -53,6 +53,12 @@ function normalizePayload(body = {}) {
     ctaText: cleanText(body.ctaText || defaults.ctaText, 60),
     ctaUrl: cleanText(body.ctaUrl || defaults.ctaUrl, 260)
   };
+}
+
+function ensureCampaignPayload(payload) {
+  if (!payload.subject || !payload.heading || !payload.campaignBody || !payload.ctaText || !payload.ctaUrl) {
+    throw new Error("A kampányhoz tárgy, heading, szöveg és CTA is kell.");
+  }
 }
 
 export const handler = async (event) => {
@@ -102,6 +108,7 @@ export const handler = async (event) => {
     const payload = normalizePayload(body);
 
     if (action === "send_test") {
+      ensureCampaignPayload(payload);
       const testEmail = String(body.testEmail || "").trim().slice(0, 120).toLowerCase();
       if (!isValidEmail(testEmail)) {
         return json(400, { error: "Érvényes teszt email cím kell." });
@@ -129,6 +136,7 @@ export const handler = async (event) => {
     }
 
     if (action === "send_campaign") {
+      ensureCampaignPayload(payload);
       const result = await sendCampaignBatch({
         supabase,
         from,
@@ -147,6 +155,10 @@ export const handler = async (event) => {
         return json(400, { error: "Nincs megerősített feliratkozó ehhez a nyelvhez." });
       }
 
+      if (!result.sentCount && result.failedCount) {
+        return json(502, { error: "A kampány minden címnél hibára futott. Ellenőrizd a küldő emailt és a Resend beállításokat." });
+      }
+
       return json(200, { success: true, ...result });
     }
 
@@ -159,10 +171,19 @@ export const handler = async (event) => {
         logType: "followup"
       });
 
+      if (!result.recipientCount) {
+        return json(400, { error: "Nincs esedékes follow-up küldés ehhez a nyelvhez." });
+      }
+
+      if (!result.sentCount && result.failedCount) {
+        return json(502, { error: "A follow-up minden címnél hibára futott. Ellenőrizd a Resend beállításokat." });
+      }
+
       return json(200, { success: true, ...result });
     }
 
     if (action === "schedule_campaign") {
+      ensureCampaignPayload(payload);
       const scheduledForRaw = String(body.scheduledFor || "").trim();
       const scheduledFor = new Date(scheduledForRaw);
 

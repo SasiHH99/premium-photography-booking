@@ -204,6 +204,7 @@ img {
 .menu-toggle {
   display: none;
   position: relative;
+  z-index: 2;
   width: 46px;
   height: 46px;
   border-radius: 50%;
@@ -252,6 +253,7 @@ img {
   z-index: 99998;
   background: rgba(5, 6, 10, 0.52);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transition: opacity 0.24s ease;
   backdrop-filter: blur(4px);
@@ -259,6 +261,7 @@ img {
 
 .mobile-menu-backdrop.open {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
@@ -268,10 +271,15 @@ img {
   inset: 0;
   z-index: 99999;
   justify-content: flex-end;
+  visibility: hidden;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.24s ease, visibility 0.24s ease;
 }
 
 .mobile-menu.open {
+  visibility: visible;
+  opacity: 1;
   pointer-events: auto;
 }
 
@@ -470,7 +478,7 @@ body.has-site-chat .whatsapp-float {
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .header-inner {
     width: min(var(--site-max-width), calc(100% - 20px));
     padding: 14px 0;

@@ -1,4 +1,4 @@
-import {
+﻿import {
   generateToken,
   sendResendMail,
   createNewsletterCampaignHtml,
@@ -169,9 +169,10 @@ export async function sendFollowupBatch({
       await sendResendMail({
         from,
         to: subscriber.email,
-        subject: subscriber.lang === "hu"
-          ? "Van már elképzelésed a következő fotózásról? | B. Photography"
-          : "Planst du schon dein nächstes Shooting? | B. Photography",
+        subject:
+          subscriber.lang === "hu"
+            ? "Van már elképzelésed a következő fotózásról? | B. Photography"
+            : "Planst du schon dein nächstes Shooting? | B. Photography",
         html: createNewsletterFollowupHtml({
           lang: subscriber.lang || lang,
           unsubscribeUrl

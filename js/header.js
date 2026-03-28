@@ -127,7 +127,7 @@ function initHamburger() {
     if (event.key === "Escape") closeMenu();
   });
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 960) closeMenu();
+    if (window.innerWidth > 1100) closeMenu();
   });
 
   closeMenu();
@@ -140,8 +140,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const { lang } = getRouteInfo();
   const partialPath = lang === "hu" ? "/partials/header-hu.html" : "/partials/header-de.html";
 
-  const html = await fetch(partialPath).then((response) => response.text());
-  target.innerHTML = html;
+  try {
+    const response = await fetch(partialPath);
+    if (!response.ok) {
+      throw new Error(`Header partial request failed: ${response.status}`);
+    }
+
+    const html = await response.text();
+    target.innerHTML = html;
+  } catch (error) {
+    console.error("Header bootstrap failed:", error);
+    return;
+  }
 
   initLangSwitch();
   initActiveNavigation();
