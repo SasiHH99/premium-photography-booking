@@ -136,12 +136,24 @@
           <div class="form-card">
             <div class="split-grid">
               <label class="field">
+                <span>Preset</span>
+                <select id="newsletterCampaignPreset">
+                  <option value="free-terms">Szabad időpontok</option>
+                  <option value="portfolio-drop">Új portfólió sorozat</option>
+                  <option value="mini-session">Limitált mini session</option>
+                </select>
+              </label>
+              <label class="field">
                 <span>Nyelv</span>
                 <select id="newsletterCampaignLang">
                   <option value="de">DE</option>
                   <option value="hu">HU</option>
                 </select>
               </label>
+              <div class="field field-actions">
+                <span>Preset alkalmazása</span>
+                <button type="button" class="ghost-btn" id="newsletterCampaignPresetBtn">Preset betöltése</button>
+              </div>
               <label class="field">
                 <span>Teszt email</span>
                 <input type="email" id="newsletterCampaignTestEmail" placeholder="teszt@email.hu">
@@ -190,6 +202,20 @@
               </div>
             </div>
 
+            <div class="split-grid">
+              <label class="field">
+                <span>Ütemezett küldés ideje</span>
+                <input type="datetime-local" id="newsletterCampaignScheduleAt">
+              </label>
+              <div class="field field-actions">
+                <span>Ütemezés</span>
+                <div class="inline-actions">
+                  <button type="button" class="ghost-btn" id="newsletterCampaignScheduleBtn">Kampány időzítése</button>
+                  <button type="button" class="ghost-btn" id="newsletterCampaignRunScheduledBtn">Esedékes futtatása</button>
+                </div>
+              </div>
+            </div>
+
             <div class="detail-actions">
               <button type="button" class="ghost-btn" id="newsletterCampaignTestBtn">Tesztküldés</button>
               <button type="button" class="primary-btn" id="newsletterCampaignSendBtn">Kampány küldése</button>
@@ -200,6 +226,15 @@
 
         <aside class="panel">
           <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Ütemezés</p>
+              <h2>Következő küldések</h2>
+            </div>
+          </div>
+          <div class="detail-placeholder" id="newsletterScheduledJobsEmpty">Még nincs időzített kampány.</div>
+          <div class="campaign-log-list hidden" id="newsletterScheduledJobsList"></div>
+
+          <div class="panel-head panel-head-separator">
             <div>
               <p class="panel-kicker">Előzmények</p>
               <h2>Legutóbbi küldések</h2>

@@ -3,24 +3,17 @@ import {
   json,
   verifyAdminFromEvent,
   isValidEmail,
-  generateToken,
   sendResendMail,
-  createNewsletterCampaignHtml,
-  createNewsletterFollowupHtml,
-  createNewsletterUnsubscribeUrl
+  createNewsletterCampaignHtml
 } from "./_admin.js";
-
-const SETUP_ERROR =
-  "Hiányzik a newsletter_subscribers vagy a newsletter_campaign_logs tábla. Futtasd újra a supabase/admin_tables.sql fájlt a Supabase SQL Editorban.";
-
-function isMissingRelation(error, relation) {
-  const message = String(error?.message || "");
-  return error?.code === "42P01" || message.includes(`relation \"public.${relation}\" does not exist`);
-}
-
-function cleanText(value = "", max = 8000) {
-  return String(value || "").trim().slice(0, max);
-}
+import {
+  NEWSLETTER_SETUP_ERROR,
+  isMissingRelation,
+  cleanText,
+  sendCampaignBatch,
+  sendFollowupBatch,
+  processScheduledCampaignJobs
+} from "./_newsletterCampaigns.js";
 
 function buildCampaignDefaults(lang = "de") {
   if (lang === "hu") {
@@ -46,27 +39,20 @@ function buildCampaignDefaults(lang = "de") {
   };
 }
 
-async function ensureUnsubscribeToken(supabase, subscriber) {
-  if (subscriber.unsubscribe_token) return subscriber.unsubscribe_token;
+function normalizePayload(body = {}) {
+  const lang = body.lang === "hu" ? "hu" : "de";
+  const defaults = buildCampaignDefaults(lang);
 
-  const token = generateToken(24);
-  const { error } = await supabase
-    .from("newsletter_subscribers")
-    .update({ unsubscribe_token: token })
-    .eq("id", subscriber.id);
-
-  if (error) {
-    throw new Error(`Unsubscribe token update failed: ${error.message}`);
-  }
-
-  return token;
-}
-
-async function insertCampaignLog(supabase, payload) {
-  const { error } = await supabase.from("newsletter_campaign_logs").insert(payload);
-  if (error && !isMissingRelation(error, "newsletter_campaign_logs")) {
-    throw new Error(`newsletter_campaign_logs insert failed: ${error.message}`);
-  }
+  return {
+    lang,
+    presetKey: cleanText(body.presetKey || "", 60),
+    subject: cleanText(body.subject || defaults.subject, 160),
+    heading: cleanText(body.heading || defaults.heading, 160),
+    intro: cleanText(body.intro || defaults.intro, 320),
+    campaignBody: cleanText(body.body || defaults.body, 5000),
+    ctaText: cleanText(body.ctaText || defaults.ctaText, 60),
+    ctaUrl: cleanText(body.ctaUrl || defaults.ctaUrl, 260)
+  };
 }
 
 export const handler = async (event) => {
@@ -78,21 +64,33 @@ export const handler = async (event) => {
   if (!admin.ok) return admin.response;
 
   const { supabase, user } = admin;
+  const from =
+    process.env.NEWSLETTER_FROM_EMAIL ||
+    process.env.CONTACT_FROM_EMAIL ||
+    "B. Photography <noreply@bphoto.at>";
 
   try {
     if (event.httpMethod === "GET") {
-      const { data, error } = await supabase
-        .from("newsletter_campaign_logs")
-        .select("id, type, lang, subject, heading, intro, body, cta_text, cta_url, recipient_count, sent_count, failed_count, created_at")
-        .order("created_at", { ascending: false })
-        .limit(12);
+      const [{ data: logs, error: logsError }, { data: schedules, error: schedulesError }] = await Promise.all([
+        supabase
+          .from("newsletter_campaign_logs")
+          .select("id, type, lang, subject, heading, intro, body, cta_text, cta_url, recipient_count, sent_count, failed_count, created_at")
+          .order("created_at", { ascending: false })
+          .limit(12),
+        supabase
+          .from("newsletter_broadcast_jobs")
+          .select("id, lang, preset_key, subject, heading, scheduled_for, status, recipient_count, sent_count, failed_count, created_at, processed_at")
+          .order("scheduled_for", { ascending: true })
+          .limit(12)
+      ]);
 
-      if (isMissingRelation(error, "newsletter_campaign_logs")) {
-        return json(500, { error: SETUP_ERROR });
+      if (isMissingRelation(logsError, "newsletter_campaign_logs") || isMissingRelation(schedulesError, "newsletter_broadcast_jobs")) {
+        return json(500, { error: NEWSLETTER_SETUP_ERROR });
       }
 
-      if (error) return json(400, { error: error.message });
-      return json(200, { logs: data || [] });
+      if (logsError) return json(400, { error: logsError.message });
+      if (schedulesError) return json(400, { error: schedulesError.message });
+      return json(200, { logs: logs || [], schedules: schedules || [] });
     }
 
     if (event.httpMethod !== "POST") {
@@ -101,21 +99,10 @@ export const handler = async (event) => {
 
     const body = JSON.parse(event.body || "{}");
     const action = String(body.action || "").trim();
-    const lang = body.lang === "hu" ? "hu" : "de";
-    const defaults = buildCampaignDefaults(lang);
-    const subject = cleanText(body.subject || defaults.subject, 160);
-    const heading = cleanText(body.heading || defaults.heading, 160);
-    const intro = cleanText(body.intro || defaults.intro, 320);
-    const campaignBody = cleanText(body.body || defaults.body, 5000);
-    const ctaText = cleanText(body.ctaText || defaults.ctaText, 60);
-    const ctaUrl = cleanText(body.ctaUrl || defaults.ctaUrl, 260);
-    const from =
-      process.env.NEWSLETTER_FROM_EMAIL ||
-      process.env.CONTACT_FROM_EMAIL ||
-      "B. Photography <noreply@bphoto.at>";
+    const payload = normalizePayload(body);
 
     if (action === "send_test") {
-      const testEmail = cleanText(body.testEmail || "", 120).toLowerCase();
+      const testEmail = String(body.testEmail || "").trim().slice(0, 120).toLowerCase();
       if (!isValidEmail(testEmail)) {
         return json(400, { error: "Érvényes teszt email cím kell." });
       }
@@ -123,183 +110,112 @@ export const handler = async (event) => {
       await sendResendMail({
         from,
         to: testEmail,
-        subject: `[TESZT] ${subject}`,
+        subject: `[TESZT] ${payload.subject}`,
         html: createNewsletterCampaignHtml({
-          lang,
-          heading,
-          intro,
-          body: campaignBody,
-          ctaText,
-          ctaUrl,
+          lang: payload.lang,
+          heading: payload.heading,
+          intro: payload.intro,
+          body: payload.campaignBody,
+          ctaText: payload.ctaText,
+          ctaUrl: payload.ctaUrl,
           isTest: true
         })
       });
 
-      return json(200, { success: true, message: "Tesztlevél elküldve." });
+      return json(200, {
+        success: true,
+        message: "Tesztlevél elküldve."
+      });
     }
 
     if (action === "send_campaign") {
-      const { data: subscribers, error } = await supabase
-        .from("newsletter_subscribers")
-        .select("id, email, lang, status, unsubscribe_token")
-        .eq("status", "confirmed")
-        .eq("lang", lang)
-        .order("created_at", { ascending: true });
+      const result = await sendCampaignBatch({
+        supabase,
+        from,
+        lang: payload.lang,
+        subject: payload.subject,
+        heading: payload.heading,
+        intro: payload.intro,
+        body: payload.campaignBody,
+        ctaText: payload.ctaText,
+        ctaUrl: payload.ctaUrl,
+        createdBy: user.id,
+        logType: "campaign"
+      });
 
-      if (isMissingRelation(error, "newsletter_subscribers")) {
-        return json(500, { error: SETUP_ERROR });
-      }
-
-      if (error) return json(400, { error: error.message });
-
-      const recipients = subscribers || [];
-      if (!recipients.length) {
+      if (!result.recipientCount) {
         return json(400, { error: "Nincs megerősített feliratkozó ehhez a nyelvhez." });
       }
 
-      let sentCount = 0;
-      let failedCount = 0;
-
-      for (const subscriber of recipients) {
-        try {
-          const unsubscribeToken = await ensureUnsubscribeToken(supabase, subscriber);
-          const unsubscribeUrl = createNewsletterUnsubscribeUrl(subscriber.lang || lang, unsubscribeToken);
-
-          await sendResendMail({
-            from,
-            to: subscriber.email,
-            subject,
-            html: createNewsletterCampaignHtml({
-              lang: subscriber.lang || lang,
-              heading,
-              intro,
-              body: campaignBody,
-              ctaText,
-              ctaUrl,
-              unsubscribeUrl
-            })
-          });
-
-          sentCount += 1;
-        } catch (sendError) {
-          failedCount += 1;
-          console.error("newsletter campaign send failed:", subscriber.email, sendError);
-        }
-      }
-
-      await insertCampaignLog(supabase, {
-        type: "campaign",
-        lang,
-        subject,
-        heading,
-        intro,
-        body: campaignBody,
-        cta_text: ctaText,
-        cta_url: ctaUrl,
-        recipient_count: recipients.length,
-        sent_count: sentCount,
-        failed_count: failedCount,
-        created_by: user.id
-      });
-
-      return json(200, {
-        success: true,
-        recipientCount: recipients.length,
-        sentCount,
-        failedCount
-      });
+      return json(200, { success: true, ...result });
     }
 
     if (action === "send_followup") {
-      const { data: subscribers, error } = await supabase
-        .from("newsletter_subscribers")
-        .select("id, email, lang, status, confirmed_at, welcome_sent_at, followup_sent_at, unsubscribe_token")
-        .eq("status", "confirmed")
-        .eq("lang", lang)
-        .is("followup_sent_at", null)
-        .order("confirmed_at", { ascending: true });
+      const result = await sendFollowupBatch({
+        supabase,
+        from,
+        lang: payload.lang,
+        createdBy: user.id,
+        logType: "followup"
+      });
 
-      if (isMissingRelation(error, "newsletter_subscribers")) {
-        return json(500, { error: SETUP_ERROR });
+      return json(200, { success: true, ...result });
+    }
+
+    if (action === "schedule_campaign") {
+      const scheduledForRaw = String(body.scheduledFor || "").trim();
+      const scheduledFor = new Date(scheduledForRaw);
+
+      if (!scheduledForRaw || Number.isNaN(scheduledFor.getTime())) {
+        return json(400, { error: "Érvényes időpont kell az ütemezéshez." });
+      }
+
+      if (scheduledFor.getTime() < Date.now() + 60 * 1000) {
+        return json(400, { error: "Az ütemezett időpont legalább 1 perccel legyen a jelenlegi idő után." });
+      }
+
+      const { data, error } = await supabase
+        .from("newsletter_broadcast_jobs")
+        .insert({
+          lang: payload.lang,
+          preset_key: payload.presetKey || null,
+          subject: payload.subject,
+          heading: payload.heading,
+          intro: payload.intro,
+          body: payload.campaignBody,
+          cta_text: payload.ctaText,
+          cta_url: payload.ctaUrl,
+          scheduled_for: scheduledFor.toISOString(),
+          status: "scheduled",
+          created_by: user.id
+        })
+        .select("id, scheduled_for, status")
+        .single();
+
+      if (isMissingRelation(error, "newsletter_broadcast_jobs")) {
+        return json(500, { error: NEWSLETTER_SETUP_ERROR });
       }
 
       if (error) return json(400, { error: error.message });
 
-      const now = Date.now();
-      const eligible = (subscribers || []).filter((subscriber) => {
-        const sourceDate = subscriber.welcome_sent_at || subscriber.confirmed_at;
-        if (!sourceDate) return false;
-        const ageMs = now - new Date(sourceDate).getTime();
-        return ageMs >= 1000 * 60 * 60 * 24 * 2;
+      return json(200, {
+        success: true,
+        message: "A kampány időzítve.",
+        job: data
       });
+    }
 
-      if (!eligible.length) {
-        return json(200, {
-          success: true,
-          recipientCount: 0,
-          sentCount: 0,
-          failedCount: 0
-        });
-      }
-
-      let sentCount = 0;
-      let failedCount = 0;
-      const sentIds = [];
-
-      for (const subscriber of eligible) {
-        try {
-          const unsubscribeToken = await ensureUnsubscribeToken(supabase, subscriber);
-          const unsubscribeUrl = createNewsletterUnsubscribeUrl(subscriber.lang || lang, unsubscribeToken);
-
-          await sendResendMail({
-            from,
-            to: subscriber.email,
-            subject: subscriber.lang === "hu" ? "Van már elképzelésed a következő fotózásról? | B. Photography" : "Planst du schon dein nächstes Shooting? | B. Photography",
-            html: createNewsletterFollowupHtml({
-              lang: subscriber.lang || lang,
-              unsubscribeUrl
-            })
-          });
-
-          sentCount += 1;
-          sentIds.push(subscriber.id);
-        } catch (sendError) {
-          failedCount += 1;
-          console.error("newsletter followup send failed:", subscriber.email, sendError);
-        }
-      }
-
-      if (sentIds.length) {
-        const { error: updateError } = await supabase
-          .from("newsletter_subscribers")
-          .update({ followup_sent_at: new Date().toISOString() })
-          .in("id", sentIds);
-
-        if (updateError) {
-          console.error("newsletter followup timestamp update failed:", updateError);
-        }
-      }
-
-      await insertCampaignLog(supabase, {
-        type: "followup",
-        lang,
-        subject: lang === "hu" ? "Második follow-up" : "Zweiter Follow-up",
-        heading: lang === "hu" ? "Második follow-up" : "Zweiter Follow-up",
-        intro: null,
-        body: null,
-        cta_text: lang === "hu" ? "Időpontot kérek" : "Termin anfragen",
-        cta_url: lang === "hu" ? "https://bphoto.at/hu/foglalas.html" : "https://bphoto.at/de/termin.html",
-        recipient_count: eligible.length,
-        sent_count: sentCount,
-        failed_count: failedCount,
-        created_by: user.id
+    if (action === "run_scheduled") {
+      const result = await processScheduledCampaignJobs({
+        supabase,
+        from,
+        createdBy: user.id
       });
 
       return json(200, {
         success: true,
-        recipientCount: eligible.length,
-        sentCount,
-        failedCount
+        processedCount: result.processedCount,
+        jobs: result.jobs
       });
     }
 

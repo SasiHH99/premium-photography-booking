@@ -175,10 +175,20 @@ body.admin-body {
   margin-bottom: 18px;
 }
 
+.panel-head-separator {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .field {
   display: grid;
   gap: 8px;
   min-width: 160px;
+}
+
+.field-actions {
+  align-content: end;
 }
 .field input,
 .field select,

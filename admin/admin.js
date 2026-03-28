@@ -165,6 +165,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterDetailResendId: document.getElementById("newsletterDetailResendId"),
     newsletterEmailLink: document.getElementById("newsletterEmailLink"),
     newsletterResendBtn: document.getElementById("newsletterResendBtn"),
+    newsletterCampaignPreset: document.getElementById("newsletterCampaignPreset"),
+    newsletterCampaignPresetBtn: document.getElementById("newsletterCampaignPresetBtn"),
     newsletterCampaignLang: document.getElementById("newsletterCampaignLang"),
     newsletterCampaignSubject: document.getElementById("newsletterCampaignSubject"),
     newsletterCampaignHeading: document.getElementById("newsletterCampaignHeading"),
@@ -172,12 +174,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterCampaignBody: document.getElementById("newsletterCampaignBody"),
     newsletterCampaignCtaText: document.getElementById("newsletterCampaignCtaText"),
     newsletterCampaignCtaUrl: document.getElementById("newsletterCampaignCtaUrl"),
+    newsletterCampaignScheduleAt: document.getElementById("newsletterCampaignScheduleAt"),
     newsletterCampaignTestEmail: document.getElementById("newsletterCampaignTestEmail"),
     newsletterCampaignAudience: document.getElementById("newsletterCampaignAudience"),
     newsletterFollowupAudience: document.getElementById("newsletterFollowupAudience"),
     newsletterCampaignTestBtn: document.getElementById("newsletterCampaignTestBtn"),
     newsletterCampaignSendBtn: document.getElementById("newsletterCampaignSendBtn"),
+    newsletterCampaignScheduleBtn: document.getElementById("newsletterCampaignScheduleBtn"),
+    newsletterCampaignRunScheduledBtn: document.getElementById("newsletterCampaignRunScheduledBtn"),
     newsletterFollowupSendBtn: document.getElementById("newsletterFollowupSendBtn"),
+    newsletterScheduledJobsList: document.getElementById("newsletterScheduledJobsList"),
+    newsletterScheduledJobsEmpty: document.getElementById("newsletterScheduledJobsEmpty"),
     newsletterCampaignLogList: document.getElementById("newsletterCampaignLogList"),
     newsletterCampaignLogEmpty: document.getElementById("newsletterCampaignLogEmpty")
   };
@@ -193,6 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     portfolioItems: [],
     newsletterSubscribers: [],
     newsletterCampaignLogs: [],
+    newsletterScheduledJobs: [],
     selectedBookingId: null,
     selectedContactId: null,
     selectedGalleryUserId: null,
@@ -336,6 +344,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadNewsletterCampaignLogs() {
     const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", { method: "GET" });
     state.newsletterCampaignLogs = data.logs || [];
+    state.newsletterScheduledJobs = data.schedules || [];
   }
 
   async function loadGalleryFiles(userId) {
@@ -527,39 +536,78 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  function getNewsletterCampaignDefaults(lang = "de") {
+  function getNewsletterCampaignPresets(lang = "de") {
     if (lang === "hu") {
       return {
-        subject: "Szabad időpontok és új sorozatok | B. Photography",
-        heading: "Új szabad időpontok és friss képi anyagok",
-        intro: "Rövid frissítés a nyitott időpontokról, új sorozatokról és válogatott fotózási lehetőségekről.",
-        body: "Ha szeretnél időben értesülni az új időpontokról és az új képi anyagokról, ez a lista erre szolgál.\n\nHa már most tudod, hogy fotózást szeretnél, elindíthatod a foglalást is.",
-        ctaText: "Időpontot kérek",
-        ctaUrl: "https://bphoto.at/hu/foglalas.html"
+        "free-terms": {
+          subject: "Szabad időpontok és új sorozatok | B. Photography",
+          heading: "Új szabad időpontok és friss képi anyagok",
+          intro: "Rövid frissítés a nyitott időpontokról, új sorozatokról és válogatott fotózási lehetőségekről.",
+          body: "Átnéztem a következő hetek szabad időpontjait és az új képi anyagokat.\n\nHa most szeretnél fotózást tervezni, ez jó pillanat az egyeztetés elindítására.",
+          ctaText: "Időpontot kérek",
+          ctaUrl: "https://bphoto.at/hu/foglalas.html"
+        },
+        "portfolio-drop": {
+          subject: "Új portfólió sorozat került fel | B. Photography",
+          heading: "Friss sorozat a portfólióban",
+          intro: "Új képi anyag került fel a portfólióba portré, páros és válogatott kreatív sorozatokkal.",
+          body: "Ha szeretnéd látni, milyen irányban épülnek most a képi anyagok, nézd meg az új portfólió részt.\n\nHa hasonló stílusban gondolkodsz, közvetlenül is elindíthatjuk az egyeztetést.",
+          ctaText: "Portfólió megnyitása",
+          ctaUrl: "https://bphoto.at/hu/portfolio.html"
+        },
+        "mini-session": {
+          subject: "Limitált időpontok nyíltak meg | B. Photography",
+          heading: "Most nyílt néhány limitált időpont",
+          intro: "Rövid, fókuszált fotózásokhoz új, korlátozott helyek nyíltak meg.",
+          body: "Ha gyors, tiszta és mégis prémium képi anyagot szeretnél, ezek a limitált helyek erre ideálisak.\n\nHa érdekel, most érdemes jelezni, mielőtt betelnek.",
+          ctaText: "Időpontot nézek",
+          ctaUrl: "https://bphoto.at/hu/arak.html"
+        }
       };
     }
 
     return {
-      subject: "Freie Termine und neue Serien | B. Photography",
-      heading: "Neue freie Termine und frische Bildserien",
-      intro: "Kurzes Update zu aktuellen Verfügbarkeiten, neuen Serien und ausgewählten Shooting-Möglichkeiten.",
-      body: "Wenn du früh über neue Termine und neue Arbeiten informiert werden möchtest, ist diese Liste genau dafür da.\n\nWenn du schon weißt, dass du ein Shooting planst, kannst du auch direkt eine Anfrage senden.",
-      ctaText: "Termin anfragen",
-      ctaUrl: "https://bphoto.at/de/termin.html"
+      "free-terms": {
+        subject: "Freie Termine und neue Serien | B. Photography",
+        heading: "Neue freie Termine und frische Bildserien",
+        intro: "Kurzes Update zu aktuellen Verfügbarkeiten, neuen Serien und ausgewählten Shooting-Möglichkeiten.",
+        body: "Ich habe die nächsten freien Termine und neue Bildserien zusammengestellt.\n\nWenn du gerade ein Shooting planst, ist jetzt ein guter Moment für die erste Anfrage.",
+        ctaText: "Termin anfragen",
+        ctaUrl: "https://bphoto.at/de/termin.html"
+      },
+      "portfolio-drop": {
+        subject: "Neue Portfolio-Serie online | B. Photography",
+        heading: "Neue Arbeiten im Portfolio",
+        intro: "Im Portfolio ist eine neue Serie online – mit Portraits, Paarbildern und ausgewählten Editorial-Motiven.",
+        body: "Wenn du sehen möchtest, wie sich die aktuelle Bildsprache weiterentwickelt, wirf einen Blick in die neue Serie.\n\nWenn du genau in diese Richtung möchtest, können wir direkt die Anfrage starten.",
+        ctaText: "Portfolio ansehen",
+        ctaUrl: "https://bphoto.at/de/portfolio.html"
+      },
+      "mini-session": {
+        subject: "Limitierte Termine sind offen | B. Photography",
+        heading: "Kurzfristig sind einige limitierte Slots frei",
+        intro: "Für kurze, klare und hochwertig geführte Shootings sind gerade wenige zusätzliche Termine offen.",
+        body: "Wenn du ein kompaktes Shooting mit sauberer Führung und premium Bearbeitung suchst, ist das die passende Gelegenheit.\n\nWenn du Interesse hast, lohnt sich eine schnelle Anfrage.",
+        ctaText: "Preise ansehen",
+        ctaUrl: "https://bphoto.at/de/preise.html"
+      }
     };
   }
 
-  function applyNewsletterCampaignDefaults(force = false) {
-    if (!ui.newsletterCampaignLang || !ui.newsletterCampaignSubject) return;
+  function applyNewsletterCampaignPreset(force = true) {
+    if (!ui.newsletterCampaignPreset || !ui.newsletterCampaignLang) return;
 
-    const defaults = getNewsletterCampaignDefaults(ui.newsletterCampaignLang.value === "hu" ? "hu" : "de");
+    const lang = ui.newsletterCampaignLang.value === "hu" ? "hu" : "de";
+    const presets = getNewsletterCampaignPresets(lang);
+    const selectedPreset = presets[ui.newsletterCampaignPreset.value] || presets["free-terms"];
+
     const fields = [
-      [ui.newsletterCampaignSubject, defaults.subject],
-      [ui.newsletterCampaignHeading, defaults.heading],
-      [ui.newsletterCampaignIntro, defaults.intro],
-      [ui.newsletterCampaignBody, defaults.body],
-      [ui.newsletterCampaignCtaText, defaults.ctaText],
-      [ui.newsletterCampaignCtaUrl, defaults.ctaUrl]
+      [ui.newsletterCampaignSubject, selectedPreset.subject],
+      [ui.newsletterCampaignHeading, selectedPreset.heading],
+      [ui.newsletterCampaignIntro, selectedPreset.intro],
+      [ui.newsletterCampaignBody, selectedPreset.body],
+      [ui.newsletterCampaignCtaText, selectedPreset.ctaText],
+      [ui.newsletterCampaignCtaUrl, selectedPreset.ctaUrl]
     ];
 
     fields.forEach(([field, value]) => {
@@ -568,6 +616,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         field.value = value;
       }
     });
+  }
+
+  function setNewsletterScheduleDefault(force = false) {
+    if (!ui.newsletterCampaignScheduleAt) return;
+    if (!force && ui.newsletterCampaignScheduleAt.value) return;
+
+    const next = new Date();
+    next.setHours(next.getHours() + 2, 0, 0, 0);
+    const pad = (value) => String(value).padStart(2, "0");
+    ui.newsletterCampaignScheduleAt.value = `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}T${pad(next.getHours())}:${pad(next.getMinutes())}`;
   }
 
   function getCampaignAudienceCount(lang) {
@@ -635,6 +693,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (ui.newsletterFollowupAudience) {
       ui.newsletterFollowupAudience.textContent = `${getFollowupAudienceCount(lang)} esedékes feliratkozó`;
+    }
+
+    if (ui.newsletterScheduledJobsList && ui.newsletterScheduledJobsEmpty) {
+      ui.newsletterScheduledJobsList.innerHTML = state.newsletterScheduledJobs.map((job) => `
+        <article class="campaign-log-item">
+          <p class="panel-kicker">${escapeHtml((LANG_LABELS[job.lang] || job.lang || "-").toUpperCase())} · ${escapeHtml(job.status || "scheduled")}</p>
+          <h3>${escapeHtml(job.subject || "-")}</h3>
+          <p class="campaign-log-meta">Ütemezve: ${escapeHtml(formatDateTime(job.scheduled_for))}</p>
+          <p class="campaign-log-meta">Preset: ${escapeHtml(job.preset_key || "egyedi")} · Sikeres: ${escapeHtml(String(job.sent_count || 0))} · Hiba: ${escapeHtml(String(job.failed_count || 0))}</p>
+        </article>
+      `).join("");
+
+      ui.newsletterScheduledJobsEmpty.classList.toggle("hidden", state.newsletterScheduledJobs.length > 0);
+      ui.newsletterScheduledJobsList.classList.toggle("hidden", state.newsletterScheduledJobs.length === 0);
     }
 
     ui.newsletterCampaignLogList.innerHTML = state.newsletterCampaignLogs.map((log) => `
@@ -1036,6 +1108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const lang = ui.newsletterCampaignLang?.value === "hu" ? "hu" : "de";
     return {
       lang,
+      presetKey: ui.newsletterCampaignPreset?.value || "",
       subject: ui.newsletterCampaignSubject?.value.trim() || "",
       heading: ui.newsletterCampaignHeading?.value.trim() || "",
       intro: ui.newsletterCampaignIntro?.value.trim() || "",
@@ -1086,6 +1159,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNewsletterCampaignLogs();
     renderNewsletterCampaigns();
     showFeedback(`Kampány elküldve. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
+  }
+
+  async function scheduleNewsletterCampaign() {
+    const payload = getNewsletterCampaignPayload();
+    const scheduledFor = ui.newsletterCampaignScheduleAt?.value || "";
+
+    if (!scheduledFor) {
+      throw new Error("Adj meg ütemezett időpontot.");
+    }
+
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "schedule_campaign",
+        scheduledFor,
+        ...payload
+      })
+    });
+
+    await loadNewsletterCampaignLogs();
+    renderNewsletterCampaigns();
+    setNewsletterScheduleDefault(true);
+    showFeedback(`A kampány időzítve: ${formatDateTime(data.job?.scheduled_for)}`);
+  }
+
+  async function runScheduledNewsletterJobs() {
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+      method: "POST",
+      body: JSON.stringify({ action: "run_scheduled" })
+    });
+
+    await loadNewsletterSubscribers();
+    await loadNewsletterCampaignLogs();
+    render();
+    showFeedback(`Az esedékes kampányok futtatása kész. Feldolgozott: ${data.processedCount || 0}.`);
   }
 
   async function sendNewsletterFollowup() {
@@ -1183,7 +1291,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     ui.newsletterCampaignLang?.addEventListener("change", () => {
-      applyNewsletterCampaignDefaults(true);
+      applyNewsletterCampaignPreset(true);
       renderNewsletterCampaigns();
     });
 
@@ -1387,6 +1495,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterExportBtn?.addEventListener("click", exportNewsletterCsv);
 
+    ui.newsletterCampaignPresetBtn?.addEventListener("click", () => {
+      applyNewsletterCampaignPreset(true);
+    });
+
     ui.newsletterCampaignTestBtn?.addEventListener("click", async () => {
       try {
         await sendNewsletterTest();
@@ -1402,6 +1514,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült elküldeni a kampányt.", "error");
+      }
+    });
+
+    ui.newsletterCampaignScheduleBtn?.addEventListener("click", async () => {
+      try {
+        await scheduleNewsletterCampaign();
+      } catch (error) {
+        console.error(error);
+        showFeedback(error.message || "Nem sikerült időzíteni a kampányt.", "error");
+      }
+    });
+
+    ui.newsletterCampaignRunScheduledBtn?.addEventListener("click", async () => {
+      try {
+        await runScheduledNewsletterJobs();
+      } catch (error) {
+        console.error(error);
+        showFeedback(error.message || "Nem sikerült futtatni az esedékes kampányokat.", "error");
       }
     });
 
@@ -1446,7 +1576,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   bindEvents();
-  applyNewsletterCampaignDefaults(true);
+  applyNewsletterCampaignPreset(true);
+  setNewsletterScheduleDefault(true);
   setActiveTab("bookings");
   await refreshAll();
   updatePortfolioFormMode("create");
