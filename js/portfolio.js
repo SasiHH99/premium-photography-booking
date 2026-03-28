@@ -4,6 +4,7 @@
     heroCopy: "Portré, páros, autós, családi és kreatív sorozatok Bécsből és környékéről, valódi fényekkel és tiszta vizuális vezetéssel.",
     allLabel: "Összes kategória",
     totalLabel: "Válogatott képek",
+    activeLabel: "Aktív nézet",
     ctaTitle: "Ha ezt a vizuális minőséget a saját képeidnél is szeretnéd, innen érdemes továbblépni.",
     ctaCopy: "Először röviden egyeztetjük a célt, utána áll össze az időpont, a helyszín és a legerősebb csomag.",
     ctaButton: "Fotózást kérek",
@@ -44,6 +45,7 @@
     heroCopy: "Porträts, Paare, Auto-, Familien- und kreative Serien aus Wien und Umgebung mit echtem Licht und klarer, ruhiger Bildsprache.",
     allLabel: "Alle Kategorien",
     totalLabel: "Kuratiertes Bildmaterial",
+    activeLabel: "Aktive Auswahl",
     ctaTitle: "Wenn du genau diese Bildqualität auch für dein eigenes Shooting willst, geht es hier weiter.",
     ctaCopy: "Wir klären zuerst Ziel, Stimmung und Ort und legen danach den passenden Ablauf und das stärkste Paket fest.",
     ctaButton: "Shooting anfragen",
@@ -186,7 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const activeLabel = state.filter === "all" ? copy.categories.all : copy.categories[state.filter];
     categoryValue.textContent = activeLabel;
     categoryValuePanel.textContent = activeLabel;
-    noteTitle.textContent = activeLabel;
+    noteTitle.textContent = copy.activeLabel;
     noteCopy.textContent = state.filter === "all" ? copy.heroCopy : (copy.categoryNotes[state.filter] || copy.heroCopy);
     totalValue.textContent = String(getCards().length);
   }
