@@ -2,7 +2,12 @@ import {
   CORS_HEADERS,
   json,
   createServiceClient,
-  createResendAudienceContact
+  createResendAudienceContact,
+  updateResendContactSubscription,
+  sendResendMail,
+  createNewsletterWelcomeHtml,
+  createNewsletterUnsubscribeUrl,
+  generateToken
 } from "./_admin.js";
 
 export const handler = async (event) => {
@@ -26,7 +31,7 @@ export const handler = async (event) => {
 
     const { data: subscriber, error: lookupError } = await supabase
       .from("newsletter_subscribers")
-      .select("id, email, lang, status, confirmation_token, confirmed_at, resend_contact_id")
+      .select("id, email, lang, status, confirmation_token, confirmed_at, resend_contact_id, unsubscribe_token")
       .eq("confirmation_token", token)
       .maybeSingle();
 
@@ -47,13 +52,16 @@ export const handler = async (event) => {
     }
 
     const confirmedAt = new Date().toISOString();
+    const unsubscribeToken = subscriber.unsubscribe_token || generateToken(24);
 
     const { error: updateError } = await supabase
       .from("newsletter_subscribers")
       .update({
         status: "confirmed",
         confirmed_at: confirmedAt,
-        confirmation_token: null
+        confirmation_token: null,
+        unsubscribe_token: unsubscribeToken,
+        unsubscribed_at: null
       })
       .eq("id", subscriber.id);
 
@@ -69,6 +77,11 @@ export const handler = async (event) => {
         audienceResult = await createResendAudienceContact({
           audienceId,
           email: subscriber.email
+        });
+
+        await updateResendContactSubscription({
+          email: subscriber.email,
+          unsubscribed: false
         });
 
         const contactId = audienceResult?.data?.id || audienceResult?.data?.data?.id || null;
@@ -90,6 +103,40 @@ export const handler = async (event) => {
           error: String(audienceError?.message || audienceError).slice(0, 400)
         };
       }
+    }
+
+    const unsubscribeUrl = createNewsletterUnsubscribeUrl(subscriber.lang || "de", unsubscribeToken);
+    const welcomeSentAt = new Date().toISOString();
+    const from =
+      process.env.NEWSLETTER_FROM_EMAIL ||
+      process.env.CONTACT_FROM_EMAIL ||
+      "B. Photography <noreply@bphoto.at>";
+
+    try {
+      await sendResendMail({
+        from,
+        to: subscriber.email,
+        subject:
+          subscriber.lang === "hu"
+            ? "Feliratkozás sikeres - B. Photography"
+            : "Du bist eingetragen - B. Photography",
+        html: createNewsletterWelcomeHtml({
+          lang: subscriber.lang || "de",
+          email: subscriber.email,
+          unsubscribeUrl
+        })
+      });
+
+      const { error: welcomeUpdateError } = await supabase
+        .from("newsletter_subscribers")
+        .update({ welcome_sent_at: welcomeSentAt })
+        .eq("id", subscriber.id);
+
+      if (welcomeUpdateError) {
+        console.error("newsletter welcome timestamp update failed:", welcomeUpdateError);
+      }
+    } catch (welcomeError) {
+      console.error("newsletter welcome mail failed:", welcomeError);
     }
 
     return json(200, {

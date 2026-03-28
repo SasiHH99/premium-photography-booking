@@ -1,4 +1,4 @@
-﻿import {
+import {
   CORS_HEADERS,
   json,
   verifyAdminFromEvent,
@@ -30,7 +30,7 @@ export const handler = async (event) => {
     if (event.httpMethod === "GET") {
       const { data, error } = await supabase
         .from("newsletter_subscribers")
-        .select("id, email, lang, status, source, consent, confirmed_at, resend_contact_id, last_confirmation_sent_at, created_at, updated_at")
+        .select("id, email, lang, status, source, consent, confirmed_at, resend_contact_id, last_confirmation_sent_at, unsubscribed_at, welcome_sent_at, created_at, updated_at")
         .order("created_at", { ascending: false });
 
       if (isMissingRelation(error, "newsletter_subscribers")) {
@@ -75,8 +75,8 @@ export const handler = async (event) => {
       return json(404, { error: "A feliratkozó nem található." });
     }
 
-    if (subscriber.status === "confirmed") {
-      return json(400, { error: "A kiválasztott email már meg van erősítve." });
+    if (subscriber.status !== "pending") {
+      return json(400, { error: "Megerősítő levelet csak függőben lévő feliratkozónál lehet újraküldeni." });
     }
 
     const token = generateToken(24);
@@ -96,14 +96,18 @@ export const handler = async (event) => {
       return json(400, { error: updateError.message });
     }
 
-    const from = process.env.NEWSLETTER_FROM_EMAIL || process.env.CONTACT_FROM_EMAIL || "B. Photography <noreply@bphoto.at>";
+    const from =
+      process.env.NEWSLETTER_FROM_EMAIL ||
+      process.env.CONTACT_FROM_EMAIL ||
+      "B. Photography <noreply@bphoto.at>";
 
     await sendResendMail({
       from,
       to: subscriber.email,
-      subject: subscriber.lang === "hu"
-        ? "Erősítsd meg a feliratkozásodat - B. Photography"
-        : "Bestätige deine Anmeldung - B. Photography",
+      subject:
+        subscriber.lang === "hu"
+          ? "Erősítsd meg a feliratkozásodat - B. Photography"
+          : "Bestätige deine Anmeldung - B. Photography",
       html: createNewsletterMailHtml({
         lang: subscriber.lang || "de",
         email: subscriber.email,

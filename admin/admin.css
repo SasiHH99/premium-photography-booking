@@ -292,6 +292,7 @@ body.admin-body {
 .status-pill[data-status="confirmed"],
 .status-pill[data-status="reviewed"],
 .status-pill[data-status="active"] { color: #7dd89a; background: rgba(113, 208, 141, 0.12); }
+.status-pill[data-status="unsubscribed"] { color: #d9d2c1; background: rgba(255, 255, 255, 0.08); }
 .status-pill[data-status="cancelled"],
 .status-pill[data-status="converted"] { color: #f5a3a3; background: rgba(241, 125, 125, 0.14); }
 

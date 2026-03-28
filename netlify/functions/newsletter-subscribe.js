@@ -1,4 +1,4 @@
-﻿import {
+import {
   CORS_HEADERS,
   json,
   normalizeEmail,
@@ -54,6 +54,7 @@ export const handler = async (event) => {
     }
 
     const token = generateToken(24);
+    const unsubscribeToken = generateToken(24);
     const confirmationUrl = createNewsletterConfirmationUrl(lang, token);
 
     const payload = {
@@ -63,7 +64,10 @@ export const handler = async (event) => {
       source,
       status: "pending",
       confirmation_token: token,
+      unsubscribe_token: unsubscribeToken,
       confirmed_at: null,
+      unsubscribed_at: null,
+      welcome_sent_at: null,
       last_confirmation_sent_at: new Date().toISOString()
     };
 
@@ -75,12 +79,18 @@ export const handler = async (event) => {
       throw new Error(`newsletter_subscribers upsert failed: ${upsertError.message}`);
     }
 
-    const from = process.env.NEWSLETTER_FROM_EMAIL || process.env.CONTACT_FROM_EMAIL || "B. Photography <noreply@bphoto.at>";
+    const from =
+      process.env.NEWSLETTER_FROM_EMAIL ||
+      process.env.CONTACT_FROM_EMAIL ||
+      "B. Photography <noreply@bphoto.at>";
 
     await sendResendMail({
       from,
       to: email,
-      subject: lang === "hu" ? "Erősítsd meg a feliratkozásodat - B. Photography" : "Bestätige deine Anmeldung - B. Photography",
+      subject:
+        lang === "hu"
+          ? "Erősítsd meg a feliratkozásodat - B. Photography"
+          : "Bestätige deine Anmeldung - B. Photography",
       html: createNewsletterMailHtml({ lang, email, confirmationUrl })
     });
 

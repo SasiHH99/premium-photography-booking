@@ -1,4 +1,4 @@
-﻿import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
 export const CORS_HEADERS = {
@@ -156,6 +156,35 @@ export async function createResendAudienceContact({ audienceId, email, firstName
   throw new Error(details.slice(0, 500));
 }
 
+export async function updateResendContactSubscription({ email, unsubscribed }) {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey || !email) {
+    return { ok: false, skipped: true };
+  }
+
+  const response = await fetch(`https://api.resend.com/contacts/${encodeURIComponent(email)}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ unsubscribed: unsubscribed === true })
+  });
+
+  if (response.ok) {
+    const body = await response.json().catch(() => ({}));
+    return { ok: true, data: body };
+  }
+
+  const details = await response.text();
+  const normalized = details.toLowerCase();
+  if (response.status === 404 || normalized.includes("not found")) {
+    return { ok: false, skipped: true, notFound: true };
+  }
+
+  throw new Error(details.slice(0, 500));
+}
+
 export function createMailLayout({ eyebrow = "B. Photography", heading, intro, sections = "", ctaText = "", ctaUrl = "", footerNote = "" }) {
   const cta = ctaText && ctaUrl
     ? `
@@ -241,6 +270,11 @@ export function createNewsletterConfirmationUrl(lang = "de", token = "", siteUrl
   return `${siteUrl}${page}?token=${encodeURIComponent(token)}`;
 }
 
+export function createNewsletterUnsubscribeUrl(lang = "de", token = "", siteUrl = process.env.PUBLIC_SITE_URL || "https://bphoto.at") {
+  const page = lang === "hu" ? "/hu/hirlevel-leiratkozas.html" : "/de/newsletter-abmelden.html";
+  return `${siteUrl}${page}?token=${encodeURIComponent(token)}`;
+}
+
 export function createNewsletterMailHtml({ lang = "de", email, confirmationUrl }) {
   const isHu = lang === "hu";
 
@@ -266,5 +300,35 @@ export function createNewsletterMailHtml({ lang = "de", email, confirmationUrl }
     footerNote: isHu
       ? "Ha nem te kérted ezt a feliratkozást, egyszerűen hagyd figyelmen kívül ezt az e-mailt."
       : "Wenn du diese Anmeldung nicht angefordert hast, kannst du diese E-Mail einfach ignorieren."
+  });
+}
+
+export function createNewsletterWelcomeHtml({ lang = "de", email, unsubscribeUrl }) {
+  const isHu = lang === "hu";
+  const ctaText = isHu ? "Árak megtekintése" : "Preise ansehen";
+  const ctaUrl = isHu ? "https://bphoto.at/hu/arak.html" : "https://bphoto.at/de/preise.html";
+
+  return createMailLayout({
+    eyebrow: "B. Photography Updates",
+    heading: isHu ? "Feliratkozás sikeres" : "Du bist eingetragen",
+    intro: isHu
+      ? "Köszönöm a megerősítést. Ezután válogatott értesítéseket kapsz új sorozatokról, szabad időpontokról és limitált fotózási lehetőségekről."
+      : "Danke für die Bestätigung. Du bekommst künftig kuratierte Updates zu neuen Serien, freien Terminen und limitierten Shooting-Möglichkeiten.",
+    sections: `
+      ${createInfoTable([
+        { label: isHu ? "E-mail cím" : "E-Mail", value: email }
+      ])}
+      ${createNoteBlock(
+        isHu ? "Mire számíts?" : "Was du bekommst",
+        isHu
+          ? "Nem kapsz napi promóciókat. Csak ritka, tényleg releváns frissítéseket, amikor új képi anyag, nyitott időpont vagy különleges lehetőség érkezik."
+          : "Keine tägliche Werbung. Nur seltene, wirklich relevante Updates, wenn neue Arbeiten, freie Termine oder besondere Möglichkeiten verfügbar sind."
+      )}
+    `,
+    ctaText,
+    ctaUrl,
+    footerNote: isHu
+      ? `Ha később mégsem szeretnél ilyen leveleket kapni, itt le tudsz iratkozni: <a href="${unsubscribeUrl}" style="color:#f0ca82;text-decoration:underline;">Leiratkozás</a>.`
+      : `Wenn du später keine Updates mehr möchtest, kannst du dich hier abmelden: <a href="${unsubscribeUrl}" style="color:#f0ca82;text-decoration:underline;">Abmelden</a>.`
   });
 }

@@ -2,6 +2,7 @@
 const STATUS_LABELS = {
   pending: "Függőben",
   confirmed: "Megerősítve",
+  unsubscribed: "Leiratkozott",
   cancelled: "Lemondva",
   new: "Új",
   reviewed: "Feldolgozott",
@@ -130,6 +131,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     galleryMediaEmpty: document.getElementById("galleryMediaEmpty"),
     portfolioItemId: document.getElementById("portfolioItemId"),
     portfolioItemPath: document.getElementById("portfolioItemPath"),
+    portfolioFormHeading: document.getElementById("portfolioFormHeading"),
+    portfolioFormNote: document.getElementById("portfolioFormNote"),
     portfolioCategory: document.getElementById("portfolioCategory"),
     portfolioLang: document.getElementById("portfolioLang"),
     portfolioTitle: document.getElementById("portfolioTitle"),
@@ -157,6 +160,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterDetailCreated: document.getElementById("newsletterDetailCreated"),
     newsletterDetailConfirmed: document.getElementById("newsletterDetailConfirmed"),
     newsletterDetailLastSent: document.getElementById("newsletterDetailLastSent"),
+    newsletterDetailUnsubscribed: document.getElementById("newsletterDetailUnsubscribed"),
+    newsletterDetailWelcomeSent: document.getElementById("newsletterDetailWelcomeSent"),
     newsletterDetailResendId: document.getElementById("newsletterDetailResendId"),
     newsletterEmailLink: document.getElementById("newsletterEmailLink"),
     newsletterResendBtn: document.getElementById("newsletterResendBtn")
@@ -302,7 +307,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadPortfolioItems() {
     const data = await callAdmin("/.netlify/functions/admin-portfolio-media", { method: "GET" });
     state.portfolioItems = data.items || [];
-    state.selectedPortfolioId = ensureSelection(state.portfolioItems, state.selectedPortfolioId, (item) => item.id);
+    const hasCurrent = state.portfolioItems.some((item) => String(item.id) === String(state.selectedPortfolioId));
+    state.selectedPortfolioId = hasCurrent ? state.selectedPortfolioId : null;
   }
 
   async function loadNewsletterSubscribers() {
@@ -531,9 +537,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.newsletterDetailCreated.textContent = formatDateTime(subscriber.created_at);
     ui.newsletterDetailConfirmed.textContent = formatDateTime(subscriber.confirmed_at);
     ui.newsletterDetailLastSent.textContent = formatDateTime(subscriber.last_confirmation_sent_at);
+    ui.newsletterDetailUnsubscribed.textContent = formatDateTime(subscriber.unsubscribed_at);
+    ui.newsletterDetailWelcomeSent.textContent = formatDateTime(subscriber.welcome_sent_at);
     ui.newsletterDetailResendId.textContent = subscriber.resend_contact_id || "Még nincs összekötve Resend contacttal.";
     ui.newsletterEmailLink.href = `mailto:${subscriber.email || ""}`;
-    ui.newsletterResendBtn.disabled = subscriber.status === "confirmed";
+    ui.newsletterResendBtn.disabled = subscriber.status !== "pending";
   }
 
   function render() {
@@ -543,6 +551,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderGalleryUsers();
     renderPortfolio();
     renderNewsletter();
+  }
+
+  function updatePortfolioFormMode(mode = "create", item = null) {
+    if (!ui.portfolioFormHeading || !ui.portfolioFormNote || !ui.portfolioSaveBtn || !ui.portfolioResetBtn) return;
+
+    if (mode === "edit" && item) {
+      ui.portfolioFormHeading.textContent = "Portfólió elem szerkesztése";
+      ui.portfolioFormNote.textContent = "Most a kiválasztott portfólió elemet szerkeszted. Ha teljesen új képet akarsz feltölteni, válts vissza új elem módra.";
+      ui.portfolioSaveBtn.textContent = "Módosítás mentése";
+      ui.portfolioResetBtn.textContent = "Új elem mód";
+    } else {
+      ui.portfolioFormHeading.textContent = "Új elem feltöltése";
+      ui.portfolioFormNote.textContent = "Új képhez töltsd ki az űrlapot, majd ments. A jobb oldali listából választva szerkesztő mód nyílik.";
+      ui.portfolioSaveBtn.textContent = "Mentés a portfólióba";
+      ui.portfolioResetBtn.textContent = "Új elem mód";
+    }
   }
 
   function resetPortfolioForm() {
@@ -556,6 +580,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.portfolioNote.value = "";
     ui.portfolioSortOrder.value = "100";
     ui.portfolioUploadInput.value = "";
+    updatePortfolioFormMode("create");
     renderPortfolio();
   }
 
@@ -569,6 +594,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.portfolioNote.value = item.note || "";
     ui.portfolioSortOrder.value = String(item.sort_order || 100);
     ui.portfolioUploadInput.value = "";
+    updatePortfolioFormMode("edit", item);
   }
   async function refreshAll(options = {}) {
     const silent = options.silent === true;
@@ -798,6 +824,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const note = ui.portfolioNote.value.trim();
     const file = ui.portfolioUploadInput.files[0] || null;
     const existingPath = ui.portfolioItemPath.value.trim();
+    const isEdit = Boolean(ui.portfolioItemId.value);
 
     if (!title || !note) {
       throw new Error("A portfólió elemhez cím és rövid leírás is kell.");
@@ -843,18 +870,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     state.portfolioItems = data.items || [];
-    state.selectedPortfolioId = id ? id : (state.portfolioItems.find((item) => item.path === nextPath)?.id || state.selectedPortfolioId);
-    ui.portfolioItemPath.value = nextPath;
     ui.portfolioUploadInput.value = "";
-    renderPortfolio();
 
-    if (state.selectedPortfolioId) {
-      const currentItem = getSelectedPortfolioItem();
-      if (currentItem) populatePortfolioForm(currentItem);
+    if (isEdit) {
+      state.selectedPortfolioId = id || null;
+      ui.portfolioItemPath.value = nextPath;
+      renderPortfolio();
+
+      if (state.selectedPortfolioId) {
+        const currentItem = getSelectedPortfolioItem();
+        if (currentItem) populatePortfolioForm(currentItem);
+      }
+    } else {
+      resetPortfolioForm();
     }
 
     updateStats();
-    showFeedback("A portfólió elem mentve.");
+    showFeedback(isEdit ? "A portfólió elem frissítve." : "Az új portfólió elem mentve. Az űrlap visszaállt új feltöltés módba.");
   }
 
   async function deletePortfolioItem() {
@@ -906,6 +938,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       "Forrás",
       "Feliratkozott",
       "Megerősítve",
+      "Leiratkozva",
+      "Welcome email kiküldve",
       "Utolsó megerősítő levél",
       "Resend contact ID"
     ];
@@ -917,6 +951,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       subscriber.source || "",
       formatDateTime(subscriber.created_at),
       formatDateTime(subscriber.confirmed_at),
+      formatDateTime(subscriber.unsubscribed_at),
+      formatDateTime(subscriber.welcome_sent_at),
       formatDateTime(subscriber.last_confirmation_sent_at),
       subscriber.resend_contact_id || ""
     ]);
@@ -1194,9 +1230,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
   setActiveTab("bookings");
   await refreshAll();
-
-  const selectedPortfolio = getSelectedPortfolioItem();
-  if (selectedPortfolio) {
-    populatePortfolioForm(selectedPortfolio);
-  }
+  updatePortfolioFormMode("create");
 });
