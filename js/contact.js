@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("contactForm");
   if (!form) return;
 
+  const tracking = window.BPhotographyTracking;
   const lang = form.dataset.lang === "de" ? "de" : "hu";
   const copy = CONTACT_TEXT[lang];
   const submitButton = document.getElementById("contactSubmit");
@@ -90,6 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       form.reset();
       status.textContent = "";
+      tracking?.trackLeadWithConversion?.("contact_request", "contact", {
+        language: lang,
+        value: 1
+      });
       showOverlay("success");
     } catch (error) {
       console.error("Contact form error:", error);
@@ -107,3 +112,4 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target === overlay) hideOverlay();
   });
 });
+

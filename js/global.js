@@ -2,6 +2,7 @@ const SUPABASE_URL = "https://hxvhsxppmdzcbklcberm.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_feNwyFggYsuxRqOr85cIng_h2pP4zn8";
 const PWA_THEME_COLOR = "#0f0f12";
 const GOOGLE_ADS_ID = "AW-18017270066";
+const GOOGLE_ADS_CONVERSION_LABELS = window.BPHOTO_CONVERSION_LABELS || {};
 
 function initSupabaseClient() {
   if (window.supabaseClient || !window.supabase?.createClient) return;
@@ -66,6 +67,37 @@ function ensureGoogleAdsTag() {
   window.gtag("js", new Date());
   window.gtag("config", GOOGLE_ADS_ID);
 }
+
+function fireGtagEvent(name, params = {}) {
+  if (typeof window.gtag !== "function") return;
+  window.gtag("event", name, params);
+}
+
+function trackConversion(labelKey, params = {}) {
+  const label = GOOGLE_ADS_CONVERSION_LABELS[labelKey];
+  if (!label || typeof window.gtag !== "function") return;
+  window.gtag("event", "conversion", {
+    send_to: `${GOOGLE_ADS_ID}/${label}`,
+    ...params
+  });
+}
+
+function trackLead(type, params = {}) {
+  fireGtagEvent("generate_lead", {
+    lead_type: type,
+    ...params
+  });
+}
+
+window.BPhotographyTracking = {
+  trackEvent: fireGtagEvent,
+  trackLead,
+  trackConversion,
+  trackLeadWithConversion(type, labelKey, params = {}) {
+    trackLead(type, params);
+    trackConversion(labelKey, params);
+  }
+};
 
 function appendHeadTag(selector, createTag) {
   if (!document.head || document.head.querySelector(selector)) return;

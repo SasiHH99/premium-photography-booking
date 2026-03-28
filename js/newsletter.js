@@ -1,10 +1,10 @@
-const NEWSLETTER_TEXT = {
+﻿const NEWSLETTER_TEXT = {
   de: {
     invalid: "Bitte gib eine gültige E-Mail-Adresse ein.",
     consent: "Bitte bestätige zuerst die Einwilligung.",
     sending: "Anmeldung wird vorbereitet...",
     success: "Fast fertig. Bitte prüfe dein Postfach und bestätige die Anmeldung.",
-    alreadyConfirmed: "Diese E-Mail ist bereits bestätigt. Du bist schon auf der Liste.",
+    alreadyConfirmed: "Diese E-Mail-Adresse ist bereits bestätigt. Du bist schon auf der Liste.",
     error: "Die Anmeldung konnte gerade nicht abgeschlossen werden. Bitte versuche es später erneut."
   },
   hu: {
@@ -28,6 +28,8 @@ function setNewsletterState(form, message, kind = "") {
 document.addEventListener("DOMContentLoaded", () => {
   const forms = document.querySelectorAll("[data-newsletter-form]");
   if (!forms.length) return;
+
+  const tracking = window.BPhotographyTracking;
 
   forms.forEach((form) => {
     const lang = form.dataset.lang === "hu" ? "hu" : "de";
@@ -75,8 +77,17 @@ document.addEventListener("DOMContentLoaded", () => {
         form.reset();
         if (body.state === "already_confirmed") {
           setNewsletterState(form, copy.alreadyConfirmed, "success");
+          tracking?.trackEvent?.("newsletter_signup_already_confirmed", {
+            language: lang,
+            event_label: source
+          });
         } else {
           setNewsletterState(form, copy.success, "success");
+          tracking?.trackLeadWithConversion?.("newsletter_signup", "newsletter_signup", {
+            language: lang,
+            event_label: source,
+            value: 1
+          });
         }
       } catch (error) {
         console.error("newsletter signup failed:", error);

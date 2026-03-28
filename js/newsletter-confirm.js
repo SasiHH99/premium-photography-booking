@@ -1,4 +1,4 @@
-const NEWSLETTER_CONFIRM_TEXT = {
+﻿const NEWSLETTER_CONFIRM_TEXT = {
   de: {
     loadingEyebrow: "Newsletter Bestätigung",
     loadingTitle: "Anmeldung wird bestätigt...",
@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const root = document.querySelector("[data-newsletter-confirm]");
   if (!root) return;
 
+  const tracking = window.BPhotographyTracking;
   const lang = root.dataset.lang === "hu" ? "hu" : "de";
   renderConfirmationState(lang, "loading");
 
@@ -97,8 +98,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (body.state === "already_confirmed") {
       renderConfirmationState(lang, "already");
+      tracking?.trackEvent?.("newsletter_confirm_already", {
+        language: lang
+      });
     } else {
       renderConfirmationState(lang, "success");
+      tracking?.trackLeadWithConversion?.("newsletter_confirm", "newsletter_confirm", {
+        language: lang,
+        value: 1
+      });
     }
   } catch (error) {
     console.error("newsletter confirmation failed:", error);

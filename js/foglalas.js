@@ -1,6 +1,7 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("bookingForm");
   if (!form) return;
+  const tracking = window.BPhotographyTracking;
 
   const dateInput = document.getElementById("bookingDate");
   const gdprCheck = document.getElementById("gdpr");
@@ -202,6 +203,19 @@
       const hasWorkingAdminNotification =
         adminNotifications.length === 0 || adminNotifications.some((item) => item && item.ok);
 
+      if (hasWorkingAdminNotification) {
+        tracking?.trackLeadWithConversion?.("booking_request", "booking", {
+          event_label: payload.package,
+          language: lang,
+          value: 1
+        });
+      } else {
+        tracking?.trackEvent?.("booking_request_partial", {
+          event_label: payload.package,
+          language: lang
+        });
+      }
+
       showSuccessState(hasWorkingAdminNotification ? "success" : "partial");
       form.reset();
       dateInput.min = formatIsoDate(getMinBookingDate());
@@ -220,4 +234,5 @@
   successClose.addEventListener("click", () => successBox.classList.remove("show"));
   errorClose.addEventListener("click", () => errorBox.classList.remove("show"));
 });
+
 

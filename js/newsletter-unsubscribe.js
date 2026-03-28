@@ -1,4 +1,4 @@
-const NEWSLETTER_UNSUBSCRIBE_TEXT = {
+﻿const NEWSLETTER_UNSUBSCRIBE_TEXT = {
   de: {
     loadingEyebrow: "Newsletter Abmeldung",
     loadingTitle: "Abmeldung wird verarbeitet...",
@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const root = document.querySelector("[data-newsletter-unsubscribe]");
   if (!root) return;
 
+  const tracking = window.BPhotographyTracking;
   const lang = root.dataset.lang === "hu" ? "hu" : "de";
   renderUnsubscribeState(lang, "loading");
 
@@ -97,8 +98,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (body.state === "already_unsubscribed") {
       renderUnsubscribeState(lang, "already");
+      tracking?.trackEvent?.("newsletter_unsubscribe_already", {
+        language: lang
+      });
     } else {
       renderUnsubscribeState(lang, "success");
+      tracking?.trackEvent?.("newsletter_unsubscribed", {
+        language: lang
+      });
     }
   } catch (error) {
     console.error("newsletter unsubscribe failed:", error);

@@ -1,4 +1,4 @@
-const CHAT_CONFIG = {
+﻿const CHAT_CONFIG = {
   hu: {
     kicker: "AI asszisztens",
     title: "Kérdezz gyorsan a fotózásról",
@@ -82,6 +82,7 @@ function initSiteChat() {
 
   const lang = window.location.pathname.startsWith("/hu") ? "hu" : "de";
   const copy = CHAT_CONFIG[lang];
+  const tracking = window.BPhotographyTracking;
   const state = {
     messages: [{ role: "assistant", text: copy.welcome }],
     previousResponseId: null
@@ -139,9 +140,7 @@ function initSiteChat() {
 
   function setTyping(visible) {
     typing.hidden = !visible;
-    if (visible) {
-      messages.scrollTop = messages.scrollHeight;
-    }
+    if (visible) messages.scrollTop = messages.scrollHeight;
   }
 
   function addMessage(role, text, cta = null) {
@@ -201,6 +200,10 @@ function initSiteChat() {
     const action = copy.quickActions[Number(button.dataset.quickIndex)];
     if (!action) return;
 
+    tracking?.trackEvent?.("ai_chat_quick_action", {
+      language: lang,
+      event_label: action.label
+    });
     sendMessage(action.prompt);
   });
 
@@ -212,6 +215,7 @@ function initSiteChat() {
   toggle.addEventListener("click", () => {
     host.classList.toggle("is-open");
     if (host.classList.contains("is-open")) {
+      tracking?.trackEvent?.("ai_chat_opened", { language: lang });
       input.focus();
     }
   });

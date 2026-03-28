@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+﻿import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
 export const CORS_HEADERS = {
@@ -334,7 +334,9 @@ export function createNewsletterWelcomeHtml({ lang = "de", email, unsubscribeUrl
 }
 
 function nl2br(text = "") {
-  return escapeHtml(text).replace(/\n{2,}/g, "</p><p style=\"margin:0 0 16px;line-height:1.75;color:#f3efe5;font-size:15px;\">").replace(/\n/g, "<br>");
+  return escapeHtml(text)
+    .replace(/\n{2,}/g, '</p><p style="margin:0 0 16px;line-height:1.75;color:#f3efe5;font-size:15px;">')
+    .replace(/\n/g, "<br>");
 }
 
 export function createNewsletterCampaignHtml({
