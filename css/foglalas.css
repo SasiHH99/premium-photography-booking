@@ -441,6 +441,20 @@ body {
   width: min(460px, 100%);
   padding: 34px;
   text-align: center;
+  border-radius: 30px;
+  border: 1px solid rgba(214, 179, 106, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+    linear-gradient(180deg, rgba(18, 23, 34, 0.96), rgba(12, 16, 23, 0.96));
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.34);
+}
+
+.success-eyebrow {
+  margin: 0 0 14px;
+  color: rgba(214, 179, 106, 0.92);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
 }
 
 .success-icon,
@@ -467,6 +481,36 @@ body {
 .thank-you-title,
 .error-title {
   font-size: 1.4rem;
+}
+
+.thank-you-text,
+.error-text {
+  max-width: 34ch;
+  margin: 0 auto;
+}
+
+.success-note {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.success-btn,
+.error-btn {
+  min-width: 180px;
+}
+
+.success-btn {
+  background: linear-gradient(135deg, rgba(214, 179, 106, 0.96), rgba(240, 203, 133, 0.96));
+  color: #16120c;
+  border-color: transparent;
+  box-shadow: 0 18px 42px rgba(214, 179, 106, 0.22);
+}
+
+.error-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f6f2e8;
 }
 
 .footer {
@@ -498,6 +542,12 @@ body {
   .booking-success-card,
   .booking-error-card {
     padding: 24px;
+  }
+
+  .success-btn,
+  .error-btn {
+    width: 100%;
+    min-width: 0;
   }
 
   .booking-form-grid,
