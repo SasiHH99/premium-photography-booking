@@ -1,14 +1,57 @@
-<header class="site-header">
+﻿<header class="site-header">
   <div class="header-inner">
-
     <div class="logo">
-      <a href="/de/index.html">
+      <a href="/de/index.html" aria-label="B. Photography Startseite">
         <span class="logo-main">B.</span>
         <span class="logo-sub">PHOTOGRAPHY</span>
       </a>
     </div>
 
-    <nav class="main-nav">
+    <nav class="main-nav" aria-label="Hauptnavigation">
+      <a href="/de/index.html">Startseite</a>
+      <a href="/de/portfolio.html">Portfolio</a>
+      <a href="/de/preise.html">Preise</a>
+      <a href="/de/kontakt.html">Kontakt</a>
+      <a href="/de/galeria-login.html">Online Galerie</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="lang-switch" aria-label="Sprache wechseln">
+        <button type="button" data-lang="hu">HU</button>
+        <span aria-hidden="true">|</span>
+        <button type="button" data-lang="de" class="active">DE</button>
+      </div>
+
+      <a class="nav-cta" href="/de/termin.html">Termin anfragen</a>
+
+      <button class="menu-toggle" type="button" aria-label="Menü öffnen" aria-controls="mobileMenu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+
+<aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-panel">
+    <div class="mobile-menu-top">
+      <div class="mobile-menu-brand">
+        <span class="logo-main">B.</span>
+        <span class="logo-sub">PHOTOGRAPHY</span>
+      </div>
+      <button class="mobile-menu-close" type="button" aria-label="Menü schließen">×</button>
+    </div>
+
+    <div class="lang-switch mobile-lang-switch" aria-label="Sprache wechseln">
+      <button type="button" data-lang="hu">HU</button>
+      <span aria-hidden="true">|</span>
+      <button type="button" data-lang="de" class="active">DE</button>
+    </div>
+
+    <nav class="mobile-menu-nav" aria-label="Mobile Navigation">
       <a href="/de/index.html">Startseite</a>
       <a href="/de/portfolio.html">Portfolio</a>
       <a href="/de/preise.html">Preise</a>
@@ -17,28 +60,12 @@
       <a href="/de/galeria-login.html">Online Galerie</a>
     </nav>
 
-    <div class="lang-switch">
-      <button type="button" data-lang="hu">HU</button>
-      <span>|</span>
-      <button type="button" data-lang="de" class="active">DE</button>
-    </div>
+    <a class="nav-cta mobile-menu-cta" href="/de/termin.html">Termin anfragen</a>
 
-    <div class="menu-toggle" aria-label="Menü öffnen">
-      <span></span>
-      <span></span>
-      <span></span>
+    <div class="mobile-menu-meta">
+      <span>Antwort in 24h</span>
+      <span>Wien &amp; Umgebung</span>
+      <span>Online-Galerie</span>
     </div>
-
   </div>
-</header>
-
-<nav class="mobile-menu" id="mobileMenu">
-  <button class="mobile-menu-close" aria-label="Menü schließen">×</button>
-
-  <a href="/de/index.html">Startseite</a>
-  <a href="/de/portfolio.html">Portfolio</a>
-  <a href="/de/preise.html">Preise</a>
-  <a href="/de/termin.html">Termin</a>
-  <a href="/de/kontakt.html">Kontakt</a>
-  <a href="/de/galeria-login.html">Online Galerie</a>
-</nav>
+</aside>

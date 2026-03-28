@@ -155,6 +155,38 @@ function registerServiceWorker() {
   );
 }
 
+function initRevealAnimations() {
+  const items = Array.from(document.querySelectorAll("[data-reveal]"));
+  if (!items.length) return;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+    items.forEach((item) => item.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    {
+      threshold: 0.16,
+      rootMargin: "0px 0px -10% 0px"
+    }
+  );
+
+  items.forEach((item) => {
+    const delay = Number(item.dataset.delay || "0");
+    if (delay > 0) {
+      item.style.setProperty("--reveal-delay", `${delay}s`);
+    }
+    observer.observe(item);
+  });
+}
+
 ensureGoogleAdsTag();
 ensurePwaHead();
 
@@ -162,4 +194,5 @@ document.addEventListener("DOMContentLoaded", () => {
   ensureChatbotAssets();
   registerServiceWorker();
   initSupabaseClient();
+  initRevealAnimations();
 });
