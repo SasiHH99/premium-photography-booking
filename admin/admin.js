@@ -57,6 +57,7 @@ function formatDateTime(value) {
 document.addEventListener("DOMContentLoaded", async () => {
   const supabase = window.supabaseClient;
   if (!supabase) return;
+  const adminView = document.body.dataset.adminView || "dashboard";
 
   const ui = {
     refreshAllBtn: document.getElementById("refreshAllBtn"),
@@ -217,6 +218,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedPortfolioId: null,
     selectedNewsletterId: null
   };
+
+  function shouldLoadNewsletterCampaignData() {
+    return adminView === "newsletter";
+  }
+
+  function shouldLoadGalleryMedia() {
+    return adminView === "gallery" && Boolean(state.selectedGalleryUserId);
+  }
 
   function showFeedback(message, tone = "success") {
     if (!message) {
@@ -858,28 +867,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.refreshAllBtn.textContent = "Betöltés...";
 
     const steps = [
-      ["foglalások", loadBookings],
-      ["kapcsolati üzenetek", loadContacts],
-      ["galéria ügyfelek", loadGalleryUsers],
-      ["portfólió elemek", loadPortfolioItems],
-      ["hírlevél feliratkozók", loadNewsletterSubscribers],
-      ["hírlevél kampányok", loadNewsletterCampaignLogs]
-    ];
+      { label: "foglalások", run: loadBookings, enabled: true },
+      { label: "kapcsolati üzenetek", run: loadContacts, enabled: true },
+      { label: "galéria ügyfelek", run: loadGalleryUsers, enabled: true },
+      { label: "portfólió elemek", run: loadPortfolioItems, enabled: true },
+      { label: "hírlevél feliratkozók", run: loadNewsletterSubscribers, enabled: true },
+      { label: "hírlevél kampányok", run: loadNewsletterCampaignLogs, enabled: shouldLoadNewsletterCampaignData() }
+    ].filter((step) => step.enabled);
 
-    for (const [label, run] of steps) {
-      try {
-        await run();
-      } catch (error) {
-        console.error(error);
-        failures.push(label);
-        failureDetails[label] = String(error?.message || error).slice(0, 260);
-        if (String(error.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
-          localPreviewMissingFunctions.push(label);
-        }
+    const results = await Promise.allSettled(
+      steps.map(async (step) => {
+        await step.run();
+        return step.label;
+      })
+    );
+
+    results.forEach((result, index) => {
+      if (result.status === "fulfilled") return;
+
+      const label = steps[index].label;
+      const error = result.reason;
+      console.error(error);
+      failures.push(label);
+      failureDetails[label] = String(error?.message || error).slice(0, 260);
+      if (String(error?.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
+        localPreviewMissingFunctions.push(label);
       }
+    });
+
+    if (!shouldLoadNewsletterCampaignData()) {
+      state.newsletterCampaignLogs = [];
+      state.newsletterScheduledJobs = [];
+      state.newsletterDiagnostics = {};
     }
 
-    if (state.selectedGalleryUserId) {
+    if (shouldLoadGalleryMedia()) {
       try {
         await loadGalleryFiles(state.selectedGalleryUserId);
       } catch (error) {
