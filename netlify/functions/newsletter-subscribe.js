@@ -1,50 +1,14 @@
-import {
+﻿import {
   CORS_HEADERS,
   json,
   normalizeEmail,
   isValidEmail,
   createServiceClient,
   sendResendMail,
-  createMailLayout,
-  createInfoTable,
-  createNoteBlock,
-  generateToken
+  generateToken,
+  createNewsletterConfirmationUrl,
+  createNewsletterMailHtml
 } from "./_admin.js";
-
-const SITE_URL = process.env.PUBLIC_SITE_URL || "https://bphoto.at";
-
-function createConfirmationUrl(lang, token) {
-  const page = lang === "hu" ? "/hu/hirlevel-megerosites.html" : "/de/newsletter-bestaetigen.html";
-  return `${SITE_URL}${page}?token=${encodeURIComponent(token)}`;
-}
-
-function createNewsletterMailHtml({ lang, email, confirmationUrl }) {
-  const isHu = lang === "hu";
-
-  return createMailLayout({
-    eyebrow: "B. Photography Updates",
-    heading: isHu ? "Erősítsd meg a feliratkozásodat" : "Bestätige deine Anmeldung",
-    intro: isHu
-      ? "Kattints a gombra, és megerősítjük, hogy valóban te szeretnél értesülni az új sorozatokról, szabad időpontokról és limitált fotózási lehetőségekről."
-      : "Klicke auf den Button, damit ich dir wirklich neue Serien, freie Termine und limitierte Shooting-Möglichkeiten schicken darf.",
-    sections: `
-      ${createInfoTable([
-        { label: isHu ? "E-mail cím" : "E-Mail", value: email }
-      ])}
-      ${createNoteBlock(
-        isHu ? "Mit kapsz?" : "Was du bekommst",
-        isHu
-          ? "Ritka, válogatott értesítéseket új képi anyagokról, szabad időpontokról és exkluzív fotózási frissítésekről. Nem küldök napi promóciókat."
-          : "Seltene, kuratierte Updates zu neuen Serien, freien Terminen und exklusiven Shooting-Möglichkeiten. Keine tägliche Werbeflut."
-      )}
-    `,
-    ctaText: isHu ? "Feliratkozás megerősítése" : "Anmeldung bestätigen",
-    ctaUrl: confirmationUrl,
-    footerNote: isHu
-      ? "Ha nem te kérted ezt a feliratkozást, egyszerűen hagyd figyelmen kívül ezt az e-mailt."
-      : "Wenn du diese Anmeldung nicht angefordert hast, kannst du diese E-Mail einfach ignorieren."
-  });
-}
 
 export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
@@ -90,7 +54,7 @@ export const handler = async (event) => {
     }
 
     const token = generateToken(24);
-    const confirmationUrl = createConfirmationUrl(lang, token);
+    const confirmationUrl = createNewsletterConfirmationUrl(lang, token);
 
     const payload = {
       email,

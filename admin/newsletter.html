@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kapcsolatok Admin | B. Photography</title>
+  <title>Hírlevél Admin | B. Photography</title>
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/global.js"></script>
 </head>
-<body class="admin-body" data-admin-view="contacts">
+<body class="admin-body" data-admin-view="newsletter">
   <div class="admin-shell">
     <header class="admin-topbar">
       <div>
         <p class="admin-eyebrow">B. Photography</p>
-        <h1>Kapcsolati üzenetek</h1>
+        <h1>Hírlevél feliratkozók</h1>
       </div>
       <div class="admin-topbar-actions">
         <button type="button" class="ghost-btn" id="refreshAllBtn">Minden frissítése</button>
@@ -25,10 +25,10 @@
       <nav class="admin-linkbar" aria-label="Admin navigáció">
         <a class="admin-link" href="index.html">Dashboard</a>
         <a class="admin-link" href="foglalasok.html">Foglalások</a>
-        <a class="admin-link is-active" href="kapcsolatok.html">Kapcsolatok</a>
+        <a class="admin-link" href="kapcsolatok.html">Kapcsolatok</a>
         <a class="admin-link" href="galeria.html">Galéria</a>
         <a class="admin-link" href="portfolio.html">Portfólió</a>
-        <a class="admin-link" href="newsletter.html">Hírlevél</a>
+        <a class="admin-link is-active" href="newsletter.html">Hírlevél</a>
       </nav>
 
       <section class="stats-grid" aria-label="Admin statisztikák">
@@ -45,74 +45,78 @@
         <section class="panel">
           <div class="panel-head">
             <div>
-              <p class="panel-kicker">Kapcsolat</p>
-              <h2>Beérkező üzenetek</h2>
+              <p class="panel-kicker">Hírlevél</p>
+              <h2>Feliratkozó lista</h2>
             </div>
             <div class="toolbar">
               <label class="field">
                 <span>Keresés</span>
-                <input type="search" id="contactSearch" placeholder="Név, email, üzenet">
+                <input type="search" id="newsletterSearch" placeholder="Email vagy forrás">
               </label>
               <label class="field">
                 <span>Státusz</span>
-                <select id="contactStatusFilter">
+                <select id="newsletterStatusFilter">
                   <option value="all">Mind</option>
-                  <option value="new">Új</option>
-                  <option value="reviewed">Feldolgozott</option>
-                  <option value="converted">Galériává alakítva</option>
+                  <option value="pending">Megerősítésre vár</option>
+                  <option value="confirmed">Megerősített</option>
                 </select>
               </label>
+              <label class="field">
+                <span>Nyelv</span>
+                <select id="newsletterLangFilter">
+                  <option value="all">Mind</option>
+                  <option value="hu">HU</option>
+                  <option value="de">DE</option>
+                </select>
+              </label>
+              <button type="button" class="ghost-btn" id="newsletterExportBtn">CSV export</button>
             </div>
           </div>
           <div class="table-wrap">
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Név</th>
                   <th>Email</th>
                   <th>Nyelv</th>
                   <th>Státusz</th>
-                  <th>Érkezett</th>
+                  <th>Forrás</th>
+                  <th>Feliratkozott</th>
                 </tr>
               </thead>
-              <tbody id="contactRows"></tbody>
+              <tbody id="newsletterRows"></tbody>
             </table>
           </div>
-          <div class="empty-state hidden" id="contactEmpty">Nincs találat.</div>
+          <div class="empty-state hidden" id="newsletterEmpty">Még nincs a szűrőknek megfelelő feliratkozó.</div>
         </section>
 
         <aside class="panel">
           <div class="panel-head">
             <div>
               <p class="panel-kicker">Részletek</p>
-              <h2>Kiválasztott kapcsolat</h2>
+              <h2>Kiválasztott feliratkozó</h2>
             </div>
           </div>
-          <div class="detail-placeholder" id="contactDetailEmpty">Válassz ki egy üzenetet a listából.</div>
-          <div class="detail-card hidden" id="contactDetailCard">
+          <div class="detail-placeholder" id="newsletterDetailEmpty">Válassz ki egy feliratkozót a listából.</div>
+          <div class="detail-card hidden" id="newsletterDetailCard">
             <div>
-              <h3 class="detail-title" id="contactDetailName"></h3>
-              <p class="list-secondary" id="contactDetailMeta"></p>
+              <h3 class="detail-title" id="newsletterDetailEmail"></h3>
+              <p class="list-secondary" id="newsletterDetailMeta"></p>
             </div>
             <div class="detail-grid">
-              <div><span class="detail-meta-label">Nyelv</span><strong class="detail-value" id="contactDetailLang"></strong></div>
-              <div><span class="detail-meta-label">Státusz</span><span class="status-pill" id="contactDetailStatus"></span></div>
-              <div><span class="detail-meta-label">Érkezett</span><strong class="detail-value" id="contactDetailCreated"></strong></div>
-              <div><span class="detail-meta-label">Forrás</span><strong class="detail-value" id="contactDetailSource"></strong></div>
+              <div><span class="detail-meta-label">Nyelv</span><strong class="detail-value" id="newsletterDetailLang"></strong></div>
+              <div><span class="detail-meta-label">Státusz</span><span class="status-pill" id="newsletterDetailStatus"></span></div>
+              <div><span class="detail-meta-label">Forrás</span><strong class="detail-value" id="newsletterDetailSource"></strong></div>
+              <div><span class="detail-meta-label">Feliratkozott</span><strong class="detail-value" id="newsletterDetailCreated"></strong></div>
+              <div><span class="detail-meta-label">Megerősítve</span><strong class="detail-value" id="newsletterDetailConfirmed"></strong></div>
+              <div><span class="detail-meta-label">Utolsó megerősítő levél</span><strong class="detail-value" id="newsletterDetailLastSent"></strong></div>
             </div>
             <div>
-              <span class="detail-meta-label">Üzenet</span>
-              <p class="detail-copy" id="contactDetailMessage"></p>
+              <span class="detail-meta-label">Resend contact ID</span>
+              <p class="detail-copy" id="newsletterDetailResendId"></p>
             </div>
-            <label class="field">
-              <span>Admin megjegyzés</span>
-              <textarea id="contactAdminNote" placeholder="Belső jegyzet ehhez az érdeklődéshez"></textarea>
-            </label>
             <div class="detail-actions">
-              <button type="button" class="ghost-btn" id="contactSaveBtn">Megjegyzés mentése</button>
-              <button type="button" class="primary-btn" id="contactReviewedBtn">Feldolgozottnak jelölöm</button>
-              <button type="button" class="ghost-btn" id="contactCreateGalleryBtn">Galéria fiók létrehozása</button>
-              <a class="inline-link" id="contactReplyLink" href="#">Email írása</a>
+              <button type="button" class="primary-btn" id="newsletterResendBtn">Megerősítő levél újraküldése</button>
+              <a class="inline-link" id="newsletterEmailLink" href="#">Email írása</a>
             </div>
           </div>
         </aside>

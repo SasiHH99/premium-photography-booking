@@ -127,6 +127,8 @@ function initHamburger() {
   window.addEventListener("resize", () => {
     if (window.innerWidth > 960) closeMenu();
   });
+
+  closeMenu();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

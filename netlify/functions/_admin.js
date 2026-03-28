@@ -235,3 +235,36 @@ export function createGalleryMailHtml({ heading, intro, email, password, ctaText
     footerNote: "Ha a gomb nem nyílik meg, nyisd meg kézzel a weboldalt, és jelentkezz be a kapott adatokkal."
   });
 }
+
+export function createNewsletterConfirmationUrl(lang = "de", token = "", siteUrl = process.env.PUBLIC_SITE_URL || "https://bphoto.at") {
+  const page = lang === "hu" ? "/hu/hirlevel-megerosites.html" : "/de/newsletter-bestaetigen.html";
+  return `${siteUrl}${page}?token=${encodeURIComponent(token)}`;
+}
+
+export function createNewsletterMailHtml({ lang = "de", email, confirmationUrl }) {
+  const isHu = lang === "hu";
+
+  return createMailLayout({
+    eyebrow: "B. Photography Updates",
+    heading: isHu ? "Erősítsd meg a feliratkozásodat" : "Bestätige deine Anmeldung",
+    intro: isHu
+      ? "Kattints a gombra, és megerősítjük, hogy valóban te szeretnél értesülni az új sorozatokról, szabad időpontokról és limitált fotózási lehetőségekről."
+      : "Klicke auf den Button, damit ich dir wirklich neue Serien, freie Termine und limitierte Shooting-Möglichkeiten schicken darf.",
+    sections: `
+      ${createInfoTable([
+        { label: isHu ? "E-mail cím" : "E-Mail", value: email }
+      ])}
+      ${createNoteBlock(
+        isHu ? "Mit kapsz?" : "Was du bekommst",
+        isHu
+          ? "Ritka, válogatott értesítéseket új képi anyagokról, szabad időpontokról és exkluzív fotózási frissítésekről. Nem küldök napi promóciókat."
+          : "Seltene, kuratierte Updates zu neuen Serien, freien Terminen und exklusiven Shooting-Möglichkeiten. Keine tägliche Werbeflut."
+      )}
+    `,
+    ctaText: isHu ? "Feliratkozás megerősítése" : "Anmeldung bestätigen",
+    ctaUrl: confirmationUrl,
+    footerNote: isHu
+      ? "Ha nem te kérted ezt a feliratkozást, egyszerűen hagyd figyelmen kívül ezt az e-mailt."
+      : "Wenn du diese Anmeldung nicht angefordert hast, kannst du diese E-Mail einfach ignorieren."
+  });
+}

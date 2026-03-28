@@ -1,4 +1,4 @@
-const NEWSLETTER_CONFIRM_TEXT = {
+﻿const NEWSLETTER_CONFIRM_TEXT = {
   de: {
     loadingEyebrow: "Newsletter Bestätigung",
     loadingTitle: "Anmeldung wird bestätigt...",

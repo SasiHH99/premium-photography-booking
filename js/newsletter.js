@@ -1,4 +1,4 @@
-const NEWSLETTER_TEXT = {
+﻿const NEWSLETTER_TEXT = {
   de: {
     invalid: "Bitte gib eine gültige E-Mail-Adresse ein.",
     consent: "Bitte bestätige zuerst die Einwilligung.",

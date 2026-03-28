@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     statContacts: document.getElementById("statContacts"),
     statGalleryUsers: document.getElementById("statGalleryUsers"),
     statPortfolioItems: document.getElementById("statPortfolioItems"),
+    statNewsletter: document.getElementById("statNewsletter"),
     tabButtons: Array.from(document.querySelectorAll(".tab-btn[data-tab]")),
     tabPanels: Array.from(document.querySelectorAll(".tab-panel[data-panel]")),
     bookingSearch: document.getElementById("bookingSearch"),
@@ -139,7 +140,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     portfolioResetBtn: document.getElementById("portfolioResetBtn"),
     portfolioDeleteBtn: document.getElementById("portfolioDeleteBtn"),
     portfolioList: document.getElementById("portfolioList"),
-    portfolioEmpty: document.getElementById("portfolioEmpty")
+    portfolioEmpty: document.getElementById("portfolioEmpty"),
+    newsletterSearch: document.getElementById("newsletterSearch"),
+    newsletterStatusFilter: document.getElementById("newsletterStatusFilter"),
+    newsletterLangFilter: document.getElementById("newsletterLangFilter"),
+    newsletterExportBtn: document.getElementById("newsletterExportBtn"),
+    newsletterRows: document.getElementById("newsletterRows"),
+    newsletterEmpty: document.getElementById("newsletterEmpty"),
+    newsletterDetailEmpty: document.getElementById("newsletterDetailEmpty"),
+    newsletterDetailCard: document.getElementById("newsletterDetailCard"),
+    newsletterDetailEmail: document.getElementById("newsletterDetailEmail"),
+    newsletterDetailMeta: document.getElementById("newsletterDetailMeta"),
+    newsletterDetailLang: document.getElementById("newsletterDetailLang"),
+    newsletterDetailStatus: document.getElementById("newsletterDetailStatus"),
+    newsletterDetailSource: document.getElementById("newsletterDetailSource"),
+    newsletterDetailCreated: document.getElementById("newsletterDetailCreated"),
+    newsletterDetailConfirmed: document.getElementById("newsletterDetailConfirmed"),
+    newsletterDetailLastSent: document.getElementById("newsletterDetailLastSent"),
+    newsletterDetailResendId: document.getElementById("newsletterDetailResendId"),
+    newsletterEmailLink: document.getElementById("newsletterEmailLink"),
+    newsletterResendBtn: document.getElementById("newsletterResendBtn")
   };
 
   if (!ui.refreshAllBtn) return;
@@ -151,10 +171,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     galleryUsers: [],
     galleryFiles: [],
     portfolioItems: [],
+    newsletterSubscribers: [],
     selectedBookingId: null,
     selectedContactId: null,
     selectedGalleryUserId: null,
-    selectedPortfolioId: null
+    selectedPortfolioId: null,
+    selectedNewsletterId: null
   };
 
   function showFeedback(message, tone = "success") {
@@ -187,6 +209,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function getSelectedPortfolioItem() {
     return state.portfolioItems.find((item) => String(item.id) === String(state.selectedPortfolioId)) || null;
+  }
+
+  function getSelectedNewsletterSubscriber() {
+    return state.newsletterSubscribers.find((subscriber) => String(subscriber.id) === String(state.selectedNewsletterId)) || null;
   }
   async function getAccessToken() {
     const {
@@ -241,6 +267,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (ui.statContacts) ui.statContacts.textContent = String(state.contacts.length);
     if (ui.statGalleryUsers) ui.statGalleryUsers.textContent = String(state.galleryUsers.length);
     if (ui.statPortfolioItems) ui.statPortfolioItems.textContent = String(state.portfolioItems.length);
+    if (ui.statNewsletter) ui.statNewsletter.textContent = String(state.newsletterSubscribers.length);
   }
 
   function ensureSelection(list, selectedId, getId) {
@@ -276,6 +303,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = await callAdmin("/.netlify/functions/admin-portfolio-media", { method: "GET" });
     state.portfolioItems = data.items || [];
     state.selectedPortfolioId = ensureSelection(state.portfolioItems, state.selectedPortfolioId, (item) => item.id);
+  }
+
+  async function loadNewsletterSubscribers() {
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-subscribers", { method: "GET" });
+    state.newsletterSubscribers = data.subscribers || [];
+    state.selectedNewsletterId = ensureSelection(state.newsletterSubscribers, state.selectedNewsletterId, (subscriber) => subscriber.id);
   }
 
   async function loadGalleryFiles(userId) {
@@ -450,12 +483,66 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function getFilteredNewsletterSubscribers() {
+    const query = ui.newsletterSearch?.value.trim().toLowerCase() || "";
+    const status = ui.newsletterStatusFilter?.value || "all";
+    const lang = ui.newsletterLangFilter?.value || "all";
+
+    return state.newsletterSubscribers.filter((subscriber) => {
+      const haystack = [subscriber.email, subscriber.source, subscriber.resend_contact_id]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return (!query || haystack.includes(query))
+        && (status === "all" || subscriber.status === status)
+        && (lang === "all" || subscriber.lang === lang);
+    });
+  }
+
+  function renderNewsletter() {
+    if (!ui.newsletterRows) return;
+
+    const filtered = getFilteredNewsletterSubscribers();
+
+    ui.newsletterRows.innerHTML = filtered.map((subscriber) => `
+      <tr data-newsletter-id="${subscriber.id}" class="${String(subscriber.id) === String(state.selectedNewsletterId) ? "is-selected" : ""}">
+        <td><strong>${escapeHtml(subscriber.email || "-")}</strong></td>
+        <td>${escapeHtml(LANG_LABELS[subscriber.lang] || subscriber.lang || "-")}</td>
+        <td><span class="status-pill" data-status="${escapeHtml(subscriber.status || "")}">${escapeHtml(STATUS_LABELS[subscriber.status] || subscriber.status || "-")}</span></td>
+        <td>${escapeHtml(subscriber.source || "-")}</td>
+        <td>${escapeHtml(formatDateTime(subscriber.created_at))}</td>
+      </tr>
+    `).join("");
+
+    ui.newsletterEmpty.classList.toggle("hidden", filtered.length > 0);
+
+    const subscriber = getSelectedNewsletterSubscriber();
+    ui.newsletterDetailEmpty.classList.toggle("hidden", !!subscriber);
+    ui.newsletterDetailCard.classList.toggle("hidden", !subscriber);
+    if (!subscriber) return;
+
+    ui.newsletterDetailEmail.textContent = subscriber.email || "-";
+    ui.newsletterDetailMeta.textContent = `Feliratkozó #${subscriber.id}`;
+    ui.newsletterDetailLang.textContent = LANG_LABELS[subscriber.lang] || subscriber.lang || "-";
+    ui.newsletterDetailStatus.textContent = STATUS_LABELS[subscriber.status] || subscriber.status || "-";
+    ui.newsletterDetailStatus.dataset.status = subscriber.status || "";
+    ui.newsletterDetailSource.textContent = subscriber.source || "-";
+    ui.newsletterDetailCreated.textContent = formatDateTime(subscriber.created_at);
+    ui.newsletterDetailConfirmed.textContent = formatDateTime(subscriber.confirmed_at);
+    ui.newsletterDetailLastSent.textContent = formatDateTime(subscriber.last_confirmation_sent_at);
+    ui.newsletterDetailResendId.textContent = subscriber.resend_contact_id || "Még nincs összekötve Resend contacttal.";
+    ui.newsletterEmailLink.href = `mailto:${subscriber.email || ""}`;
+    ui.newsletterResendBtn.disabled = subscriber.status === "confirmed";
+  }
+
   function render() {
     updateStats();
     renderBookings();
     renderContacts();
     renderGalleryUsers();
     renderPortfolio();
+    renderNewsletter();
   }
 
   function resetPortfolioForm() {
@@ -497,7 +584,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       ["foglalások", loadBookings],
       ["kapcsolati üzenetek", loadContacts],
       ["galéria ügyfelek", loadGalleryUsers],
-      ["portfólió elemek", loadPortfolioItems]
+      ["portfólió elemek", loadPortfolioItems],
+      ["hírlevél feliratkozók", loadNewsletterSubscribers]
     ];
 
     for (const [label, run] of steps) {
@@ -788,6 +876,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderPortfolio();
     showFeedback("A portfólió elem törölve.");
   }
+
+  async function resendNewsletterConfirmation() {
+    const subscriber = getSelectedNewsletterSubscriber();
+    if (!subscriber) return;
+
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-subscribers", {
+      method: "POST",
+      body: JSON.stringify({ action: "resend_confirmation", id: subscriber.id })
+    });
+
+    subscriber.status = "pending";
+    subscriber.last_confirmation_sent_at = data.sentAt || new Date().toISOString();
+    renderNewsletter();
+    showFeedback("A megerősítő levél újraküldve.");
+  }
+
+  function exportNewsletterCsv() {
+    const rows = getFilteredNewsletterSubscribers();
+    if (!rows.length) {
+      showFeedback("Nincs exportálható feliratkozó a jelenlegi szűrőkkel.", "error");
+      return;
+    }
+
+    const header = [
+      "Email",
+      "Nyelv",
+      "Státusz",
+      "Forrás",
+      "Feliratkozott",
+      "Megerősítve",
+      "Utolsó megerősítő levél",
+      "Resend contact ID"
+    ];
+
+    const csvRows = rows.map((subscriber) => [
+      subscriber.email || "",
+      LANG_LABELS[subscriber.lang] || subscriber.lang || "",
+      STATUS_LABELS[subscriber.status] || subscriber.status || "",
+      subscriber.source || "",
+      formatDateTime(subscriber.created_at),
+      formatDateTime(subscriber.confirmed_at),
+      formatDateTime(subscriber.last_confirmation_sent_at),
+      subscriber.resend_contact_id || ""
+    ]);
+
+    const csv = [header, ...csvRows]
+      .map((row) => row.map((value) => `"${String(value || "").replaceAll('"', '""')}"`).join(";"))
+      .join("\r\n");
+
+    const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0, 19).replaceAll(":", "-");
+
+    link.href = url;
+    link.download = `newsletter-feliratkozok-${stamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    showFeedback("A hírlevél CSV export elkészült.");
+  }
+
   function bindEvents() {
     ui.tabButtons.forEach((button) => {
       button.addEventListener("click", () => setActiveTab(button.dataset.tab));
@@ -801,6 +953,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     [ui.contactSearch, ui.contactStatusFilter].filter(Boolean).forEach((element) => {
       element.addEventListener("input", renderContacts);
       element.addEventListener("change", renderContacts);
+    });
+
+    [ui.newsletterSearch, ui.newsletterStatusFilter, ui.newsletterLangFilter].filter(Boolean).forEach((element) => {
+      element.addEventListener("input", renderNewsletter);
+      element.addEventListener("change", renderNewsletter);
     });
 
     ui.galleryUserSearch?.addEventListener("input", renderGalleryUsers);
@@ -817,6 +974,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!row) return;
       state.selectedContactId = row.dataset.contactId;
       renderContacts();
+    });
+
+    ui.newsletterRows?.addEventListener("click", (event) => {
+      const row = event.target.closest("[data-newsletter-id]");
+      if (!row) return;
+      state.selectedNewsletterId = row.dataset.newsletterId;
+      renderNewsletter();
     });
 
     ui.galleryUserList?.addEventListener("click", async (event) => {
@@ -984,6 +1148,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         showFeedback(error.message || "Nem sikerült törölni a portfólió elemet.", "error");
       }
     });
+
+    ui.newsletterResendBtn?.addEventListener("click", async () => {
+      try {
+        await resendNewsletterConfirmation();
+      } catch (error) {
+        console.error(error);
+        showFeedback(error.message || "Nem sikerült újraküldeni a megerősítő levelet.", "error");
+      }
+    });
+
+    ui.newsletterExportBtn?.addEventListener("click", exportNewsletterCsv);
 
     ui.refreshAllBtn.addEventListener("click", () => {
       refreshAll();

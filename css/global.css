@@ -246,6 +246,7 @@ img {
 }
 
 .mobile-menu-backdrop {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 99998;
@@ -262,10 +263,10 @@ img {
 }
 
 .mobile-menu {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 99999;
-  display: flex;
   justify-content: flex-end;
   pointer-events: none;
 }
@@ -486,6 +487,14 @@ body.has-site-chat .whatsapp-float {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .mobile-menu-backdrop {
+    display: block;
+  }
+
+  .mobile-menu {
+    display: flex;
   }
 }
 
