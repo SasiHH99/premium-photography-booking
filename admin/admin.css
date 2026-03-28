@@ -531,6 +531,33 @@ body.admin-body {
   font-size: 0.92rem;
 }
 
+.campaign-feedback {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--admin-text);
+  line-height: 1.6;
+}
+
+.campaign-feedback[data-tone="success"] {
+  color: #dcffe5;
+  background: rgba(113, 208, 141, 0.12);
+  border-color: rgba(113, 208, 141, 0.2);
+}
+
+.campaign-feedback[data-tone="warning"] {
+  color: #fff0bf;
+  background: rgba(240, 207, 123, 0.12);
+  border-color: rgba(240, 207, 123, 0.2);
+}
+
+.campaign-feedback[data-tone="error"] {
+  color: #ffd5d5;
+  background: rgba(241, 125, 125, 0.12);
+  border-color: rgba(241, 125, 125, 0.2);
+}
+
 .login-card {
   width: min(460px, 100%);
   padding: 32px;

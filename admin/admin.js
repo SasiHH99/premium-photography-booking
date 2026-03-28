@@ -194,7 +194,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterScheduledJobsList: document.getElementById("newsletterScheduledJobsList"),
     newsletterScheduledJobsEmpty: document.getElementById("newsletterScheduledJobsEmpty"),
     newsletterCampaignLogList: document.getElementById("newsletterCampaignLogList"),
-    newsletterCampaignLogEmpty: document.getElementById("newsletterCampaignLogEmpty")
+    newsletterCampaignLogEmpty: document.getElementById("newsletterCampaignLogEmpty"),
+    newsletterCampaignFeedback: document.getElementById("newsletterCampaignFeedback")
   };
 
   if (!ui.refreshAllBtn) return;
@@ -231,6 +232,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.globalFeedback.textContent = "";
     ui.globalFeedback.removeAttribute("data-tone");
     ui.globalFeedback.classList.add("hidden");
+  }
+
+  function setNewsletterCampaignFeedback(message = "", tone = "success") {
+    if (!ui.newsletterCampaignFeedback) return;
+
+    if (!message) {
+      ui.newsletterCampaignFeedback.textContent = "";
+      ui.newsletterCampaignFeedback.removeAttribute("data-tone");
+      ui.newsletterCampaignFeedback.classList.add("hidden");
+      return;
+    }
+
+    ui.newsletterCampaignFeedback.textContent = message;
+    ui.newsletterCampaignFeedback.dataset.tone = tone;
+    ui.newsletterCampaignFeedback.classList.remove("hidden");
   }
 
   function getSelectedBooking() {
@@ -1185,16 +1201,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       throw new Error("Adj meg egy teszt email címet.");
     }
 
-      const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
-        method: "POST",
-        body: JSON.stringify({
-          action: "send_test",
-          testEmail,
-          ...getNewsletterCampaignPayload()
-        })
-      });
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "send_test",
+        testEmail,
+        ...getNewsletterCampaignPayload()
+      })
+    });
 
-    showFeedback(data.message || "A teszt hírlevél elküldve.");
+    const message = data.message || "A teszt hírlevél elküldve.";
+    const senderDetail = data.sender ? ` Küldő: ${data.sender}.` : "";
+    showFeedback(message);
+    setNewsletterCampaignFeedback(`${message}${senderDetail}`, "success");
   }
 
   async function sendNewsletterCampaign() {
@@ -1219,7 +1238,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await loadNewsletterCampaignLogs();
     renderNewsletterCampaigns();
-    showFeedback(data.message || `Kampány elküldve. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
+    const message = data.message || `Kampány elküldve. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`;
+    const senderDetail = data.sender ? ` Küldő: ${data.sender}.` : "";
+    showFeedback(message);
+    setNewsletterCampaignFeedback(`${message} Címzett: ${data.recipientCount || recipientCount}.${senderDetail}`, (data.failedCount || 0) > 0 ? "warning" : "success");
   }
 
   async function scheduleNewsletterCampaign() {
@@ -1242,7 +1264,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNewsletterCampaignLogs();
     renderNewsletterCampaigns();
     setNewsletterScheduleDefault(true);
-    showFeedback(`A kampány időzítve: ${formatDateTime(data.job?.scheduled_for)}`);
+    const message = `A kampány időzítve: ${formatDateTime(data.job?.scheduled_for)}`;
+    showFeedback(message);
+    setNewsletterCampaignFeedback(message, "success");
   }
 
   async function runScheduledNewsletterJobs() {
@@ -1254,7 +1278,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNewsletterSubscribers();
     await loadNewsletterCampaignLogs();
     render();
-    showFeedback(`Az esedékes kampányok futtatása kész. Feldolgozott: ${data.processedCount || 0}.`);
+    const message = `Az esedékes kampányok futtatása kész. Feldolgozott: ${data.processedCount || 0}.`;
+    showFeedback(message);
+    setNewsletterCampaignFeedback(message, "success");
   }
 
   async function sendNewsletterFollowup() {
@@ -1276,7 +1302,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNewsletterSubscribers();
     await loadNewsletterCampaignLogs();
     render();
-    showFeedback(data.message || `Follow-up küldés kész. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
+    const message = data.message || `Follow-up küldés kész. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`;
+    const senderDetail = data.sender ? ` Küldő: ${data.sender}.` : "";
+    showFeedback(message);
+    setNewsletterCampaignFeedback(`${message} Címzett: ${data.recipientCount || recipientCount}.${senderDetail}`, (data.failedCount || 0) > 0 ? "warning" : "success");
   }
 
   function exportNewsletterCsv() {
@@ -1354,6 +1383,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.newsletterCampaignLang?.addEventListener("change", () => {
       applyNewsletterCampaignPreset(true);
       renderNewsletterCampaigns();
+      setNewsletterCampaignFeedback();
+    });
+
+    ui.newsletterCampaignPreset?.addEventListener("change", () => {
+      setNewsletterCampaignFeedback();
     });
 
     ui.galleryUserSearch?.addEventListener("input", renderGalleryUsers);
@@ -1558,6 +1592,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterCampaignPresetBtn?.addEventListener("click", () => {
       applyNewsletterCampaignPreset(true);
+      setNewsletterCampaignFeedback();
     });
 
     ui.newsletterCampaignTestBtn?.addEventListener("click", async () => {
@@ -1566,6 +1601,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült elküldeni a teszt hírlevelet.", "error");
+        setNewsletterCampaignFeedback(error.message || "Nem sikerült elküldeni a teszt hírlevelet.", "error");
       }
     });
 
@@ -1575,6 +1611,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült elküldeni a kampányt.", "error");
+        setNewsletterCampaignFeedback(error.message || "Nem sikerült elküldeni a kampányt.", "error");
       }
     });
 
@@ -1584,6 +1621,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült időzíteni a kampányt.", "error");
+        setNewsletterCampaignFeedback(error.message || "Nem sikerült időzíteni a kampányt.", "error");
       }
     });
 
@@ -1593,6 +1631,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült futtatni az esedékes kampányokat.", "error");
+        setNewsletterCampaignFeedback(error.message || "Nem sikerült futtatni az esedékes kampányokat.", "error");
       }
     });
 
@@ -1602,6 +1641,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült elküldeni a follow-up levelet.", "error");
+        setNewsletterCampaignFeedback(error.message || "Nem sikerült elküldeni a follow-up levelet.", "error");
       }
     });
 

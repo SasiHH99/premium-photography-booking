@@ -27,6 +27,10 @@
       stepThreeCopy: "Ha minden tiszta, a folyamat onnantól gyors, nyugodt és rendezett lesz.",
       actionPrimary: "Portfólió megtekintése",
       actionSecondary: "Inkább írnék",
+      actionPrimaryPartial: "Kapcsolat megnyitása",
+      actionSecondaryPartial: "Portfólió megtekintése",
+      actionNoteSuccess: "Ha közben még pontosítanál valamit, a kapcsolat oldalon bármikor hozzá tudsz írni egy rövid kiegészítést.",
+      actionNotePartial: "Az anyag rögzítve van, de itt érdemes most rögtön egy rövid üzenettel is megerősíteni a kérésed.",
       infoDate: "Tervezett dátum",
       infoPackage: "Csomag",
       infoEmail: "Visszajelzési email",
@@ -58,7 +62,8 @@
       stepThreeTitle: "Foglalás",
       stepThreeCopy: "Ha már tiszta a cél, innen közvetlenül át tudsz lépni a foglalási kéréshez.",
       actionPrimary: "Árak megtekintése",
-      actionSecondary: "Portfólió"
+      actionSecondary: "Portfólió",
+      actionNoteSuccess: "Ha már látod az irányt, innen tovább tudsz lépni az árakhoz vagy rögtön a foglalási kéréshez."
     }
   },
   de: {
@@ -89,6 +94,10 @@
       stepThreeCopy: "Wenn alles passt, läuft der Rest ruhig, geführt und ohne Reibung.",
       actionPrimary: "Portfolio ansehen",
       actionSecondary: "Lieber schreiben",
+      actionPrimaryPartial: "Kontakt öffnen",
+      actionSecondaryPartial: "Portfolio ansehen",
+      actionNoteSuccess: "Wenn du zwischenzeitlich noch etwas präzisieren willst, kannst du deine Anfrage jederzeit kurz über die Kontaktseite ergänzen.",
+      actionNotePartial: "Die Anfrage ist gespeichert, aber jetzt ist ein kurzer Zusatz über die Kontaktseite der sauberste nächste Schritt.",
       infoDate: "Wunschdatum",
       infoPackage: "Paket",
       infoEmail: "Rückmeldung an",
@@ -120,7 +129,8 @@
       stepThreeTitle: "Termin",
       stepThreeCopy: "Wenn dein Ziel schon klar ist, kannst du direkt in die Buchungsanfrage weitergehen.",
       actionPrimary: "Preise ansehen",
-      actionSecondary: "Portfolio"
+      actionSecondary: "Portfolio",
+      actionNoteSuccess: "Wenn dein Ziel schon klar ist, geh von hier direkt weiter zu Preisen oder Termin."
     }
   }
 };
@@ -142,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stepTitle = document.getElementById("thanksSectionTitle");
   const actionPrimary = document.getElementById("thanksActionPrimary");
   const actionSecondary = document.getElementById("thanksActionSecondary");
+  const actionNote = document.getElementById("thanksActionNote");
   const newsletterBox = document.getElementById("thanksNewsletterBox");
   const newsletterLabel = document.getElementById("thanksNewsletterLabel");
   const newsletterCopy = document.getElementById("thanksNewsletterCopy");
@@ -160,18 +171,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   stepTitle.textContent = copy.sectionTitle;
-  actionPrimary.textContent = copy.actionPrimary;
-  actionSecondary.textContent = copy.actionSecondary;
+  const isPartialBooking = type === "booking" && state === "partial";
+  actionPrimary.textContent = isPartialBooking ? (copy.actionPrimaryPartial || copy.actionPrimary) : copy.actionPrimary;
+  actionSecondary.textContent = isPartialBooking ? (copy.actionSecondaryPartial || copy.actionSecondary) : copy.actionSecondary;
 
   const actionPrimaryHref = type === "booking"
-    ? "portfolio.html"
+    ? (isPartialBooking ? (lang === "hu" ? "kapcsolat.html" : "kontakt.html") : "portfolio.html")
     : (lang === "hu" ? "arak.html" : "preise.html");
   const actionSecondaryHref = type === "booking"
-    ? (lang === "hu" ? "kapcsolat.html" : "kontakt.html")
+    ? (isPartialBooking ? "portfolio.html" : (lang === "hu" ? "kapcsolat.html" : "kontakt.html"))
     : "portfolio.html";
 
   actionPrimary.href = actionPrimaryHref;
   actionSecondary.href = actionSecondaryHref;
+
+  if (actionNote) {
+    const noteMessage = type === "booking"
+      ? (isPartialBooking ? copy.actionNotePartial : copy.actionNoteSuccess)
+      : copy.actionNoteSuccess;
+
+    if (noteMessage) {
+      actionNote.textContent = noteMessage;
+      actionNote.hidden = false;
+    } else {
+      actionNote.hidden = true;
+    }
+  }
 
   document.getElementById("summaryOneLabel").textContent = copy.summaryOneLabel;
   document.getElementById("summaryOneValue").textContent = copy.summaryOneValue;

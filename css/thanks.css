@@ -184,6 +184,13 @@ body.thanks-page {
   gap: 12px;
 }
 
+.thanks-action-note {
+  margin: 0;
+  color: var(--thanks-muted);
+  line-height: 1.7;
+  max-width: 44rem;
+}
+
 .thanks-btn {
   min-height: 52px;
   padding: 0 22px;
