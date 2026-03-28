@@ -90,6 +90,8 @@ function initHamburger() {
   const menu = document.getElementById("mobileMenu");
   const backdrop = document.getElementById("mobileMenuBackdrop");
   const close = document.querySelector(".mobile-menu-close");
+  const panel = menu?.querySelector(".mobile-menu-panel");
+  const nav = menu?.querySelector(".mobile-menu-nav");
 
   if (!toggle || !menu || toggle.dataset.bound) return;
   toggle.dataset.bound = "true";
@@ -101,6 +103,18 @@ function initHamburger() {
     menu.setAttribute("aria-hidden", "false");
     backdrop?.classList.add("open");
     document.body.classList.add("menu-open");
+    menu.style.display = "flex";
+    menu.style.visibility = "visible";
+    menu.style.opacity = "1";
+    menu.style.pointerEvents = "auto";
+    if (panel) {
+      panel.style.display = "grid";
+      panel.style.transform = "translateX(0)";
+    }
+    if (nav) {
+      nav.style.display = "grid";
+      nav.style.gap = "16px";
+    }
   };
 
   const closeMenu = () => {
@@ -110,6 +124,9 @@ function initHamburger() {
     menu.setAttribute("aria-hidden", "true");
     backdrop?.classList.remove("open");
     document.body.classList.remove("menu-open");
+    menu.style.opacity = "";
+    menu.style.pointerEvents = "";
+    if (panel) panel.style.transform = "";
   };
 
   toggle.addEventListener("click", () => {
@@ -144,10 +161,53 @@ function initResponsiveHeaderState() {
   const applyState = () => {
     const isMobile = window.innerWidth <= 1100;
 
-    mainNav.style.display = isMobile ? "none" : "flex";
-    if (desktopCta) desktopCta.style.display = isMobile ? "none" : "inline-flex";
-    if (desktopLang) desktopLang.style.display = isMobile ? "none" : "inline-flex";
-    menuToggle.style.display = isMobile ? "inline-flex" : "none";
+    if (isMobile) {
+      mainNav.style.display = "none";
+      mainNav.style.opacity = "0";
+      mainNav.style.visibility = "hidden";
+      mainNav.style.pointerEvents = "none";
+      mainNav.style.width = "0";
+      mainNav.style.overflow = "hidden";
+
+      if (desktopCta) {
+        desktopCta.style.display = "none";
+        desktopCta.style.visibility = "hidden";
+        desktopCta.style.pointerEvents = "none";
+      }
+
+      if (desktopLang) {
+        desktopLang.style.display = "none";
+        desktopLang.style.visibility = "hidden";
+        desktopLang.style.pointerEvents = "none";
+      }
+
+      menuToggle.style.display = "inline-flex";
+      menuToggle.style.visibility = "visible";
+      menuToggle.style.pointerEvents = "auto";
+    } else {
+      mainNav.style.display = "flex";
+      mainNav.style.opacity = "";
+      mainNav.style.visibility = "";
+      mainNav.style.pointerEvents = "";
+      mainNav.style.width = "";
+      mainNav.style.overflow = "";
+
+      if (desktopCta) {
+        desktopCta.style.display = "inline-flex";
+        desktopCta.style.visibility = "";
+        desktopCta.style.pointerEvents = "";
+      }
+
+      if (desktopLang) {
+        desktopLang.style.display = "inline-flex";
+        desktopLang.style.visibility = "";
+        desktopLang.style.pointerEvents = "";
+      }
+
+      menuToggle.style.display = "none";
+      menuToggle.style.visibility = "";
+      menuToggle.style.pointerEvents = "";
+    }
   };
 
   applyState();
@@ -246,6 +306,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const partialPath = lang === "hu" ? "/partials/header-hu.html" : "/partials/header-de.html";
   const applyHeaderMarkup = (html) => {
     target.innerHTML = html;
+    const existingBackdrop = document.getElementById("mobileMenuBackdrop");
+    const existingMenu = document.getElementById("mobileMenu");
+    if (existingBackdrop && existingBackdrop.parentElement !== document.body) {
+      document.body.appendChild(existingBackdrop);
+    }
+    if (existingMenu && existingMenu.parentElement !== document.body) {
+      document.body.appendChild(existingMenu);
+    }
     initResponsiveHeaderState();
     initLangSwitch();
     initActiveNavigation();
