@@ -373,6 +373,35 @@
       </div>
     </section>
 
+    <section class="newsletter-section">
+      <div class="container newsletter-shell" data-reveal>
+        <div class="newsletter-copy">
+          <p class="section-kicker">Exklusive Updates</p>
+          <h2 class="section-title">Freie Termine und neue Serien lieber früher sehen.</h2>
+          <p class="section-copy">Kein lauter Newsletter. Nur seltene, kuratierte Updates zu freien Slots, neuen Serien und limitierten Shooting-Möglichkeiten.</p>
+          <div class="newsletter-highlights">
+            <span>Freie Termine zuerst sehen</span>
+            <span>Neue Arbeiten ohne Umwege</span>
+            <span>Keine tägliche Werbeflut</span>
+          </div>
+        </div>
+
+        <form class="newsletter-form" data-newsletter-form data-lang="de" data-source="homepage_section">
+          <label class="newsletter-label" for="newsletterEmailDe">E-Mail</label>
+          <div class="newsletter-input-row">
+            <input id="newsletterEmailDe" type="email" name="email" placeholder="deine@email.de" autocomplete="email" required>
+            <button type="submit" class="btn-primary">Jetzt anmelden</button>
+          </div>
+          <label class="newsletter-consent">
+            <input type="checkbox" name="consent" required>
+            <span>Ich möchte exklusive Updates von B. Photography erhalten und akzeptiere die <a href="datenschutz.html">Datenschutzhinweise</a>.</span>
+          </label>
+          <p class="newsletter-hint">Nach der Anmeldung bekommst du eine kurze Bestätigungs-E-Mail. Erst danach bist du wirklich eingetragen.</p>
+          <p class="newsletter-status" data-newsletter-status aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
     <section class="testimonial-section">
       <div class="container">
         <div class="section-heading" data-reveal>
@@ -447,6 +476,18 @@
       <div class="footer-brand-block">
         <p class="footer-brand">B. Photography</p>
         <p class="footer-copy">Premium Fotoshootings in Wien für Portrait, Paar, Natur, Auto und Familie mit ruhiger Führung und klarer Übergabe.</p>
+        <form class="newsletter-form newsletter-form--footer" data-newsletter-form data-lang="de" data-source="footer">
+          <label class="newsletter-label" for="newsletterEmailFooterDe">Updates zuerst sehen</label>
+          <div class="newsletter-input-row">
+            <input id="newsletterEmailFooterDe" type="email" name="email" placeholder="deine@email.de" autocomplete="email" required>
+            <button type="submit" class="btn-secondary">Eintragen</button>
+          </div>
+          <label class="newsletter-consent newsletter-consent--compact">
+            <input type="checkbox" name="consent" required>
+            <span>Ich möchte seltene Updates erhalten und akzeptiere die <a href="datenschutz.html">Datenschutzhinweise</a>.</span>
+          </label>
+          <p class="newsletter-status newsletter-status--footer" data-newsletter-status aria-live="polite"></p>
+        </form>
       </div>
 
       <nav class="footer-column" aria-label="Footer Navigation">
@@ -480,5 +521,6 @@
 
   <script src="../js/header.js"></script>
   <script src="../js/global.js"></script>
+  <script src="../js/newsletter.js"></script>
 </body>
 </html>

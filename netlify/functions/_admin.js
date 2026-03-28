@@ -65,6 +65,10 @@ export function generatePassword() {
   return crypto.randomBytes(9).toString("base64url").slice(0, 12);
 }
 
+export function generateToken(size = 24) {
+  return crypto.randomBytes(size).toString("hex");
+}
+
 export async function verifyAdminFromEvent(event) {
   const supabase = createServiceClient();
   const token = getBearerToken(event.headers || {});
@@ -113,6 +117,43 @@ export async function sendResendMail({ to, subject, html, from, replyTo }) {
     const details = await response.text();
     throw new Error(details.slice(0, 500));
   }
+}
+
+export async function createResendAudienceContact({ audienceId, email, firstName = "", lastName = "", unsubscribed = false }) {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey || !audienceId) {
+    return { ok: false, skipped: true };
+  }
+
+  const payload = {
+    email,
+    unsubscribed
+  };
+
+  if (firstName) payload.first_name = firstName;
+  if (lastName) payload.last_name = lastName;
+
+  const response = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok) {
+    const body = await response.json().catch(() => ({}));
+    return { ok: true, data: body };
+  }
+
+  const details = await response.text();
+  const normalized = details.toLowerCase();
+  if (response.status === 409 || normalized.includes("already exists") || normalized.includes("contact exists")) {
+    return { ok: true, duplicate: true };
+  }
+
+  throw new Error(details.slice(0, 500));
 }
 
 export function createMailLayout({ eyebrow = "B. Photography", heading, intro, sections = "", ctaText = "", ctaUrl = "", footerNote = "" }) {

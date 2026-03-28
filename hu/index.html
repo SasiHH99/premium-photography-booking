@@ -373,6 +373,35 @@
       </div>
     </section>
 
+    <section class="newsletter-section">
+      <div class="container newsletter-shell" data-reveal>
+        <div class="newsletter-copy">
+          <p class="section-kicker">Exkluzív frissítések</p>
+          <h2 class="section-title">Lásd hamarabb a szabad időpontokat és az új sorozatokat.</h2>
+          <p class="section-copy">Nem harsány hírlevél. Csak ritka, válogatott frissítés szabad időpontokról, új munkákról és limitált fotózási lehetőségekről.</p>
+          <div class="newsletter-highlights">
+            <span>Szabad időpontok elsőként</span>
+            <span>Új képi anyagok közvetlenül</span>
+            <span>Nincs napi promócióáradat</span>
+          </div>
+        </div>
+
+        <form class="newsletter-form" data-newsletter-form data-lang="hu" data-source="homepage_section">
+          <label class="newsletter-label" for="newsletterEmailHu">E-mail</label>
+          <div class="newsletter-input-row">
+            <input id="newsletterEmailHu" type="email" name="email" placeholder="te@email.hu" autocomplete="email" required>
+            <button type="submit" class="btn-primary">Feliratkozom</button>
+          </div>
+          <label class="newsletter-consent">
+            <input type="checkbox" name="consent" required>
+            <span>Szeretnék exkluzív frissítéseket kapni a B. Photography-tól, és elfogadom az <a href="privacy.html">adatkezelési tájékoztatót</a>.</span>
+          </label>
+          <p class="newsletter-hint">A feliratkozás után kapsz egy rövid megerősítő e-mailt. Csak azután leszel ténylegesen felvéve.</p>
+          <p class="newsletter-status" data-newsletter-status aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
     <section class="testimonial-section">
       <div class="container">
         <div class="section-heading" data-reveal>
@@ -447,6 +476,18 @@
       <div class="footer-brand-block">
         <p class="footer-brand">B. Photography</p>
         <p class="footer-copy">Prémium fotózás Bécsben portré, páros, természet, autós és családi sorozatokhoz nyugodt vezetéssel és rendezett átadással.</p>
+        <form class="newsletter-form newsletter-form--footer" data-newsletter-form data-lang="hu" data-source="footer">
+          <label class="newsletter-label" for="newsletterEmailFooterHu">Frissítések elsőként</label>
+          <div class="newsletter-input-row">
+            <input id="newsletterEmailFooterHu" type="email" name="email" placeholder="te@email.hu" autocomplete="email" required>
+            <button type="submit" class="btn-secondary">Kérem</button>
+          </div>
+          <label class="newsletter-consent newsletter-consent--compact">
+            <input type="checkbox" name="consent" required>
+            <span>Ritka, válogatott frissítéseket szeretnék kapni, és elfogadom az <a href="privacy.html">adatkezelési tájékoztatót</a>.</span>
+          </label>
+          <p class="newsletter-status newsletter-status--footer" data-newsletter-status aria-live="polite"></p>
+        </form>
       </div>
 
       <nav class="footer-column" aria-label="Lábléc navigáció">
@@ -480,5 +521,6 @@
 
   <script src="../js/header.js"></script>
   <script src="../js/global.js"></script>
+  <script src="../js/newsletter.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@
   "kontakt.html": "kapcsolat.html",
   "galeria-login.html": "galeria-login.html",
   "galeria.html": "galeria.html",
+  "newsletter-bestaetigen.html": "hirlevel-megerosites.html",
   "datenschutz.html": "privacy.html",
   "agb.html": "aszf.html",
   "impressum.html": "impresszum.html"
@@ -19,6 +20,7 @@ const TO_DE = {
   "kapcsolat.html": "kontakt.html",
   "galeria-login.html": "galeria-login.html",
   "galeria.html": "galeria.html",
+  "hirlevel-megerosites.html": "newsletter-bestaetigen.html",
   "privacy.html": "datenschutz.html",
   "aszf.html": "agb.html",
   "impresszum.html": "impressum.html"
