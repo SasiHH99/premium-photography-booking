@@ -34,30 +34,53 @@
 function renderUnsubscribeState(lang, state) {
   const copy = NEWSLETTER_UNSUBSCRIBE_TEXT[lang];
   const eyebrow = document.querySelector("[data-confirm-eyebrow]");
+  const status = document.querySelector("[data-confirm-status]");
   const title = document.querySelector("[data-confirm-title]");
   const text = document.querySelector("[data-confirm-text]");
+  const note = document.querySelector("[data-confirm-note]");
   const primary = document.querySelector("[data-confirm-primary]");
   const secondary = document.querySelector("[data-confirm-secondary]");
 
-  if (!eyebrow || !title || !text || !primary || !secondary) return;
+  if (!eyebrow || !title || !text || !primary || !secondary || !status || !note) return;
 
   eyebrow.textContent = copy.loadingEyebrow;
+  status.className = `newsletter-confirm-status is-${state}`;
 
   if (state === "success") {
+    status.textContent = "✓";
     title.textContent = copy.successTitle;
     text.textContent = copy.successText;
+    note.textContent = lang === "hu"
+      ? "Később bármikor újra feliratkozhatsz, ha új időpontokat vagy friss sorozatokat szeretnél látni."
+      : "Du kannst dich später jederzeit wieder eintragen, wenn du neue Termine oder Serien sehen möchtest.";
   } else if (state === "already") {
+    status.textContent = "•";
     title.textContent = copy.alreadyTitle;
     text.textContent = copy.alreadyText;
+    note.textContent = lang === "hu"
+      ? "Az e-mail címed már nincs aktív feliratkozóként kezelve."
+      : "Deine E-Mail-Adresse wird bereits nicht mehr als aktive Anmeldung geführt.";
   } else if (state === "invalid") {
+    status.textContent = "!";
     title.textContent = copy.invalidTitle;
     text.textContent = copy.invalidText;
+    note.textContent = lang === "hu"
+      ? "Ha inkább személyesen írnál, a kapcsolat oldal ugyanúgy működik."
+      : "Wenn du lieber direkt schreiben möchtest, kannst du jederzeit die Kontaktseite nutzen.";
   } else if (state === "error") {
+    status.textContent = "!";
     title.textContent = copy.errorTitle;
     text.textContent = copy.errorText;
+    note.textContent = lang === "hu"
+      ? "Ha a hiba később is megmarad, írj a kapcsolat oldalon, és kézzel rendezzük."
+      : "Wenn der Fehler bestehen bleibt, schreib mir über die Kontaktseite, dann kümmere ich mich manuell darum.";
   } else {
+    status.textContent = "…";
     title.textContent = copy.loadingTitle;
     text.textContent = copy.loadingText;
+    note.textContent = lang === "hu"
+      ? "A leiratkozás után nem kapsz több ilyen értesítést."
+      : "Nach der Abmeldung bekommst du keine weiteren Newsletter-Updates.";
   }
 
   primary.textContent = copy.primary;

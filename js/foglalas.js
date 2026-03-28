@@ -16,6 +16,7 @@
   const successTitle = successBox?.querySelector(".thank-you-title");
   const successText = successBox?.querySelector(".thank-you-text");
   const successNote = successBox?.querySelector(".success-note");
+  const successNextCopy = document.getElementById("bookingSuccessNextCopy");
 
   const lang = window.location.pathname.startsWith("/hu") ? "hu" : "de";
 
@@ -28,10 +29,12 @@
       successTitle: "Kérés elküldve",
       successText: "A foglalási kérésed beérkezett. Hamarosan jelentkezem a következő lépésekkel.",
       successNote: "Általában 24 órán belül válaszolok.",
+      successNext: "Átnézheted a portfóliót, vagy írhatsz, ha még pontosítanád a részleteket.",
       partialTitle: "Kérés rögzítve",
       partialText:
         "A foglalási kérésed elmentődött, de az admin értesítés nem ment át minden címre. A visszaigazolás ettől még megérkezhetett.",
-      partialNote: "Ha biztosra akarsz menni, írj a kapcsolat oldalon is."
+      partialNote: "Ha biztosra akarsz menni, írj a kapcsolat oldalon is.",
+      partialNext: "A részleteket most is át tudod nézni, és ha kell, külön üzenetben pontosíthatod a kérést."
     },
     de: {
       packagePlaceholder: "Nach der Paketauswahl siehst du hier kurz, wofür es am besten passt.",
@@ -41,10 +44,12 @@
       successTitle: "Anfrage gesendet",
       successText: "Deine Buchungsanfrage ist eingegangen. Ich melde mich mit den nächsten Schritten.",
       successNote: "In der Regel antworte ich innerhalb von 24 Stunden.",
+      successNext: "Du kannst dir in der Zwischenzeit das Portfolio ansehen oder mir noch eine kurze Ergänzung schicken.",
       partialTitle: "Anfrage gespeichert",
       partialText:
         "Deine Buchungsanfrage wurde gespeichert, aber die Admin-Benachrichtigung konnte nicht an alle Empfänger zugestellt werden.",
-      partialNote: "Wenn du sicher gehen willst, schreib zusätzlich über die Kontaktseite."
+      partialNote: "Wenn du sicher gehen willst, schreib zusätzlich über die Kontaktseite.",
+      partialNext: "Die nächsten Schritte kannst du trotzdem schon vorbereiten und bei Bedarf noch kurz ergänzen."
     }
   };
 
@@ -117,17 +122,22 @@
       ? {
           title: TEXT[lang].partialTitle,
           text: TEXT[lang].partialText,
-          note: TEXT[lang].partialNote
+          note: TEXT[lang].partialNote,
+          next: TEXT[lang].partialNext
         }
       : {
           title: TEXT[lang].successTitle,
           text: TEXT[lang].successText,
-          note: TEXT[lang].successNote
+          note: TEXT[lang].successNote,
+          next: TEXT[lang].successNext
         };
 
     successTitle.textContent = copy.title;
     successText.textContent = copy.text;
     successNote.textContent = copy.note;
+    if (successNextCopy) {
+      successNextCopy.textContent = copy.next;
+    }
     successBox.classList.add("show");
   }
 

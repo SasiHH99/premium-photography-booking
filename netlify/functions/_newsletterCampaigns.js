@@ -74,6 +74,7 @@ export async function sendCampaignBatch({
 
   let sentCount = 0;
   let failedCount = 0;
+  const sampleErrors = [];
 
   for (const subscriber of recipients) {
     try {
@@ -98,6 +99,9 @@ export async function sendCampaignBatch({
       sentCount += 1;
     } catch (sendError) {
       failedCount += 1;
+      if (sampleErrors.length < 3) {
+        sampleErrors.push(`${subscriber.email}: ${String(sendError?.message || sendError).slice(0, 180)}`);
+      }
       console.error("newsletter campaign send failed:", subscriber.email, sendError);
     }
   }
@@ -120,7 +124,8 @@ export async function sendCampaignBatch({
   return {
     recipientCount: recipients.length,
     sentCount,
-    failedCount
+    failedCount,
+    sampleErrors
   };
 }
 
@@ -160,6 +165,7 @@ export async function sendFollowupBatch({
   let sentCount = 0;
   let failedCount = 0;
   const sentIds = [];
+  const sampleErrors = [];
 
   for (const subscriber of eligible) {
     try {
@@ -183,6 +189,9 @@ export async function sendFollowupBatch({
       sentIds.push(subscriber.id);
     } catch (sendError) {
       failedCount += 1;
+      if (sampleErrors.length < 3) {
+        sampleErrors.push(`${subscriber.email}: ${String(sendError?.message || sendError).slice(0, 180)}`);
+      }
       console.error("newsletter followup send failed:", subscriber.email, sendError);
     }
   }
@@ -216,7 +225,8 @@ export async function sendFollowupBatch({
   return {
     recipientCount: eligible.length,
     sentCount,
-    failedCount
+    failedCount,
+    sampleErrors
   };
 }
 

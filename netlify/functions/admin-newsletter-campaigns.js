@@ -73,6 +73,8 @@ export const handler = async (event) => {
   const from =
     process.env.NEWSLETTER_FROM_EMAIL ||
     process.env.CONTACT_FROM_EMAIL ||
+    process.env.BOOKING_FROM_EMAIL ||
+    process.env.GALLERY_FROM_EMAIL ||
     "B. Photography <noreply@bphoto.at>";
 
   try {
@@ -131,7 +133,7 @@ export const handler = async (event) => {
 
       return json(200, {
         success: true,
-        message: "Tesztlevél elküldve."
+        message: `Tesztlevél elküldve erre: ${testEmail}.`
       });
     }
 
@@ -156,10 +158,17 @@ export const handler = async (event) => {
       }
 
       if (!result.sentCount && result.failedCount) {
-        return json(502, { error: "A kampány minden címnél hibára futott. Ellenőrizd a küldő emailt és a Resend beállításokat." });
+        return json(502, {
+          error: "A kampány minden címnél hibára futott. Ellenőrizd a küldő emailt és a Resend beállításokat.",
+          details: (result.sampleErrors || []).join(" | ")
+        });
       }
 
-      return json(200, { success: true, ...result });
+      return json(200, {
+        success: true,
+        message: `Kampány kiküldve. Sikeres: ${result.sentCount || 0}, hiba: ${result.failedCount || 0}.`,
+        ...result
+      });
     }
 
     if (action === "send_followup") {
@@ -176,10 +185,17 @@ export const handler = async (event) => {
       }
 
       if (!result.sentCount && result.failedCount) {
-        return json(502, { error: "A follow-up minden címnél hibára futott. Ellenőrizd a Resend beállításokat." });
+        return json(502, {
+          error: "A follow-up minden címnél hibára futott. Ellenőrizd a Resend beállításokat.",
+          details: (result.sampleErrors || []).join(" | ")
+        });
       }
 
-      return json(200, { success: true, ...result });
+      return json(200, {
+        success: true,
+        message: `Follow-up kiküldve. Sikeres: ${result.sentCount || 0}, hiba: ${result.failedCount || 0}.`,
+        ...result
+      });
     }
 
     if (action === "schedule_campaign") {

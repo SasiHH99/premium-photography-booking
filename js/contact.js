@@ -3,8 +3,10 @@
     sending: "Küldés folyamatban...",
     successTitle: "Üzenet elküldve",
     successText: "Köszönöm az üzenetet. Hamarosan válaszolok.",
+    successNote: "Ha a fotózás iránya már tiszta, innen rögtön tovább tudsz menni a foglalás vagy a portfólió felé.",
     errorTitle: "Küldés sikertelen",
     errorText: "Valami hiba történt az üzenet küldése közben. Próbáld meg újra kicsit később.",
+    errorNote: "Ha sürgős, próbáld meg később újra, vagy írj közvetlenül emailben.",
     close: "Bezár",
     invalid: "Kérlek tölts ki minden mezőt érvényes adatokkal."
   },
@@ -12,8 +14,10 @@
     sending: "Nachricht wird gesendet...",
     successTitle: "Nachricht gesendet",
     successText: "Danke für deine Nachricht. Ich melde mich bald zurück.",
+    successNote: "Wenn dein Ziel schon klar ist, kannst du direkt mit Termin oder Portfolio weitermachen.",
     errorTitle: "Senden fehlgeschlagen",
     errorText: "Beim Versenden ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
+    errorNote: "Wenn es dringend ist, versuche es später erneut oder schreibe direkt per E-Mail.",
     close: "Schließen",
     invalid: "Bitte alle Felder korrekt ausfüllen."
   }
@@ -31,6 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("contactSuccess");
   const overlayTitle = document.getElementById("contactSuccessTitle");
   const overlayText = document.getElementById("contactSuccessText");
+  const overlayNote = document.getElementById("contactSuccessNote");
+  const overlayActions = document.getElementById("contactSuccessActions");
   const overlayButton = document.getElementById("contactSuccessClose");
 
   let isSubmitting = false;
@@ -47,6 +53,12 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.classList.toggle("error", isError);
     overlayTitle.textContent = isError ? copy.errorTitle : copy.successTitle;
     overlayText.textContent = isError ? copy.errorText : copy.successText;
+    if (overlayNote) {
+      overlayNote.textContent = isError ? copy.errorNote : copy.successNote;
+    }
+    if (overlayActions) {
+      overlayActions.classList.toggle("hidden", isError);
+    }
     overlayButton.textContent = copy.close;
     overlay.classList.add("show");
   }

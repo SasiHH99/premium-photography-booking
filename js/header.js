@@ -133,12 +133,103 @@ function initHamburger() {
   closeMenu();
 }
 
+function buildHeaderMarkup(lang = "de") {
+  const isHu = lang === "hu";
+  const home = isHu ? "/hu/index.html" : "/de/index.html";
+  const portfolio = isHu ? "/hu/portfolio.html" : "/de/portfolio.html";
+  const prices = isHu ? "/hu/arak.html" : "/de/preise.html";
+  const booking = isHu ? "/hu/foglalas.html" : "/de/termin.html";
+  const contact = isHu ? "/hu/kapcsolat.html" : "/de/kontakt.html";
+  const gallery = isHu ? "/hu/galeria-login.html" : "/de/galeria-login.html";
+
+  return `
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <a href="${home}" aria-label="B. Photography ${isHu ? "kezdőlap" : "Startseite"}">
+        <span class="logo-main">B.</span>
+        <span class="logo-sub">PHOTOGRAPHY</span>
+      </a>
+    </div>
+
+    <nav class="main-nav" aria-label="${isHu ? "Fő navigáció" : "Hauptnavigation"}">
+      <a href="${home}">${isHu ? "Kezdőlap" : "Startseite"}</a>
+      <a href="${portfolio}">${isHu ? "Portfólió" : "Portfolio"}</a>
+      <a href="${prices}">${isHu ? "Árak" : "Preise"}</a>
+      <a href="${contact}">${isHu ? "Kapcsolat" : "Kontakt"}</a>
+      <a href="${gallery}">${isHu ? "Online galéria" : "Online Galerie"}</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="lang-switch" aria-label="${isHu ? "Nyelvváltás" : "Sprachwechsel"}">
+        <button type="button" data-lang="hu" class="${isHu ? "active" : ""}">HU</button>
+        <span aria-hidden="true">|</span>
+        <button type="button" data-lang="de" class="${isHu ? "" : "active"}">DE</button>
+      </div>
+
+      <a class="nav-cta" href="${booking}">${isHu ? "Időpontot kérek" : "Termin anfragen"}</a>
+
+      <button class="menu-toggle" type="button" aria-label="${isHu ? "Menü megnyitása" : "Menü öffnen"}" aria-controls="mobileMenu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+
+<aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-panel">
+    <div class="mobile-menu-top">
+      <div class="mobile-menu-brand">
+        <span class="logo-main">B.</span>
+        <span class="logo-sub">PHOTOGRAPHY</span>
+      </div>
+      <button class="mobile-menu-close" type="button" aria-label="${isHu ? "Menü bezárása" : "Menü schließen"}">×</button>
+    </div>
+
+    <div class="lang-switch mobile-lang-switch" aria-label="${isHu ? "Nyelvváltás" : "Sprachwechsel"}">
+      <button type="button" data-lang="hu" class="${isHu ? "active" : ""}">HU</button>
+      <span aria-hidden="true">|</span>
+      <button type="button" data-lang="de" class="${isHu ? "" : "active"}">DE</button>
+    </div>
+
+    <nav class="mobile-menu-nav" aria-label="${isHu ? "Mobil navigáció" : "Mobile Navigation"}">
+      <a href="${home}">${isHu ? "Kezdőlap" : "Startseite"}</a>
+      <a href="${portfolio}">${isHu ? "Portfólió" : "Portfolio"}</a>
+      <a href="${prices}">${isHu ? "Árak" : "Preise"}</a>
+      <a href="${booking}">${isHu ? "Foglalás" : "Termin"}</a>
+      <a href="${contact}">${isHu ? "Kapcsolat" : "Kontakt"}</a>
+      <a href="${gallery}">${isHu ? "Online galéria" : "Online Galerie"}</a>
+    </nav>
+
+    <a class="nav-cta mobile-menu-cta" href="${booking}">${isHu ? "Időpontot kérek" : "Termin anfragen"}</a>
+
+    <div class="mobile-menu-meta">
+      <span>${isHu ? "24 órán belüli válasz" : "Antwort innerhalb von 24h"}</span>
+      <span>${isHu ? "Bécs és környéke" : "Wien und Umgebung"}</span>
+      <span>${isHu ? "Online galéria" : "Online-Galerie"}</span>
+    </div>
+  </div>
+</aside>
+`;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const target = document.getElementById("site-header");
   if (!target) return;
 
   const { lang } = getRouteInfo();
   const partialPath = lang === "hu" ? "/partials/header-hu.html" : "/partials/header-de.html";
+  const applyHeaderMarkup = (html) => {
+    target.innerHTML = html;
+    initLangSwitch();
+    initActiveNavigation();
+    initStickyHeader();
+    initHamburger();
+  };
 
   try {
     const response = await fetch(partialPath);
@@ -147,14 +238,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const html = await response.text();
-    target.innerHTML = html;
+    if (!html.includes("menu-toggle") || !html.includes("mobileMenu")) {
+      throw new Error("Header partial incomplete");
+    }
+
+    applyHeaderMarkup(html);
   } catch (error) {
     console.error("Header bootstrap failed:", error);
-    return;
+    applyHeaderMarkup(buildHeaderMarkup(lang));
   }
-
-  initLangSwitch();
-  initActiveNavigation();
-  initStickyHeader();
-  initHamburger();
 });

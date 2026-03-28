@@ -285,7 +285,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         throw new Error("A Netlify funkciók ebben a helyi előnézetben nem érhetők el.");
       }
 
-      throw new Error(data.error || data.details || "Ismeretlen admin hiba történt.");
+      const detailText = [data.error, data.details].filter(Boolean).join(" | ");
+      throw new Error(detailText || "Ismeretlen admin hiba történt.");
     }
 
     return data;
@@ -697,11 +698,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (ui.newsletterScheduledJobsList && ui.newsletterScheduledJobsEmpty) {
       ui.newsletterScheduledJobsList.innerHTML = state.newsletterScheduledJobs.map((job) => `
-        <article class="campaign-log-item">
+        <article class="campaign-log-item ${job.status === "scheduled" || job.status === "processing" ? "is-pending" : job.status === "failed" ? "is-error" : "is-done"}">
           <p class="panel-kicker">${escapeHtml((LANG_LABELS[job.lang] || job.lang || "-").toUpperCase())} · ${escapeHtml(job.status || "scheduled")}</p>
           <h3>${escapeHtml(job.subject || "-")}</h3>
           <p class="campaign-log-meta">Ütemezve: ${escapeHtml(formatDateTime(job.scheduled_for))}</p>
           <p class="campaign-log-meta">Preset: ${escapeHtml(job.preset_key || "egyedi")} · Sikeres: ${escapeHtml(String(job.sent_count || 0))} · Hiba: ${escapeHtml(String(job.failed_count || 0))}</p>
+          ${job.error_message ? `<p class="campaign-log-meta">${escapeHtml(job.error_message)}</p>` : ""}
         </article>
       `).join("");
 
@@ -710,7 +712,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     ui.newsletterCampaignLogList.innerHTML = state.newsletterCampaignLogs.map((log) => `
-      <article class="campaign-log-item">
+      <article class="campaign-log-item ${Number(log.failed_count || 0) > 0 && Number(log.sent_count || 0) === 0 ? "is-error" : "is-done"}">
         <p class="panel-kicker">${escapeHtml(log.type === "followup" ? "Follow-up" : "Kampány")} · ${escapeHtml((LANG_LABELS[log.lang] || log.lang || "-").toUpperCase())}</p>
         <h3>${escapeHtml(log.subject || "-")}</h3>
         <p class="campaign-log-meta">${escapeHtml(formatDateTime(log.created_at))}</p>
@@ -1124,7 +1126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       throw new Error("Adj meg egy teszt email címet.");
     }
 
-    await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
       method: "POST",
       body: JSON.stringify({
         action: "send_test",
@@ -1133,7 +1135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       })
     });
 
-    showFeedback("A teszt hírlevél elküldve.");
+    showFeedback(data.message || "A teszt hírlevél elküldve.");
   }
 
   async function sendNewsletterCampaign() {
@@ -1158,7 +1160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await loadNewsletterCampaignLogs();
     renderNewsletterCampaigns();
-    showFeedback(`Kampány elküldve. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
+    showFeedback(data.message || `Kampány elküldve. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
   }
 
   async function scheduleNewsletterCampaign() {
@@ -1215,7 +1217,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNewsletterSubscribers();
     await loadNewsletterCampaignLogs();
     render();
-    showFeedback(`Follow-up küldés kész. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
+    showFeedback(data.message || `Follow-up küldés kész. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`);
   }
 
   function exportNewsletterCsv() {
