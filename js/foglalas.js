@@ -141,6 +141,21 @@
     successBox.classList.add("show");
   }
 
+  function redirectToThanks(kind, payload) {
+    const page = lang === "hu" ? "koszonjuk-foglalas.html" : "danke-termin.html";
+    const formattedDate = payload.booking_date
+      ? dateFormatter.format(new Date(`${payload.booking_date}T12:00:00`))
+      : "";
+    const params = new URLSearchParams({
+      state: kind,
+      date: formattedDate,
+      package: payload.package || "",
+      email: payload.email || ""
+    });
+
+    window.location.href = `${page}?${params.toString()}`;
+  }
+
   function updateDateDisplay() {
     if (!dateInput.value) {
       dateDisplay.textContent = TEXT[lang].dateEmpty;
@@ -225,13 +240,7 @@
           language: lang
         });
       }
-
-      showSuccessState(hasWorkingAdminNotification ? "success" : "partial");
-      form.reset();
-      dateInput.min = formatIsoDate(getMinBookingDate());
-      updatePackageInfo();
-      updateDateDisplay();
-      updateSubmitState();
+      redirectToThanks(hasWorkingAdminNotification ? "success" : "partial", payload);
     } catch (error) {
       console.error("Booking error:", error);
       errorBox.classList.add("show");

@@ -70,6 +70,13 @@ export const handler = async (event) => {
   if (!admin.ok) return admin.response;
 
   const { supabase, user } = admin;
+  const senderSource =
+    process.env.NEWSLETTER_FROM_EMAIL ? "NEWSLETTER_FROM_EMAIL" :
+    process.env.CONTACT_FROM_EMAIL ? "CONTACT_FROM_EMAIL" :
+    process.env.BOOKING_FROM_EMAIL ? "BOOKING_FROM_EMAIL" :
+    process.env.GALLERY_FROM_EMAIL ? "GALLERY_FROM_EMAIL" :
+    "default fallback";
+
   const from =
     process.env.NEWSLETTER_FROM_EMAIL ||
     process.env.CONTACT_FROM_EMAIL ||
@@ -98,7 +105,16 @@ export const handler = async (event) => {
 
       if (logsError) return json(400, { error: logsError.message });
       if (schedulesError) return json(400, { error: schedulesError.message });
-      return json(200, { logs: logs || [], schedules: schedules || [] });
+      return json(200, {
+        logs: logs || [],
+        schedules: schedules || [],
+        diagnostics: {
+          from,
+          senderSource,
+          publicSiteUrl: process.env.PUBLIC_SITE_URL || "https://bphoto.at",
+          resendAudienceConfigured: Boolean(process.env.RESEND_AUDIENCE_ID)
+        }
+      });
     }
 
     if (event.httpMethod !== "POST") {
@@ -133,7 +149,9 @@ export const handler = async (event) => {
 
       return json(200, {
         success: true,
-        message: `Tesztlevél elküldve erre: ${testEmail}.`
+        message: `Tesztlevél elküldve erre: ${testEmail}. Küldő: ${from}.`,
+        sender: from,
+        senderSource
       });
     }
 
@@ -167,6 +185,8 @@ export const handler = async (event) => {
       return json(200, {
         success: true,
         message: `Kampány kiküldve. Sikeres: ${result.sentCount || 0}, hiba: ${result.failedCount || 0}.`,
+        sender: from,
+        senderSource,
         ...result
       });
     }
@@ -194,6 +214,8 @@ export const handler = async (event) => {
       return json(200, {
         success: true,
         message: `Follow-up kiküldve. Sikeres: ${result.sentCount || 0}, hiba: ${result.failedCount || 0}.`,
+        sender: from,
+        senderSource,
         ...result
       });
     }

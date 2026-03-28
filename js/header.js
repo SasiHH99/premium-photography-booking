@@ -96,6 +96,46 @@ function initHamburger() {
   if (!toggle || !menu || toggle.dataset.bound) return;
   toggle.dataset.bound = "true";
 
+  const applyLayerStyles = (isOpen) => {
+    if (backdrop) {
+      backdrop.hidden = !isOpen;
+      backdrop.style.display = isOpen ? "block" : "none";
+      backdrop.style.position = "fixed";
+      backdrop.style.inset = "0";
+      backdrop.style.zIndex = "100010";
+      backdrop.style.visibility = isOpen ? "visible" : "hidden";
+      backdrop.style.opacity = isOpen ? "1" : "0";
+      backdrop.style.pointerEvents = isOpen ? "auto" : "none";
+    }
+
+    menu.hidden = !isOpen;
+    menu.style.display = isOpen ? "flex" : "none";
+    menu.style.position = "fixed";
+    menu.style.inset = "0";
+    menu.style.justifyContent = "flex-end";
+    menu.style.zIndex = "100020";
+    menu.style.visibility = isOpen ? "visible" : "hidden";
+    menu.style.opacity = isOpen ? "1" : "0";
+    menu.style.pointerEvents = isOpen ? "auto" : "none";
+
+    if (panel) {
+      panel.style.display = "grid";
+      panel.style.width = "min(420px, 100%)";
+      panel.style.maxWidth = "420px";
+      panel.style.height = "100%";
+      panel.style.padding = "22px";
+      panel.style.background = "linear-gradient(180deg, rgba(15, 18, 25, 0.98), rgba(10, 12, 17, 0.98))";
+      panel.style.borderLeft = "1px solid rgba(255, 255, 255, 0.08)";
+      panel.style.boxShadow = "-24px 0 80px rgba(0, 0, 0, 0.4)";
+      panel.style.transform = isOpen ? "translateX(0)" : "translateX(104%)";
+    }
+
+    if (nav) {
+      nav.style.display = "grid";
+      nav.style.gap = "16px";
+    }
+  };
+
   const openMenu = () => {
     toggle.classList.add("active");
     toggle.setAttribute("aria-expanded", "true");
@@ -103,18 +143,7 @@ function initHamburger() {
     menu.setAttribute("aria-hidden", "false");
     backdrop?.classList.add("open");
     document.body.classList.add("menu-open");
-    menu.style.display = "flex";
-    menu.style.visibility = "visible";
-    menu.style.opacity = "1";
-    menu.style.pointerEvents = "auto";
-    if (panel) {
-      panel.style.display = "grid";
-      panel.style.transform = "translateX(0)";
-    }
-    if (nav) {
-      nav.style.display = "grid";
-      nav.style.gap = "16px";
-    }
+    applyLayerStyles(true);
   };
 
   const closeMenu = () => {
@@ -124,9 +153,7 @@ function initHamburger() {
     menu.setAttribute("aria-hidden", "true");
     backdrop?.classList.remove("open");
     document.body.classList.remove("menu-open");
-    menu.style.opacity = "";
-    menu.style.pointerEvents = "";
-    if (panel) panel.style.transform = "";
+    applyLayerStyles(false);
   };
 
   toggle.addEventListener("click", () => {
@@ -259,9 +286,9 @@ function buildHeaderMarkup(lang = "de") {
   </div>
 </header>
 
-<div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+<div class="mobile-menu-backdrop" id="mobileMenuBackdrop" hidden style="display:none;visibility:hidden;opacity:0;pointer-events:none;"></div>
 
-<aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+<aside class="mobile-menu" id="mobileMenu" aria-hidden="true" hidden style="display:none;visibility:hidden;opacity:0;pointer-events:none;">
   <div class="mobile-menu-panel">
     <div class="mobile-menu-top">
       <div class="mobile-menu-brand">

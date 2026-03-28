@@ -440,6 +440,21 @@ body.admin-body {
   gap: 14px;
 }
 
+.campaign-summary-grid,
+.campaign-diagnostics-grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.campaign-summary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.campaign-diagnostics-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .campaign-help-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -452,6 +467,21 @@ body.admin-body {
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.campaign-summary-card,
+.campaign-diagnostics-card {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.campaign-summary-value {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  color: var(--admin-text);
 }
 
 .campaign-help-card .detail-copy {
@@ -531,7 +561,9 @@ body.admin-body {
   .detail-grid,
   .stats-grid,
   .campaign-help-grid,
-  .campaign-meta-strip { grid-template-columns: 1fr; }
+  .campaign-meta-strip,
+  .campaign-summary-grid,
+  .campaign-diagnostics-grid { grid-template-columns: 1fr; }
   .portfolio-item { grid-template-columns: 1fr; }
   .portfolio-thumb { width: 100%; height: 220px; }
 }

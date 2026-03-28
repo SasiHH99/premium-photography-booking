@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18017270066"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18017270066');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/pwa/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/images/pwa/icon-512.png">
+  <link rel="apple-touch-icon" href="/images/pwa/apple-touch-icon.png">
+  <title>Danke für die Buchung | B. Photography</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/thanks.css">
+</head>
+<body class="thanks-page">
+  <div id="site-header"></div>
+  <main class="thanks-shell" data-thanks-page data-thanks-type="booking" data-lang="de">
+    <section class="thanks-card">
+      <div class="thanks-header">
+        <div>
+          <p class="thanks-eyebrow">B. Photography</p>
+          <h1 id="thanksTitle"></h1>
+          <p class="thanks-copy" id="thanksBody"></p>
+        </div>
+        <div class="thanks-status" id="thanksStatus">
+          <span class="thanks-status-badge" id="thanksBadge"></span>
+          <p class="thanks-status-copy">Ab hier kommt eine persönliche Rückmeldung von mir, keine anonyme Standardmail.</p>
+        </div>
+      </div>
+
+      <section class="thanks-data-grid">
+        <article class="thanks-summary-card">
+          <p class="thanks-summary-label" id="summaryOneLabel"></p>
+          <h2 class="thanks-summary-value" id="summaryOneValue"></h2>
+          <p class="thanks-summary-copy" id="summaryOneCopy"></p>
+        </article>
+        <article class="thanks-summary-card">
+          <p class="thanks-summary-label" id="summaryTwoLabel"></p>
+          <h2 class="thanks-summary-value" id="summaryTwoValue"></h2>
+          <p class="thanks-summary-copy" id="summaryTwoCopy"></p>
+        </article>
+        <article class="thanks-summary-card">
+          <p class="thanks-summary-label" id="summaryThreeLabel"></p>
+          <h2 class="thanks-summary-value" id="summaryThreeValue"></h2>
+          <p class="thanks-summary-copy" id="summaryThreeCopy"></p>
+        </article>
+      </section>
+
+      <dl class="thanks-data-list" id="thanksDataList"></dl>
+    </section>
+
+    <section class="thanks-next-steps">
+      <div>
+        <p class="thanks-eyebrow">Nächster Schritt</p>
+        <h2 id="thanksSectionTitle"></h2>
+      </div>
+      <div class="thanks-steps-grid">
+        <article class="thanks-step">
+          <span class="thanks-step-label">01</span>
+          <strong id="stepOneTitle"></strong>
+          <p id="stepOneCopy"></p>
+        </article>
+        <article class="thanks-step">
+          <span class="thanks-step-label">02</span>
+          <strong id="stepTwoTitle"></strong>
+          <p id="stepTwoCopy"></p>
+        </article>
+        <article class="thanks-step">
+          <span class="thanks-step-label">03</span>
+          <strong id="stepThreeTitle"></strong>
+          <p id="stepThreeCopy"></p>
+        </article>
+      </div>
+      <div class="thanks-actions">
+        <a class="thanks-btn is-primary" id="thanksActionPrimary" href="#"></a>
+        <a class="thanks-btn is-secondary" id="thanksActionSecondary" href="#"></a>
+      </div>
+    </section>
+  </main>
+  <script src="../js/header.js"></script>
+  <script src="../js/global.js"></script>
+  <script src="../js/thanks.js"></script>
+</body>
+</html>

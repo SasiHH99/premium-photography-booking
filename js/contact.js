@@ -63,6 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.classList.add("show");
   }
 
+  function redirectToThanks() {
+    const target = lang === "hu" ? "koszonjuk-kapcsolat.html" : "danke-kontakt.html";
+    window.location.href = target;
+  }
+
   function hideOverlay() {
     overlay.classList.remove("show");
   }
@@ -107,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         language: lang,
         value: 1
       });
-      showOverlay("success");
+      redirectToThanks();
     } catch (error) {
       console.error("Contact form error:", error);
       status.textContent = copy.errorText;

@@ -178,6 +178,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterCampaignTestEmail: document.getElementById("newsletterCampaignTestEmail"),
     newsletterCampaignAudience: document.getElementById("newsletterCampaignAudience"),
     newsletterFollowupAudience: document.getElementById("newsletterFollowupAudience"),
+    newsletterSummaryPending: document.getElementById("newsletterSummaryPending"),
+    newsletterSummaryConfirmed: document.getElementById("newsletterSummaryConfirmed"),
+    newsletterSummaryUnsubscribed: document.getElementById("newsletterSummaryUnsubscribed"),
+    newsletterSummaryWelcome: document.getElementById("newsletterSummaryWelcome"),
+    newsletterDiagnosticsSender: document.getElementById("newsletterDiagnosticsSender"),
+    newsletterDiagnosticsSenderSource: document.getElementById("newsletterDiagnosticsSenderSource"),
+    newsletterDiagnosticsAudience: document.getElementById("newsletterDiagnosticsAudience"),
+    newsletterDiagnosticsSite: document.getElementById("newsletterDiagnosticsSite"),
     newsletterCampaignTestBtn: document.getElementById("newsletterCampaignTestBtn"),
     newsletterCampaignSendBtn: document.getElementById("newsletterCampaignSendBtn"),
     newsletterCampaignScheduleBtn: document.getElementById("newsletterCampaignScheduleBtn"),
@@ -201,6 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterSubscribers: [],
     newsletterCampaignLogs: [],
     newsletterScheduledJobs: [],
+    newsletterDiagnostics: {},
     selectedBookingId: null,
     selectedContactId: null,
     selectedGalleryUserId: null,
@@ -346,6 +355,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", { method: "GET" });
     state.newsletterCampaignLogs = data.logs || [];
     state.newsletterScheduledJobs = data.schedules || [];
+    state.newsletterDiagnostics = data.diagnostics || {};
   }
 
   async function loadGalleryFiles(userId) {
@@ -648,6 +658,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).length;
   }
 
+  function getNewsletterStatusCount(status) {
+    return state.newsletterSubscribers.filter((subscriber) => subscriber.status === status).length;
+  }
+
+  function getNewsletterWelcomeCount() {
+    return state.newsletterSubscribers.filter((subscriber) => Boolean(subscriber.welcome_sent_at)).length;
+  }
+
   function renderNewsletter() {
     if (!ui.newsletterRows) return;
 
@@ -694,6 +712,41 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (ui.newsletterFollowupAudience) {
       ui.newsletterFollowupAudience.textContent = `${getFollowupAudienceCount(lang)} esedékes feliratkozó`;
+    }
+
+    if (ui.newsletterSummaryPending) {
+      ui.newsletterSummaryPending.textContent = String(getNewsletterStatusCount("pending"));
+    }
+
+    if (ui.newsletterSummaryConfirmed) {
+      ui.newsletterSummaryConfirmed.textContent = String(getNewsletterStatusCount("confirmed"));
+    }
+
+    if (ui.newsletterSummaryUnsubscribed) {
+      ui.newsletterSummaryUnsubscribed.textContent = String(getNewsletterStatusCount("unsubscribed"));
+    }
+
+    if (ui.newsletterSummaryWelcome) {
+      ui.newsletterSummaryWelcome.textContent = String(getNewsletterWelcomeCount());
+    }
+
+    const diagnostics = state.newsletterDiagnostics || {};
+    if (ui.newsletterDiagnosticsSender) {
+      ui.newsletterDiagnosticsSender.textContent = diagnostics.from || "Nincs aktív küldő konfigurálva";
+    }
+
+    if (ui.newsletterDiagnosticsSenderSource) {
+      ui.newsletterDiagnosticsSenderSource.textContent = diagnostics.senderSource
+        ? `A jelenlegi küldő innen jön: ${diagnostics.senderSource}.`
+        : "A kampányküldéshez használt feladó.";
+    }
+
+    if (ui.newsletterDiagnosticsAudience) {
+      ui.newsletterDiagnosticsAudience.textContent = diagnostics.resendAudienceConfigured ? "Bekötve" : "Nincs bekötve";
+    }
+
+    if (ui.newsletterDiagnosticsSite) {
+      ui.newsletterDiagnosticsSite.textContent = diagnostics.publicSiteUrl || "https://bphoto.at";
     }
 
     if (ui.newsletterScheduledJobsList && ui.newsletterScheduledJobsEmpty) {
@@ -1126,14 +1179,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       throw new Error("Adj meg egy teszt email címet.");
     }
 
-    const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
-      method: "POST",
-      body: JSON.stringify({
-        action: "send_test",
-        testEmail,
-        ...getNewsletterCampaignPayload()
-      })
-    });
+      const data = await callAdmin("/.netlify/functions/admin-newsletter-campaigns", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "send_test",
+          testEmail,
+          ...getNewsletterCampaignPayload()
+        })
+      });
 
     showFeedback(data.message || "A teszt hírlevél elküldve.");
   }
