@@ -133,6 +133,27 @@ function initHamburger() {
   closeMenu();
 }
 
+function initResponsiveHeaderState() {
+  const mainNav = document.querySelector(".main-nav");
+  const desktopCta = document.querySelector(".header-actions .nav-cta");
+  const desktopLang = document.querySelector(".header-actions .lang-switch");
+  const menuToggle = document.querySelector(".menu-toggle");
+
+  if (!mainNav || !menuToggle) return;
+
+  const applyState = () => {
+    const isMobile = window.innerWidth <= 1100;
+
+    mainNav.style.display = isMobile ? "none" : "flex";
+    if (desktopCta) desktopCta.style.display = isMobile ? "none" : "inline-flex";
+    if (desktopLang) desktopLang.style.display = isMobile ? "none" : "inline-flex";
+    menuToggle.style.display = isMobile ? "inline-flex" : "none";
+  };
+
+  applyState();
+  window.addEventListener("resize", applyState, { passive: true });
+}
+
 function buildHeaderMarkup(lang = "de") {
   const isHu = lang === "hu";
   const home = isHu ? "/hu/index.html" : "/de/index.html";
@@ -225,6 +246,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const partialPath = lang === "hu" ? "/partials/header-hu.html" : "/partials/header-de.html";
   const applyHeaderMarkup = (html) => {
     target.innerHTML = html;
+    initResponsiveHeaderState();
     initLangSwitch();
     initActiveNavigation();
     initStickyHeader();
