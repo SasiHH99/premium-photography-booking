@@ -67,7 +67,6 @@ body {
 .booking-card-kicker,
 .booking-field-label,
 .booking-meta-label,
-.gdpr-text,
 .booking-helper-card strong,
 .booking-date-display {
   text-transform: uppercase;
@@ -280,11 +279,37 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.consent-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.gdpr-row.is-optional {
+  background: rgba(214, 179, 106, 0.06);
+  border-color: rgba(214, 179, 106, 0.14);
+}
+
 .gdpr-checkbox {
   display: flex;
   gap: 14px;
   align-items: start;
   cursor: pointer;
+}
+
+.gdpr-text {
+  color: var(--booking-muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.consent-helper {
+  display: block;
+  margin-top: 6px;
+  color: rgba(246, 242, 232, 0.58);
+  font-size: 0.82rem;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.55;
 }
 
 .gdpr-checkbox input {

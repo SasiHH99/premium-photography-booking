@@ -171,12 +171,25 @@
             </label>
 
             <div class="booking-field is-full">
-              <div class="gdpr-row">
-                <label class="gdpr-checkbox">
-                  <input type="checkbox" id="gdpr" required>
-                  <span class="checkmark"></span>
-                  <span class="gdpr-text">Ich akzeptiere die <a href="datenschutz.html" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a>.</span>
-                </label>
+              <div class="consent-stack">
+                <div class="gdpr-row">
+                  <label class="gdpr-checkbox">
+                    <input type="checkbox" id="gdpr" required>
+                    <span class="checkmark"></span>
+                    <span class="gdpr-text">Ich akzeptiere die <a href="datenschutz.html" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a>.</span>
+                  </label>
+                </div>
+
+                <div class="gdpr-row is-optional">
+                  <label class="gdpr-checkbox">
+                    <input type="checkbox" id="newsletterOptin">
+                    <span class="checkmark"></span>
+                    <span class="gdpr-text">
+                      Ich möchte Updates zu freien Terminen, neuen Serien und limitierten Shooting-Slots erhalten.
+                      <small class="consent-helper">Die Anmeldung bestätigst du danach noch einmal per E-Mail.</small>
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
 

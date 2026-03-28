@@ -5,6 +5,7 @@
 
   const dateInput = document.getElementById("bookingDate");
   const gdprCheck = document.getElementById("gdpr");
+  const newsletterCheck = document.getElementById("newsletterOptin");
   const submitButton = document.getElementById("bookingSubmit");
   const packageSelect = document.getElementById("packageSelect");
   const packageInfo = document.getElementById("packageInfo");
@@ -141,7 +142,50 @@
     successBox.classList.add("show");
   }
 
-  function redirectToThanks(kind, payload) {
+  async function subscribeBookingLeadToNewsletter(email) {
+    if (!newsletterCheck?.checked || !email) return "";
+
+    try {
+      const response = await fetch("/.netlify/functions/newsletter-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          lang,
+          consent: true,
+          source: "booking_form"
+        })
+      });
+
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || body.error) {
+        throw new Error(body.details || body.error || "newsletter subscribe failed");
+      }
+
+      if (body.state === "confirmation_sent") {
+        tracking?.trackLeadWithConversion?.("newsletter_signup", "newsletter", {
+          language: lang,
+          placement: "booking_form"
+        });
+      } else if (body.state === "already_confirmed") {
+        tracking?.trackEvent?.("newsletter_existing_subscriber", {
+          language: lang,
+          placement: "booking_form"
+        });
+      }
+
+      return body.state || "";
+    } catch (error) {
+      console.warn("Booking newsletter opt-in failed:", error);
+      tracking?.trackEvent?.("newsletter_signup_failed", {
+        language: lang,
+        placement: "booking_form"
+      });
+      return "";
+    }
+  }
+
+  function redirectToThanks(kind, payload, newsletterState = "") {
     const page = lang === "hu" ? "koszonjuk-foglalas.html" : "danke-termin.html";
     const formattedDate = payload.booking_date
       ? dateFormatter.format(new Date(`${payload.booking_date}T12:00:00`))
@@ -152,6 +196,10 @@
       package: payload.package || "",
       email: payload.email || ""
     });
+
+    if (newsletterState) {
+      params.set("newsletter", newsletterState);
+    }
 
     window.location.href = `${page}?${params.toString()}`;
   }
@@ -227,6 +275,7 @@
       const adminNotifications = Array.isArray(body.adminNotifications) ? body.adminNotifications : [];
       const hasWorkingAdminNotification =
         adminNotifications.length === 0 || adminNotifications.some((item) => item && item.ok);
+      const newsletterState = await subscribeBookingLeadToNewsletter(payload.email);
 
       if (hasWorkingAdminNotification) {
         tracking?.trackLeadWithConversion?.("booking_request", "booking", {
@@ -240,7 +289,7 @@
           language: lang
         });
       }
-      redirectToThanks(hasWorkingAdminNotification ? "success" : "partial", payload);
+      redirectToThanks(hasWorkingAdminNotification ? "success" : "partial", payload, newsletterState);
     } catch (error) {
       console.error("Booking error:", error);
       errorBox.classList.add("show");

@@ -171,12 +171,25 @@
             </label>
 
             <div class="booking-field is-full">
-              <div class="gdpr-row">
-                <label class="gdpr-checkbox">
-                  <input type="checkbox" id="gdpr" required>
-                  <span class="checkmark"></span>
-                  <span class="gdpr-text">Elfogadom az <a href="privacy.html" target="_blank" rel="noopener noreferrer">adatkezelési tájékoztatót</a>.</span>
-                </label>
+              <div class="consent-stack">
+                <div class="gdpr-row">
+                  <label class="gdpr-checkbox">
+                    <input type="checkbox" id="gdpr" required>
+                    <span class="checkmark"></span>
+                    <span class="gdpr-text">Elfogadom az <a href="privacy.html" target="_blank" rel="noopener noreferrer">adatkezelési tájékoztatót</a>.</span>
+                  </label>
+                </div>
+
+                <div class="gdpr-row is-optional">
+                  <label class="gdpr-checkbox">
+                    <input type="checkbox" id="newsletterOptin">
+                    <span class="checkmark"></span>
+                    <span class="gdpr-text">
+                      Kérek értesítést a szabad időpontokról, új sorozatokról és limitált fotózási lehetőségekről.
+                      <small class="consent-helper">A feliratkozást egy megerősítő emailben véglegesíted.</small>
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
 

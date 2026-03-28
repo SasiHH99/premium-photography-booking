@@ -29,7 +29,12 @@
       actionSecondary: "Inkább írnék",
       infoDate: "Tervezett dátum",
       infoPackage: "Csomag",
-      infoEmail: "Visszajelzési email"
+      infoEmail: "Visszajelzési email",
+      newsletterLabel: "Hírlevél",
+      newsletterConfirmation:
+        "A hírlevélhez is kérted a hozzáférést. Küldtem egy megerősítő emailt, abból tudod véglegesíteni a feliratkozást.",
+      newsletterAlreadyConfirmed:
+        "Ez az email cím már aktív hírlevél feliratkozóként szerepel. Az új időpontokról és sorozatokról külön is kapsz majd értesítést."
     },
     contact: {
       titleSuccess: "Az üzeneted megérkezett, innen már átveszem a következő lépést.",
@@ -86,7 +91,12 @@
       actionSecondary: "Lieber schreiben",
       infoDate: "Wunschdatum",
       infoPackage: "Paket",
-      infoEmail: "Rückmeldung an"
+      infoEmail: "Rückmeldung an",
+      newsletterLabel: "Newsletter",
+      newsletterConfirmation:
+        "Du hast zusätzlich Newsletter-Updates angefragt. Die Anmeldung bestätigst du noch einmal über die E-Mail, die ich dir eben geschickt habe.",
+      newsletterAlreadyConfirmed:
+        "Diese Adresse ist bereits aktiv im Newsletter eingetragen. Freie Termine und neue Serien gehen dann künftig auch separat an dich raus."
     },
     contact: {
       titleSuccess: "Deine Nachricht ist angekommen. Ab hier übernehme ich den nächsten Schritt.",
@@ -132,6 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const stepTitle = document.getElementById("thanksSectionTitle");
   const actionPrimary = document.getElementById("thanksActionPrimary");
   const actionSecondary = document.getElementById("thanksActionSecondary");
+  const newsletterBox = document.getElementById("thanksNewsletterBox");
+  const newsletterLabel = document.getElementById("thanksNewsletterLabel");
+  const newsletterCopy = document.getElementById("thanksNewsletterCopy");
 
   if (type === "booking") {
     title.textContent = state === "partial" ? copy.titlePartial : copy.titleSuccess;
@@ -181,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = params.get("date") || "-";
     const packageName = params.get("package") || "-";
     const email = params.get("email") || "-";
+    const newsletterState = params.get("newsletter") || "";
 
     details.innerHTML = `
       <div>
@@ -196,7 +210,27 @@ document.addEventListener("DOMContentLoaded", () => {
         <dd>${email}</dd>
       </div>
     `;
+
+    if (newsletterBox && newsletterLabel && newsletterCopy) {
+      const newsletterMessage =
+        newsletterState === "confirmation_sent"
+          ? copy.newsletterConfirmation
+          : newsletterState === "already_confirmed"
+            ? copy.newsletterAlreadyConfirmed
+            : "";
+
+      if (newsletterMessage) {
+        newsletterLabel.textContent = copy.newsletterLabel;
+        newsletterCopy.textContent = newsletterMessage;
+        newsletterBox.hidden = false;
+      } else {
+        newsletterBox.hidden = true;
+      }
+    }
   } else if (details) {
     details.remove();
+    if (newsletterBox) {
+      newsletterBox.remove();
+    }
   }
 });
