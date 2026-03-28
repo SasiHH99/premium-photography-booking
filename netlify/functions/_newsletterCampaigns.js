@@ -11,7 +11,13 @@ export const NEWSLETTER_SETUP_ERROR =
 
 export function isMissingRelation(error, relation) {
   const message = String(error?.message || "");
-  return error?.code === "42P01" || message.includes(`relation \"public.${relation}\" does not exist`);
+  return (
+    error?.code === "42P01" ||
+    error?.code === "42703" ||
+    message.includes(`relation \"public.${relation}\" does not exist`) ||
+    message.includes(`column ${relation}.`) ||
+    message.includes("does not exist")
+  );
 }
 
 export function cleanText(value = "", max = 8000) {

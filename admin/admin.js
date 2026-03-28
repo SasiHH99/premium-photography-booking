@@ -833,6 +833,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function refreshAll(options = {}) {
     const silent = options.silent === true;
     const failures = [];
+    const failureDetails = {};
     const localPreviewMissingFunctions = [];
 
     if (!silent) clearFeedback();
@@ -855,6 +856,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         failures.push(label);
+        failureDetails[label] = String(error?.message || error).slice(0, 260);
         if (String(error.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
           localPreviewMissingFunctions.push(label);
         }
@@ -867,6 +869,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         failures.push("galéria fájlok");
+        failureDetails["galéria fájlok"] = String(error?.message || error).slice(0, 260);
         state.galleryFiles = [];
         if (String(error.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
           localPreviewMissingFunctions.push("galéria fájlok");
@@ -883,7 +886,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (failures.length && localPreviewMissingFunctions.length === failures.length) {
         showFeedback("Ebben a helyi 5500-as előnézetben a Netlify funkciók nem futnak. A foglalások látszanak, a kapcsolatok, galéria és portfólió admin Netlify Dev vagy éles domain alatt lesz teljes.", "success");
       } else if (failures.length) {
-        showFeedback(`Részben sikerült a frissítés. Ezeket nem tudtam betölteni: ${failures.join(", ")}.`, "error");
+        const details = failures
+          .map((label) => failureDetails[label] ? `${label}: ${failureDetails[label]}` : label)
+          .join(" | ");
+        showFeedback(`Részben sikerült a frissítés. ${details}`, "error");
       } else {
         showFeedback("Az admin adatok frissültek.");
       }
