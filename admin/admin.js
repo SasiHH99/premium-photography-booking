@@ -243,19 +243,83 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.globalFeedback.classList.add("hidden");
   }
 
-  function setNewsletterCampaignFeedback(message = "", tone = "success") {
+  function setNewsletterCampaignFeedback(content = "", tone = "success") {
     if (!ui.newsletterCampaignFeedback) return;
 
-    if (!message) {
-      ui.newsletterCampaignFeedback.textContent = "";
+    if (!content) {
+      ui.newsletterCampaignFeedback.innerHTML = "";
       ui.newsletterCampaignFeedback.removeAttribute("data-tone");
       ui.newsletterCampaignFeedback.classList.add("hidden");
       return;
     }
 
-    ui.newsletterCampaignFeedback.textContent = message;
+    if (typeof content === "string") {
+      const title = tone === "error"
+        ? "Kampány hiba"
+        : tone === "warning"
+          ? "Kampány részben sikerült"
+          : "Kampány visszajelzés";
+
+      ui.newsletterCampaignFeedback.innerHTML = `
+        <div class="campaign-feedback-head">
+          <strong>${escapeHtml(title)}</strong>
+        </div>
+        <p class="campaign-feedback-copy">${escapeHtml(content)}</p>
+      `;
+      ui.newsletterCampaignFeedback.dataset.tone = tone;
+      ui.newsletterCampaignFeedback.classList.remove("hidden");
+      return;
+    }
+
+    const meta = Array.isArray(content.meta) ? content.meta.filter(Boolean) : [];
+    const title = content.title || (tone === "error" ? "Kampány hiba" : "Kampány visszajelzés");
+    const message = content.message || "";
+
+    ui.newsletterCampaignFeedback.innerHTML = `
+      <div class="campaign-feedback-head">
+        <strong>${escapeHtml(title)}</strong>
+        ${content.eyebrow ? `<span class="campaign-feedback-eyebrow">${escapeHtml(content.eyebrow)}</span>` : ""}
+      </div>
+      ${message ? `<p class="campaign-feedback-copy">${escapeHtml(message)}</p>` : ""}
+      ${meta.length ? `
+        <div class="campaign-feedback-meta">
+          ${meta.map((item) => `<span class="campaign-feedback-chip">${escapeHtml(item)}</span>`).join("")}
+        </div>
+      ` : ""}
+    `;
     ui.newsletterCampaignFeedback.dataset.tone = tone;
     ui.newsletterCampaignFeedback.classList.remove("hidden");
+  }
+
+  function setButtonBusy(button, busyText) {
+    if (!button) return;
+    if (!button.dataset.defaultLabel) {
+      button.dataset.defaultLabel = button.textContent.trim();
+    }
+
+    button.disabled = true;
+    button.dataset.busy = "true";
+    if (busyText) {
+      button.textContent = busyText;
+    }
+  }
+
+  function resetButtonBusy(button) {
+    if (!button) return;
+    button.disabled = false;
+    button.removeAttribute("data-busy");
+    if (button.dataset.defaultLabel) {
+      button.textContent = button.dataset.defaultLabel;
+    }
+  }
+
+  async function runBusyAction(button, busyText, action) {
+    setButtonBusy(button, busyText);
+    try {
+      return await action();
+    } finally {
+      resetButtonBusy(button);
+    }
   }
 
   function getSelectedBooking() {
@@ -777,10 +841,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (ui.newsletterScheduledJobsList && ui.newsletterScheduledJobsEmpty) {
       ui.newsletterScheduledJobsList.innerHTML = state.newsletterScheduledJobs.map((job) => `
         <article class="campaign-log-item ${job.status === "scheduled" || job.status === "processing" ? "is-pending" : job.status === "failed" ? "is-error" : "is-done"}">
-          <p class="panel-kicker">${escapeHtml((LANG_LABELS[job.lang] || job.lang || "-").toUpperCase())} · ${escapeHtml(job.status || "scheduled")}</p>
+          <div class="campaign-log-head">
+            <p class="panel-kicker">${escapeHtml((LANG_LABELS[job.lang] || job.lang || "-").toUpperCase())} · ${escapeHtml(job.status || "scheduled")}</p>
+            <span class="status-pill" data-status="${escapeHtml(job.status === "failed" ? "cancelled" : job.status === "processing" ? "pending" : job.status === "scheduled" ? "pending" : "confirmed")}">${escapeHtml(job.status || "scheduled")}</span>
+          </div>
           <h3>${escapeHtml(job.subject || "-")}</h3>
           <p class="campaign-log-meta">Ütemezve: ${escapeHtml(formatDateTime(job.scheduled_for))}</p>
-          <p class="campaign-log-meta">Preset: ${escapeHtml(job.preset_key || "egyedi")} · Sikeres: ${escapeHtml(String(job.sent_count || 0))} · Hiba: ${escapeHtml(String(job.failed_count || 0))}</p>
+          <div class="campaign-log-chips">
+            <span class="campaign-feedback-chip">Preset: ${escapeHtml(job.preset_key || "egyedi")}</span>
+            <span class="campaign-feedback-chip">Sikeres: ${escapeHtml(String(job.sent_count || 0))}</span>
+            <span class="campaign-feedback-chip">Hiba: ${escapeHtml(String(job.failed_count || 0))}</span>
+          </div>
           ${job.error_message ? `<p class="campaign-log-meta">${escapeHtml(job.error_message)}</p>` : ""}
         </article>
       `).join("");
@@ -791,10 +862,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterCampaignLogList.innerHTML = state.newsletterCampaignLogs.map((log) => `
       <article class="campaign-log-item ${Number(log.failed_count || 0) > 0 && Number(log.sent_count || 0) === 0 ? "is-error" : "is-done"}">
-        <p class="panel-kicker">${escapeHtml(log.type === "followup" ? "Follow-up" : "Kampány")} · ${escapeHtml((LANG_LABELS[log.lang] || log.lang || "-").toUpperCase())}</p>
+        <div class="campaign-log-head">
+          <p class="panel-kicker">${escapeHtml(log.type === "followup" ? "Follow-up" : "Kampány")} · ${escapeHtml((LANG_LABELS[log.lang] || log.lang || "-").toUpperCase())}</p>
+          <span class="status-pill" data-status="${escapeHtml(Number(log.failed_count || 0) > 0 && Number(log.sent_count || 0) === 0 ? "cancelled" : "confirmed")}">${escapeHtml(Number(log.failed_count || 0) > 0 && Number(log.sent_count || 0) === 0 ? "hiba" : "kész")}</span>
+        </div>
         <h3>${escapeHtml(log.subject || "-")}</h3>
         <p class="campaign-log-meta">${escapeHtml(formatDateTime(log.created_at))}</p>
-        <p class="campaign-log-meta">Címzett: ${escapeHtml(String(log.recipient_count || 0))} · Sikeres: ${escapeHtml(String(log.sent_count || 0))} · Hiba: ${escapeHtml(String(log.failed_count || 0))}</p>
+        <div class="campaign-log-chips">
+          <span class="campaign-feedback-chip">Címzett: ${escapeHtml(String(log.recipient_count || 0))}</span>
+          <span class="campaign-feedback-chip">Sikeres: ${escapeHtml(String(log.sent_count || 0))}</span>
+          <span class="campaign-feedback-chip">Hiba: ${escapeHtml(String(log.failed_count || 0))}</span>
+        </div>
       </article>
     `).join("");
 
@@ -863,78 +941,77 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!silent) clearFeedback();
 
-    ui.refreshAllBtn.disabled = true;
-    ui.refreshAllBtn.textContent = "Betöltés...";
+    setButtonBusy(ui.refreshAllBtn, "Betöltés...");
+    try {
+      const steps = [
+        { label: "foglalások", run: loadBookings, enabled: true },
+        { label: "kapcsolati üzenetek", run: loadContacts, enabled: true },
+        { label: "galéria ügyfelek", run: loadGalleryUsers, enabled: true },
+        { label: "portfólió elemek", run: loadPortfolioItems, enabled: true },
+        { label: "hírlevél feliratkozók", run: loadNewsletterSubscribers, enabled: true },
+        { label: "hírlevél kampányok", run: loadNewsletterCampaignLogs, enabled: shouldLoadNewsletterCampaignData() }
+      ].filter((step) => step.enabled);
 
-    const steps = [
-      { label: "foglalások", run: loadBookings, enabled: true },
-      { label: "kapcsolati üzenetek", run: loadContacts, enabled: true },
-      { label: "galéria ügyfelek", run: loadGalleryUsers, enabled: true },
-      { label: "portfólió elemek", run: loadPortfolioItems, enabled: true },
-      { label: "hírlevél feliratkozók", run: loadNewsletterSubscribers, enabled: true },
-      { label: "hírlevél kampányok", run: loadNewsletterCampaignLogs, enabled: shouldLoadNewsletterCampaignData() }
-    ].filter((step) => step.enabled);
+      const results = await Promise.allSettled(
+        steps.map(async (step) => {
+          await step.run();
+          return step.label;
+        })
+      );
 
-    const results = await Promise.allSettled(
-      steps.map(async (step) => {
-        await step.run();
-        return step.label;
-      })
-    );
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") return;
 
-    results.forEach((result, index) => {
-      if (result.status === "fulfilled") return;
-
-      const label = steps[index].label;
-      const error = result.reason;
-      console.error(error);
-      failures.push(label);
-      failureDetails[label] = String(error?.message || error).slice(0, 260);
-      if (String(error?.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
-        localPreviewMissingFunctions.push(label);
-      }
-    });
-
-    if (!shouldLoadNewsletterCampaignData()) {
-      state.newsletterCampaignLogs = [];
-      state.newsletterScheduledJobs = [];
-      state.newsletterDiagnostics = {};
-    }
-
-    if (shouldLoadGalleryMedia()) {
-      try {
-        await loadGalleryFiles(state.selectedGalleryUserId);
-      } catch (error) {
+        const label = steps[index].label;
+        const error = result.reason;
         console.error(error);
-        failures.push("galéria fájlok");
-        failureDetails["galéria fájlok"] = String(error?.message || error).slice(0, 260);
+        failures.push(label);
+        failureDetails[label] = String(error?.message || error).slice(0, 260);
+        if (String(error?.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
+          localPreviewMissingFunctions.push(label);
+        }
+      });
+
+      if (!shouldLoadNewsletterCampaignData()) {
+        state.newsletterCampaignLogs = [];
+        state.newsletterScheduledJobs = [];
+        state.newsletterDiagnostics = {};
+      }
+
+      if (shouldLoadGalleryMedia()) {
+        try {
+          await loadGalleryFiles(state.selectedGalleryUserId);
+        } catch (error) {
+          console.error(error);
+          failures.push("galéria fájlok");
+          failureDetails["galéria fájlok"] = String(error?.message || error).slice(0, 260);
+          state.galleryFiles = [];
+          if (String(error.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
+            localPreviewMissingFunctions.push("galéria fájlok");
+          }
+        }
+      } else {
         state.galleryFiles = [];
-        if (String(error.message || "").includes("Netlify funkciók ebben a helyi előnézetben")) {
-          localPreviewMissingFunctions.push("galéria fájlok");
+      }
+
+      updateStats();
+      render();
+
+      if (!silent) {
+        if (failures.length && localPreviewMissingFunctions.length === failures.length) {
+          showFeedback("Ebben a helyi 5500-as előnézetben a Netlify funkciók nem futnak. A foglalások látszanak, a kapcsolatok, galéria és portfólió admin Netlify Dev vagy éles domain alatt lesz teljes.", "success");
+        } else if (failures.length) {
+          const details = failures
+            .map((label) => failureDetails[label] ? `${label}: ${failureDetails[label]}` : label)
+            .join(" | ");
+          showFeedback(`Részben sikerült a frissítés. ${details}`, "error");
+        } else {
+          showFeedback("Az admin adatok frissültek.");
         }
       }
-    } else {
-      state.galleryFiles = [];
+    } finally {
+      resetButtonBusy(ui.refreshAllBtn);
     }
-
-    updateStats();
-    render();
-
-    if (!silent) {
-      if (failures.length && localPreviewMissingFunctions.length === failures.length) {
-        showFeedback("Ebben a helyi 5500-as előnézetben a Netlify funkciók nem futnak. A foglalások látszanak, a kapcsolatok, galéria és portfólió admin Netlify Dev vagy éles domain alatt lesz teljes.", "success");
-      } else if (failures.length) {
-        const details = failures
-          .map((label) => failureDetails[label] ? `${label}: ${failureDetails[label]}` : label)
-          .join(" | ");
-        showFeedback(`Részben sikerült a frissítés. ${details}`, "error");
-      } else {
-        showFeedback("Az admin adatok frissültek.");
-      }
-    }
-
-    ui.refreshAllBtn.disabled = false;
-    ui.refreshAllBtn.textContent = "Minden frissítése";
   }
 
   async function updateBookingStatus(nextStatus) {
@@ -1233,9 +1310,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     const message = data.message || "A teszt hírlevél elküldve.";
-    const senderDetail = data.sender ? ` Küldő: ${data.sender}.` : "";
     showFeedback(message);
-    setNewsletterCampaignFeedback(`${message}${senderDetail}`, "success");
+    setNewsletterCampaignFeedback({
+      title: "Tesztküldés sikeres",
+      eyebrow: LANG_LABELS[getNewsletterCampaignPayload().lang] || "Mind",
+      message,
+      meta: [
+        `Teszt cím: ${testEmail}`,
+        data.sender ? `Küldő: ${data.sender}` : "",
+        data.senderSource ? `Forrás: ${data.senderSource}` : ""
+      ]
+    }, "success");
   }
 
   async function sendNewsletterCampaign() {
@@ -1261,9 +1346,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNewsletterCampaignLogs();
     renderNewsletterCampaigns();
     const message = data.message || `Kampány elküldve. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`;
-    const senderDetail = data.sender ? ` Küldő: ${data.sender}.` : "";
     showFeedback(message);
-    setNewsletterCampaignFeedback(`${message} Címzett: ${data.recipientCount || recipientCount}.${senderDetail}`, (data.failedCount || 0) > 0 ? "warning" : "success");
+    setNewsletterCampaignFeedback({
+      title: (data.failedCount || 0) > 0 ? "Kampány részben sikerült" : "Kampány elküldve",
+      eyebrow: LANG_LABELS[payload.lang] || payload.lang,
+      message,
+      meta: [
+        `Címzett: ${data.recipientCount || recipientCount}`,
+        `Sikeres: ${data.sentCount || 0}`,
+        `Hiba: ${data.failedCount || 0}`,
+        data.sender ? `Küldő: ${data.sender}` : "",
+        data.senderSource ? `Forrás: ${data.senderSource}` : ""
+      ]
+    }, (data.failedCount || 0) > 0 ? "warning" : "success");
   }
 
   async function scheduleNewsletterCampaign() {
@@ -1288,7 +1383,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     setNewsletterScheduleDefault(true);
     const message = `A kampány időzítve: ${formatDateTime(data.job?.scheduled_for)}`;
     showFeedback(message);
-    setNewsletterCampaignFeedback(message, "success");
+    setNewsletterCampaignFeedback({
+      title: "Kampány időzítve",
+      eyebrow: LANG_LABELS[payload.lang] || payload.lang,
+      message,
+      meta: [
+        `Időpont: ${formatDateTime(data.job?.scheduled_for)}`,
+        `Tárgy: ${payload.subject}`
+      ]
+    }, "success");
   }
 
   async function runScheduledNewsletterJobs() {
@@ -1302,7 +1405,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     render();
     const message = `Az esedékes kampányok futtatása kész. Feldolgozott: ${data.processedCount || 0}.`;
     showFeedback(message);
-    setNewsletterCampaignFeedback(message, "success");
+    setNewsletterCampaignFeedback({
+      title: "Időzített küldések lefutottak",
+      message,
+      meta: [`Feldolgozott feladatok: ${data.processedCount || 0}`]
+    }, "success");
   }
 
   async function sendNewsletterFollowup() {
@@ -1325,9 +1432,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNewsletterCampaignLogs();
     render();
     const message = data.message || `Follow-up küldés kész. Sikeres: ${data.sentCount || 0}, hiba: ${data.failedCount || 0}.`;
-    const senderDetail = data.sender ? ` Küldő: ${data.sender}.` : "";
     showFeedback(message);
-    setNewsletterCampaignFeedback(`${message} Címzett: ${data.recipientCount || recipientCount}.${senderDetail}`, (data.failedCount || 0) > 0 ? "warning" : "success");
+    setNewsletterCampaignFeedback({
+      title: (data.failedCount || 0) > 0 ? "Follow-up részben sikerült" : "Follow-up elküldve",
+      eyebrow: LANG_LABELS[lang] || lang,
+      message,
+      meta: [
+        `Címzett: ${data.recipientCount || recipientCount}`,
+        `Sikeres: ${data.sentCount || 0}`,
+        `Hiba: ${data.failedCount || 0}`,
+        data.sender ? `Küldő: ${data.sender}` : "",
+        data.senderSource ? `Forrás: ${data.senderSource}` : ""
+      ]
+    }, (data.failedCount || 0) > 0 ? "warning" : "success");
   }
 
   function exportNewsletterCsv() {
@@ -1467,7 +1584,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.bookingConfirmBtn?.addEventListener("click", async () => {
       try {
-        await updateBookingStatus("confirmed");
+        await runBusyAction(ui.bookingConfirmBtn, "Mentés...", () => updateBookingStatus("confirmed"));
         showFeedback("A foglalás megerősítve.");
       } catch (error) {
         console.error(error);
@@ -1477,7 +1594,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.bookingPendingBtn?.addEventListener("click", async () => {
       try {
-        await updateBookingStatus("pending");
+        await runBusyAction(ui.bookingPendingBtn, "Mentés...", () => updateBookingStatus("pending"));
         showFeedback("A foglalás visszaállítva függőbe.");
       } catch (error) {
         console.error(error);
@@ -1487,7 +1604,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.bookingCancelBtn?.addEventListener("click", async () => {
       try {
-        await updateBookingStatus("cancelled");
+        await runBusyAction(ui.bookingCancelBtn, "Mentés...", () => updateBookingStatus("cancelled"));
         showFeedback("A foglalás lemondottra állítva.");
       } catch (error) {
         console.error(error);
@@ -1497,7 +1614,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.bookingCreateGalleryBtn?.addEventListener("click", async () => {
       try {
-        await createGalleryFromBooking();
+        await runBusyAction(ui.bookingCreateGalleryBtn, "Létrehozás...", () => createGalleryFromBooking());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült galériafiókot létrehozni a foglaláshoz.", "error");
@@ -1506,7 +1623,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.contactSaveBtn?.addEventListener("click", async () => {
       try {
-        await saveContact();
+        await runBusyAction(ui.contactSaveBtn, "Mentés...", () => saveContact());
         showFeedback("A kapcsolatfelvétel megjegyzése elmentve.");
       } catch (error) {
         console.error(error);
@@ -1516,7 +1633,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.contactReviewedBtn?.addEventListener("click", async () => {
       try {
-        await saveContact("reviewed");
+        await runBusyAction(ui.contactReviewedBtn, "Mentés...", () => saveContact("reviewed"));
         showFeedback("A kapcsolatfelvétel feldolgozottnak jelölve.");
       } catch (error) {
         console.error(error);
@@ -1526,7 +1643,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.contactCreateGalleryBtn?.addEventListener("click", async () => {
       try {
-        await createGalleryFromContact();
+        await runBusyAction(ui.contactCreateGalleryBtn, "Létrehozás...", () => createGalleryFromContact());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült galériafiókot létrehozni a kapcsolatfelvételhez.", "error");
@@ -1544,7 +1661,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       try {
-        await createGalleryUser(email, lang, note);
+        await runBusyAction(ui.galleryCreateBtn, "Létrehozás...", () => createGalleryUser(email, lang, note));
         ui.galleryCreateEmail.value = "";
         ui.galleryCreateNote.value = "";
         showFeedback("A galériafiók elkészült és a jelszó email kiküldve.");
@@ -1556,7 +1673,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.gallerySaveMetaBtn?.addEventListener("click", async () => {
       try {
-        await saveGalleryMetadata();
+        await runBusyAction(ui.gallerySaveMetaBtn, "Mentés...", () => saveGalleryMetadata());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült menteni a galéria ügyfelet.", "error");
@@ -1565,7 +1682,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.galleryResetPasswordBtn?.addEventListener("click", async () => {
       try {
-        await resetGalleryPassword();
+        await runBusyAction(ui.galleryResetPasswordBtn, "Küldés...", () => resetGalleryPassword());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült új jelszót küldeni.", "error");
@@ -1574,7 +1691,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.galleryUploadBtn?.addEventListener("click", async () => {
       try {
-        await uploadGalleryFiles();
+        await runBusyAction(ui.galleryUploadBtn, "Feltöltés...", () => uploadGalleryFiles());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült feltölteni a galéria képeket.", "error");
@@ -1583,7 +1700,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.portfolioSaveBtn?.addEventListener("click", async () => {
       try {
-        await savePortfolioItem();
+        await runBusyAction(ui.portfolioSaveBtn, "Mentés...", () => savePortfolioItem());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült menteni a portfólió elemet.", "error");
@@ -1594,7 +1711,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.portfolioDeleteBtn?.addEventListener("click", async () => {
       try {
-        await deletePortfolioItem();
+        await runBusyAction(ui.portfolioDeleteBtn, "Törlés...", () => deletePortfolioItem());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült törölni a portfólió elemet.", "error");
@@ -1603,7 +1720,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterResendBtn?.addEventListener("click", async () => {
       try {
-        await resendNewsletterConfirmation();
+        await runBusyAction(ui.newsletterResendBtn, "Küldés...", () => resendNewsletterConfirmation());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült újraküldeni a megerősítő levelet.", "error");
@@ -1619,7 +1736,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterCampaignTestBtn?.addEventListener("click", async () => {
       try {
-        await sendNewsletterTest();
+        await runBusyAction(ui.newsletterCampaignTestBtn, "Tesztküldés...", () => sendNewsletterTest());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült elküldeni a teszt hírlevelet.", "error");
@@ -1629,7 +1746,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterCampaignSendBtn?.addEventListener("click", async () => {
       try {
-        await sendNewsletterCampaign();
+        await runBusyAction(ui.newsletterCampaignSendBtn, "Küldés...", () => sendNewsletterCampaign());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült elküldeni a kampányt.", "error");
@@ -1639,7 +1756,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterCampaignScheduleBtn?.addEventListener("click", async () => {
       try {
-        await scheduleNewsletterCampaign();
+        await runBusyAction(ui.newsletterCampaignScheduleBtn, "Időzítés...", () => scheduleNewsletterCampaign());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült időzíteni a kampányt.", "error");
@@ -1649,7 +1766,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterCampaignRunScheduledBtn?.addEventListener("click", async () => {
       try {
-        await runScheduledNewsletterJobs();
+        await runBusyAction(ui.newsletterCampaignRunScheduledBtn, "Futtatás...", () => runScheduledNewsletterJobs());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült futtatni az esedékes kampányokat.", "error");
@@ -1659,7 +1776,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     ui.newsletterFollowupSendBtn?.addEventListener("click", async () => {
       try {
-        await sendNewsletterFollowup();
+        await runBusyAction(ui.newsletterFollowupSendBtn, "Küldés...", () => sendNewsletterFollowup());
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült elküldeni a follow-up levelet.", "error");
@@ -1667,8 +1784,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-    ui.refreshAllBtn.addEventListener("click", () => {
-      refreshAll();
+    ui.refreshAllBtn.addEventListener("click", async () => {
+      await refreshAll();
     });
 
     ui.logoutBtn.addEventListener("click", async () => {
