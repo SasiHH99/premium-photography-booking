@@ -5,6 +5,12 @@
     allLabel: "Összes kategória",
     totalLabel: "Válogatott képek",
     activeLabel: "Aktív nézet",
+    visibleLabel(count) {
+      return `${count} kép látható`;
+    },
+    activeFilterLabel(label) {
+      return `Aktív szűrő: ${label}`;
+    },
     ctaTitle: "Ha ezt a vizuális minőséget a saját képeidnél is szeretnéd, innen érdemes továbblépni.",
     ctaCopy: "Először röviden egyeztetjük a célt, utána áll össze az időpont, a helyszín és a legerősebb csomag.",
     ctaButton: "Fotózást kérek",
@@ -46,6 +52,12 @@
     allLabel: "Alle Kategorien",
     totalLabel: "Kuratiertes Bildmaterial",
     activeLabel: "Aktive Auswahl",
+    visibleLabel(count) {
+      return `${count} Bilder sichtbar`;
+    },
+    activeFilterLabel(label) {
+      return `Aktiver Filter: ${label}`;
+    },
     ctaTitle: "Wenn du genau diese Bildqualität auch für dein eigenes Shooting willst, geht es hier weiter.",
     ctaCopy: "Wir klären zuerst Ziel, Stimmung und Ort und legen danach den passenden Ablauf und das stärkste Paket fest.",
     ctaButton: "Shooting anfragen",
@@ -124,6 +136,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const categoryValuePanel = document.getElementById("portfolioCategoryValuePanel");
   const noteTitle = document.getElementById("portfolioNoteTitle");
   const noteCopy = document.getElementById("portfolioNoteCopy");
+  const visibleCount = document.getElementById("portfolioVisibleCount");
+  const activeFilterChip = document.getElementById("portfolioActiveFilterChip");
   const filters = document.getElementById("portfolioFilters");
   const grid = document.getElementById("portfolioGrid");
   const empty = document.getElementById("portfolioEmpty");
@@ -185,12 +199,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function updateMeta() {
+    const cards = getCards();
     const activeLabel = state.filter === "all" ? copy.categories.all : copy.categories[state.filter];
     categoryValue.textContent = activeLabel;
     categoryValuePanel.textContent = activeLabel;
     noteTitle.textContent = copy.activeLabel;
     noteCopy.textContent = state.filter === "all" ? copy.heroCopy : (copy.categoryNotes[state.filter] || copy.heroCopy);
-    totalValue.textContent = String(getCards().length);
+    totalValue.textContent = String(cards.length);
+    if (visibleCount) visibleCount.textContent = copy.visibleLabel(state.visibleCards.length);
+    if (activeFilterChip) activeFilterChip.textContent = copy.activeFilterLabel(activeLabel);
   }
 
   function renderFilters() {

@@ -364,6 +364,33 @@ body.portfolio-page {
   font-size: clamp(1.5rem, 3vw, 2.4rem);
 }
 
+.portfolio-gallery-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: -8px;
+}
+
+.portfolio-status-chip {
+  min-height: 38px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(214, 179, 106, 0.12);
+  border: 1px solid rgba(214, 179, 106, 0.22);
+  color: var(--portfolio-accent-strong);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.portfolio-status-chip.is-muted {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(246, 242, 232, 0.76);
+}
+
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -663,6 +690,10 @@ body.portfolio-page {
     padding-bottom: 14px;
   }
 
+  .portfolio-gallery-status {
+    margin-top: -2px;
+  }
+
   .portfolio-hero-preview {
     min-height: 280px;
   }
@@ -706,6 +737,11 @@ body.portfolio-page {
     flex: 0 0 auto;
     white-space: nowrap;
     scroll-snap-align: start;
+  }
+
+  .portfolio-status-chip {
+    width: 100%;
+    justify-content: center;
   }
 
   .portfolio-lightbox {

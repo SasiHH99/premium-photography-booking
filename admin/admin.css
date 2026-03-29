@@ -325,7 +325,15 @@ body.admin-body {
   border-color: rgba(113, 208, 141, 0.18);
 }
 
-.table-wrap { overflow-x: auto; }
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.015)),
+    rgba(12, 14, 19, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
 .admin-table { width: 100%; border-collapse: collapse; }
 .admin-table th,
 .admin-table td {
@@ -340,8 +348,14 @@ body.admin-body {
   letter-spacing: 0.12em;
   color: var(--admin-muted);
 }
-.admin-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
-.admin-table tbody tr.is-selected { background: rgba(214, 179, 106, 0.08); }
+.admin-table tbody tr {
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+.admin-table tbody tr:hover { background: rgba(255, 255, 255, 0.035); }
+.admin-table tbody tr.is-selected {
+  background: linear-gradient(90deg, rgba(214, 179, 106, 0.12), rgba(214, 179, 106, 0.04));
+  box-shadow: inset 3px 0 0 rgba(214, 179, 106, 0.58);
+}
 
 .status-pill {
   display: inline-flex;
@@ -415,9 +429,11 @@ body.admin-body {
 
 .detail-card,
 .form-card {
-  padding: 18px;
+  padding: 20px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -428,10 +444,21 @@ body.admin-body {
 }
 
 .detail-grid div {
+  position: relative;
   padding: 14px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.detail-grid div::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(214, 179, 106, 0.42), transparent 70%);
 }
 
 .detail-meta-label { display: block; margin-bottom: 8px; }
@@ -445,11 +472,14 @@ body.admin-body {
 .asset-item,
 .user-item,
 .portfolio-item {
+  position: relative;
   padding: 16px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  overflow: hidden;
 }
 .portfolio-item {
   display: grid;
@@ -457,12 +487,30 @@ body.admin-body {
   gap: 14px;
   align-items: center;
 }
+.asset-item::before,
+.user-item::before,
+.portfolio-item::before,
+.campaign-log-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(214, 179, 106, 0.36), transparent 68%);
+}
 .portfolio-thumb {
   width: 88px;
   height: 88px;
   border-radius: 16px;
   object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.asset-item:hover,
+.user-item:hover,
+.portfolio-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(214, 179, 106, 0.22);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.16);
 }
 .asset-item.is-selected,
 .user-item.is-selected,
@@ -548,10 +596,12 @@ body.admin-body {
 
 .campaign-meta-card,
 .campaign-log-item {
+  position: relative;
   padding: 16px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
 }
 
 .campaign-log-list {
@@ -586,14 +636,17 @@ body.admin-body {
 
 .campaign-log-item.is-pending {
   border-color: rgba(214, 179, 106, 0.22);
+  background: rgba(214, 179, 106, 0.055);
 }
 
 .campaign-log-item.is-done {
   border-color: rgba(107, 186, 134, 0.22);
+  background: rgba(107, 186, 134, 0.055);
 }
 
 .campaign-log-item.is-error {
   border-color: rgba(201, 111, 111, 0.26);
+  background: rgba(201, 111, 111, 0.06);
 }
 
 .campaign-log-meta {
