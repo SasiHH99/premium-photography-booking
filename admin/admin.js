@@ -73,6 +73,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     bookingSearch: document.getElementById("bookingSearch"),
     bookingStatusFilter: document.getElementById("bookingStatusFilter"),
     bookingLangFilter: document.getElementById("bookingLangFilter"),
+    bookingFilterSummary: document.getElementById("bookingFilterSummary"),
+    bookingResetFiltersBtn: document.getElementById("bookingResetFiltersBtn"),
     bookingRows: document.getElementById("bookingRows"),
     bookingEmpty: document.getElementById("bookingEmpty"),
     bookingDetailEmpty: document.getElementById("bookingDetailEmpty"),
@@ -92,6 +94,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     bookingCreateGalleryBtn: document.getElementById("bookingCreateGalleryBtn"),
     contactSearch: document.getElementById("contactSearch"),
     contactStatusFilter: document.getElementById("contactStatusFilter"),
+    contactFilterSummary: document.getElementById("contactFilterSummary"),
+    contactResetFiltersBtn: document.getElementById("contactResetFiltersBtn"),
     contactRows: document.getElementById("contactRows"),
     contactEmpty: document.getElementById("contactEmpty"),
     contactDetailEmpty: document.getElementById("contactDetailEmpty"),
@@ -148,6 +152,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterSearch: document.getElementById("newsletterSearch"),
     newsletterStatusFilter: document.getElementById("newsletterStatusFilter"),
     newsletterLangFilter: document.getElementById("newsletterLangFilter"),
+    newsletterFilterSummary: document.getElementById("newsletterFilterSummary"),
+    newsletterResetFiltersBtn: document.getElementById("newsletterResetFiltersBtn"),
     newsletterExportBtn: document.getElementById("newsletterExportBtn"),
     newsletterRows: document.getElementById("newsletterRows"),
     newsletterEmpty: document.getElementById("newsletterEmpty"),
@@ -322,6 +328,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function buildFilterSummary({ total, filtered, noun, emptyText, filters = [] }) {
+    if (!total) return emptyText;
+
+    const base = filtered === total
+      ? `Mind a ${total} ${noun} látszik.`
+      : `${filtered} / ${total} ${noun} látszik.`;
+
+    if (!filters.length) return base;
+    return `${base} Aktív szűrők: ${filters.join(" · ")}.`;
+  }
+
+  function setFilterSummary(element, resetButton, summaryText, hasFilters) {
+    if (element) {
+      element.textContent = summaryText;
+    }
+
+    if (resetButton) {
+      resetButton.disabled = !hasFilters;
+      resetButton.setAttribute("aria-disabled", String(!hasFilters));
+    }
+  }
+
+  function resetBookingFilters() {
+    if (ui.bookingSearch) ui.bookingSearch.value = "";
+    if (ui.bookingStatusFilter) ui.bookingStatusFilter.value = "all";
+    if (ui.bookingLangFilter) ui.bookingLangFilter.value = "all";
+    renderBookings();
+  }
+
+  function resetContactFilters() {
+    if (ui.contactSearch) ui.contactSearch.value = "";
+    if (ui.contactStatusFilter) ui.contactStatusFilter.value = "all";
+    renderContacts();
+  }
+
+  function resetNewsletterFilters() {
+    if (ui.newsletterSearch) ui.newsletterSearch.value = "";
+    if (ui.newsletterStatusFilter) ui.newsletterStatusFilter.value = "all";
+    if (ui.newsletterLangFilter) ui.newsletterLangFilter.value = "all";
+    renderNewsletter();
+  }
+
   function getSelectedBooking() {
     return state.bookings.find((booking) => String(booking.id) === String(state.selectedBookingId)) || null;
   }
@@ -484,6 +532,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         && (lang === "all" || booking.lang === lang);
     });
 
+    const activeFilters = [];
+    if (query) activeFilters.push(`keresés: "${query}"`);
+    if (status !== "all") activeFilters.push(`státusz: ${STATUS_LABELS[status] || status}`);
+    if (lang !== "all") activeFilters.push(`nyelv: ${LANG_LABELS[lang] || lang}`);
+    setFilterSummary(
+      ui.bookingFilterSummary,
+      ui.bookingResetFiltersBtn,
+      buildFilterSummary({
+        total: state.bookings.length,
+        filtered: filtered.length,
+        noun: "foglalás",
+        emptyText: "Még nincs foglalás a rendszerben.",
+        filters: activeFilters
+      }),
+      activeFilters.length > 0
+    );
+
     ui.bookingRows.innerHTML = filtered.map((booking) => `
       <tr data-booking-id="${booking.id}" class="${String(booking.id) === String(state.selectedBookingId) ? "is-selected" : ""}">
         <td><strong>${escapeHtml(booking.name || "-")}</strong><br><span class="list-secondary">${escapeHtml(booking.email || "-")}</span></td>
@@ -522,6 +587,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       const haystack = [contact.name, contact.email, contact.message, contact.admin_note].filter(Boolean).join(" ").toLowerCase();
       return (!query || haystack.includes(query)) && (status === "all" || contact.status === status);
     });
+
+    const activeFilters = [];
+    if (query) activeFilters.push(`keresés: "${query}"`);
+    if (status !== "all") activeFilters.push(`státusz: ${STATUS_LABELS[status] || status}`);
+    setFilterSummary(
+      ui.contactFilterSummary,
+      ui.contactResetFiltersBtn,
+      buildFilterSummary({
+        total: state.contacts.length,
+        filtered: filtered.length,
+        noun: "kapcsolat",
+        emptyText: "Még nincs kapcsolatüzenet a rendszerben.",
+        filters: activeFilters
+      }),
+      activeFilters.length > 0
+    );
 
     ui.contactRows.innerHTML = filtered.map((contact) => `
       <tr data-contact-id="${contact.id}" class="${String(contact.id) === String(state.selectedContactId) ? "is-selected" : ""}">
@@ -759,6 +840,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!ui.newsletterRows) return;
 
     const filtered = getFilteredNewsletterSubscribers();
+    const query = ui.newsletterSearch?.value.trim().toLowerCase() || "";
+    const status = ui.newsletterStatusFilter?.value || "all";
+    const lang = ui.newsletterLangFilter?.value || "all";
+    const activeFilters = [];
+    if (query) activeFilters.push(`keresés: "${query}"`);
+    if (status !== "all") activeFilters.push(`státusz: ${STATUS_LABELS[status] || status}`);
+    if (lang !== "all") activeFilters.push(`nyelv: ${LANG_LABELS[lang] || lang}`);
+    setFilterSummary(
+      ui.newsletterFilterSummary,
+      ui.newsletterResetFiltersBtn,
+      buildFilterSummary({
+        total: state.newsletterSubscribers.length,
+        filtered: filtered.length,
+        noun: "feliratkozó",
+        emptyText: "Még nincs hírlevél feliratkozó.",
+        filters: activeFilters
+      }),
+      activeFilters.length > 0
+    );
 
     ui.newsletterRows.innerHTML = filtered.map((subscriber) => `
       <tr data-newsletter-id="${subscriber.id}" class="${String(subscriber.id) === String(state.selectedNewsletterId) ? "is-selected" : ""}">
@@ -1508,16 +1608,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       element.addEventListener("input", renderBookings);
       element.addEventListener("change", renderBookings);
     });
+    ui.bookingResetFiltersBtn?.addEventListener("click", resetBookingFilters);
 
     [ui.contactSearch, ui.contactStatusFilter].filter(Boolean).forEach((element) => {
       element.addEventListener("input", renderContacts);
       element.addEventListener("change", renderContacts);
     });
+    ui.contactResetFiltersBtn?.addEventListener("click", resetContactFilters);
 
     [ui.newsletterSearch, ui.newsletterStatusFilter, ui.newsletterLangFilter].filter(Boolean).forEach((element) => {
       element.addEventListener("input", renderNewsletter);
       element.addEventListener("change", renderNewsletter);
     });
+    ui.newsletterResetFiltersBtn?.addEventListener("click", resetNewsletterFilters);
 
     ui.newsletterCampaignLang?.addEventListener("change", () => {
       applyNewsletterCampaignPreset(true);
