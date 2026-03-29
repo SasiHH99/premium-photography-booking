@@ -190,9 +190,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterSummaryUnsubscribed: document.getElementById("newsletterSummaryUnsubscribed"),
     newsletterSummaryWelcome: document.getElementById("newsletterSummaryWelcome"),
     newsletterDiagnosticsSender: document.getElementById("newsletterDiagnosticsSender"),
+    newsletterDiagnosticsSenderStatus: document.getElementById("newsletterDiagnosticsSenderStatus"),
     newsletterDiagnosticsSenderSource: document.getElementById("newsletterDiagnosticsSenderSource"),
     newsletterDiagnosticsAudience: document.getElementById("newsletterDiagnosticsAudience"),
+    newsletterDiagnosticsAudienceStatus: document.getElementById("newsletterDiagnosticsAudienceStatus"),
     newsletterDiagnosticsSite: document.getElementById("newsletterDiagnosticsSite"),
+    newsletterDiagnosticsSiteStatus: document.getElementById("newsletterDiagnosticsSiteStatus"),
     newsletterCampaignTestBtn: document.getElementById("newsletterCampaignTestBtn"),
     newsletterCampaignSendBtn: document.getElementById("newsletterCampaignSendBtn"),
     newsletterCampaignScheduleBtn: document.getElementById("newsletterCampaignScheduleBtn"),
@@ -920,22 +923,55 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const diagnostics = state.newsletterDiagnostics || {};
+    const hasExplicitSender = Boolean(diagnostics.from) && diagnostics.senderSource && diagnostics.senderSource !== "default fallback";
+    const hasFallbackSender = Boolean(diagnostics.from) && diagnostics.senderSource === "default fallback";
+    const hasAudience = Boolean(diagnostics.resendAudienceConfigured);
+    const hasPublicSiteUrl = /^https?:\/\//i.test(String(diagnostics.publicSiteUrl || ""));
+
     if (ui.newsletterDiagnosticsSender) {
       ui.newsletterDiagnosticsSender.textContent = diagnostics.from || "Nincs aktív küldő konfigurálva";
     }
 
+    if (ui.newsletterDiagnosticsSenderStatus) {
+      ui.newsletterDiagnosticsSenderStatus.className = "campaign-diagnostics-pill";
+      if (hasExplicitSender) {
+        ui.newsletterDiagnosticsSenderStatus.textContent = "Rendben";
+        ui.newsletterDiagnosticsSenderStatus.classList.add("is-good");
+      } else if (hasFallbackSender) {
+        ui.newsletterDiagnosticsSenderStatus.textContent = "Fallback";
+        ui.newsletterDiagnosticsSenderStatus.classList.add("is-warning");
+      } else {
+        ui.newsletterDiagnosticsSenderStatus.textContent = "Hiányzik";
+        ui.newsletterDiagnosticsSenderStatus.classList.add("is-warning");
+      }
+    }
+
     if (ui.newsletterDiagnosticsSenderSource) {
-      ui.newsletterDiagnosticsSenderSource.textContent = diagnostics.senderSource
-        ? `A jelenlegi küldő innen jön: ${diagnostics.senderSource}.`
-        : "A kampányküldéshez használt feladó.";
+      ui.newsletterDiagnosticsSenderSource.textContent = hasFallbackSender
+        ? "A rendszer most a beépített fallback küldőt használja. Érdemes külön NEWSLETTER_FROM_EMAIL env-et beállítani."
+        : diagnostics.senderSource
+          ? `A jelenlegi küldő innen jön: ${diagnostics.senderSource}.`
+          : "A kampányküldéshez használt feladó.";
     }
 
     if (ui.newsletterDiagnosticsAudience) {
       ui.newsletterDiagnosticsAudience.textContent = diagnostics.resendAudienceConfigured ? "Bekötve" : "Nincs bekötve";
     }
 
+    if (ui.newsletterDiagnosticsAudienceStatus) {
+      ui.newsletterDiagnosticsAudienceStatus.className = "campaign-diagnostics-pill";
+      ui.newsletterDiagnosticsAudienceStatus.textContent = hasAudience ? "Aktív" : "Opcionális";
+      ui.newsletterDiagnosticsAudienceStatus.classList.add(hasAudience ? "is-good" : "is-info");
+    }
+
     if (ui.newsletterDiagnosticsSite) {
       ui.newsletterDiagnosticsSite.textContent = diagnostics.publicSiteUrl || "https://bphoto.at";
+    }
+
+    if (ui.newsletterDiagnosticsSiteStatus) {
+      ui.newsletterDiagnosticsSiteStatus.className = "campaign-diagnostics-pill";
+      ui.newsletterDiagnosticsSiteStatus.textContent = hasPublicSiteUrl ? "Rendben" : "Ellenőrizendő";
+      ui.newsletterDiagnosticsSiteStatus.classList.add(hasPublicSiteUrl ? "is-good" : "is-warning");
     }
 
     if (ui.newsletterScheduledJobsList && ui.newsletterScheduledJobsEmpty) {

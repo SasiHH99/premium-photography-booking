@@ -61,9 +61,9 @@
       stepTwoCopy: "Meg tudod nézni, milyen vizuális irányra számíthatsz a saját anyagodnál is.",
       stepThreeTitle: "Foglalás",
       stepThreeCopy: "Ha már tiszta a cél, innen közvetlenül át tudsz lépni a foglalási kéréshez.",
-      actionPrimary: "Árak megtekintése",
-      actionSecondary: "Portfólió",
-      actionNoteSuccess: "Ha már látod az irányt, innen tovább tudsz lépni az árakhoz vagy rögtön a foglalási kéréshez."
+      actionPrimary: "Időpontot kérek",
+      actionSecondary: "Árak megtekintése",
+      actionNoteSuccess: "Ha már tiszta a cél, innen a foglalás a legerősebb következő lépés. Ha még csomagot választanál, nézd át előbb az árakat."
     }
   },
   de: {
@@ -128,9 +128,9 @@
       stepTwoCopy: "So siehst du sofort, welche Bildsprache du später selbst erwarten kannst.",
       stepThreeTitle: "Termin",
       stepThreeCopy: "Wenn dein Ziel schon klar ist, kannst du direkt in die Buchungsanfrage weitergehen.",
-      actionPrimary: "Preise ansehen",
-      actionSecondary: "Portfolio",
-      actionNoteSuccess: "Wenn dein Ziel schon klar ist, geh von hier direkt weiter zu Preisen oder Termin."
+      actionPrimary: "Termin anfragen",
+      actionSecondary: "Preise ansehen",
+      actionNoteSuccess: "Wenn dein Ziel schon klar ist, ist die Buchungsanfrage jetzt der sauberste nächste Schritt. Wenn du noch zwischen Paketen abwägst, öffne zuerst die Preise."
     }
   }
 };
@@ -177,10 +177,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const actionPrimaryHref = type === "booking"
     ? (isPartialBooking ? (lang === "hu" ? "kapcsolat.html" : "kontakt.html") : "portfolio.html")
-    : (lang === "hu" ? "arak.html" : "preise.html");
+    : (lang === "hu" ? "foglalas.html" : "termin.html");
   const actionSecondaryHref = type === "booking"
     ? (isPartialBooking ? "portfolio.html" : (lang === "hu" ? "kapcsolat.html" : "kontakt.html"))
-    : "portfolio.html";
+    : (lang === "hu" ? "arak.html" : "preise.html");
 
   actionPrimary.href = actionPrimaryHref;
   actionSecondary.href = actionSecondaryHref;

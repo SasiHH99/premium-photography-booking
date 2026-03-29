@@ -73,6 +73,10 @@
               <button type="button" class="ghost-btn" id="newsletterExportBtn">CSV export</button>
             </div>
           </div>
+          <div class="toolbar-meta">
+            <p class="toolbar-summary" id="newsletterFilterSummary">Az összes feliratkozó látszik.</p>
+            <button type="button" class="inline-link toolbar-reset" id="newsletterResetFiltersBtn">Szűrők törlése</button>
+          </div>
           <div class="table-wrap">
             <table class="admin-table">
               <thead>
@@ -158,16 +162,19 @@
           <div class="campaign-diagnostics-grid">
             <article class="campaign-diagnostics-card">
               <span class="detail-meta-label">Aktív küldő</span>
+              <span class="campaign-diagnostics-pill" id="newsletterDiagnosticsSenderStatus">Betöltés...</span>
               <strong class="detail-value" id="newsletterDiagnosticsSender">Betöltés...</strong>
               <p class="campaign-meta-note" id="newsletterDiagnosticsSenderSource">A kampányküldéshez használt feladó.</p>
             </article>
             <article class="campaign-diagnostics-card">
               <span class="detail-meta-label">Audience integráció</span>
+              <span class="campaign-diagnostics-pill" id="newsletterDiagnosticsAudienceStatus">Betöltés...</span>
               <strong class="detail-value" id="newsletterDiagnosticsAudience">Betöltés...</strong>
               <p class="campaign-meta-note">A Resend Audience opcionális, a küldés nélküle is működik.</p>
             </article>
             <article class="campaign-diagnostics-card">
               <span class="detail-meta-label">Publikus oldal</span>
+              <span class="campaign-diagnostics-pill" id="newsletterDiagnosticsSiteStatus">Betöltés...</span>
               <strong class="detail-value" id="newsletterDiagnosticsSite">Betöltés...</strong>
               <p class="campaign-meta-note">Innen épülnek a megerősítő és leiratkozó linkek.</p>
             </article>

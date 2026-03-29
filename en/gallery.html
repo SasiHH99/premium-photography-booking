@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18017270066"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-18017270066');
+</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="192x192" href="/images/pwa/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/images/pwa/icon-512.png">
+<link rel="apple-touch-icon" href="/images/pwa/apple-touch-icon.png">
+  <title>Online Galerie | B. Photography</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/gallery.css">
+</head>
+<body class="gallery-page" data-gallery-app data-lang="de">
+  <div id="site-header"></div>
+
+  <main class="gallery-shell">
+    <section class="gallery-hero">
+      <div class="gallery-hero-top">
+        <div class="gallery-hero-copy">
+          <p class="gallery-kicker">B. Photography</p>
+          <h1 id="galleryHeroTitle"></h1>
+          <p id="galleryHeroCopy"></p>
+        </div>
+
+        <div class="gallery-hero-actions">
+          <button type="button" class="gallery-action-btn" id="galleryRefreshBtn"></button>
+          <button type="button" class="gallery-action-btn is-primary" id="galleryLogoutBtn"></button>
+        </div>
+      </div>
+
+      <div class="gallery-stats">
+        <article class="gallery-stat">
+          <span class="gallery-stats-label" id="galleryTotalLabel"></span>
+          <strong id="galleryTotalCount">0</strong>
+        </article>
+
+        <article class="gallery-stat">
+          <span class="gallery-stats-label" id="galleryFavoriteLabel"></span>
+          <strong id="galleryFavoriteCount">0</strong>
+        </article>
+
+        <article class="gallery-stat">
+          <span class="gallery-stats-label" id="gallerySelectionLabel"></span>
+          <strong id="gallerySelectionCount">0</strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="gallery-workspace">
+      <div class="gallery-toolbar">
+        <div class="gallery-toolbar-group">
+          <span class="gallery-toolbar-label" id="galleryToolbarLabel"></span>
+          <button type="button" class="gallery-filter-btn is-active" id="galleryFilterAll"></button>
+          <button type="button" class="gallery-filter-btn" id="galleryFilterFavorites"></button>
+        </div>
+
+        <div class="gallery-count" id="galleryCount">0 Bilder</div>
+      </div>
+
+      <div class="gallery-state" id="galleryEmpty" hidden>
+        <h2 class="gallery-empty-title">Noch keine Bilder verfugbar.</h2>
+        <p class="gallery-empty-copy">
+          Sobald die Galerie fertig ist, erscheinen hier alle Bilder.
+        </p>
+      </div>
+
+      <div class="gallery-state" id="galleryError" hidden>
+        <p class="gallery-error-copy">
+          Die Galerie konnte gerade nicht geladen werden. Bitte versuche es spater erneut.
+        </p>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+  </main>
+
+  <div class="gallery-lightbox" id="galleryLightbox">
+    <div class="gallery-lightbox-inner">
+      <div class="gallery-lightbox-top">
+        <div class="gallery-count" id="lightboxCount">0 / 0</div>
+        <div class="gallery-lightbox-actions">
+          <button type="button" class="lightbox-btn" id="prevBtn"></button>
+          <button type="button" class="lightbox-btn is-primary" id="downloadBtn"></button>
+          <button type="button" class="lightbox-btn" id="nextBtn"></button>
+          <button type="button" class="lightbox-btn" id="closeBtn"></button>
+        </div>
+      </div>
+
+      <div class="gallery-lightbox-frame">
+        <img id="lightboxImage" alt="Galeriebild">
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/global.js"></script>
+  <script src="../js/gallery-app.js"></script>
+</body>
+</html>

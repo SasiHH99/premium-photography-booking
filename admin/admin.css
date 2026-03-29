@@ -583,6 +583,41 @@ body.admin-body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.campaign-diagnostics-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 28px;
+  margin-top: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--admin-text);
+}
+
+.campaign-diagnostics-pill.is-good {
+  color: #dcffe5;
+  background: rgba(113, 208, 141, 0.12);
+  border-color: rgba(113, 208, 141, 0.22);
+}
+
+.campaign-diagnostics-pill.is-warning {
+  color: #fff0bf;
+  background: rgba(240, 207, 123, 0.12);
+  border-color: rgba(240, 207, 123, 0.2);
+}
+
+.campaign-diagnostics-pill.is-info {
+  color: #d7e8ff;
+  background: rgba(120, 168, 255, 0.12);
+  border-color: rgba(120, 168, 255, 0.2);
+}
+
 .campaign-summary-value {
   display: block;
   margin-top: 8px;
