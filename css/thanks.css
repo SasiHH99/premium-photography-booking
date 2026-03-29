@@ -191,6 +191,27 @@ body.thanks-page {
   max-width: 44rem;
 }
 
+.thanks-next-highlight {
+  display: grid;
+  gap: 8px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(214, 179, 106, 0.2);
+  background: linear-gradient(135deg, rgba(214, 179, 106, 0.08), rgba(255, 255, 255, 0.02));
+  color: var(--thanks-text);
+  line-height: 1.65;
+}
+
+.thanks-next-highlight strong {
+  font-size: 0.96rem;
+  letter-spacing: 0.04em;
+}
+
+.thanks-next-highlight p {
+  margin: 0;
+  color: var(--thanks-muted);
+}
+
 .thanks-btn {
   min-height: 52px;
   padding: 0 22px;

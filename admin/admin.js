@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     newsletterDiagnosticsAudienceStatus: document.getElementById("newsletterDiagnosticsAudienceStatus"),
     newsletterDiagnosticsSite: document.getElementById("newsletterDiagnosticsSite"),
     newsletterDiagnosticsSiteStatus: document.getElementById("newsletterDiagnosticsSiteStatus"),
+    newsletterDiagnosticsChecks: document.getElementById("newsletterDiagnosticsChecks"),
     newsletterCampaignTestBtn: document.getElementById("newsletterCampaignTestBtn"),
     newsletterCampaignSendBtn: document.getElementById("newsletterCampaignSendBtn"),
     newsletterCampaignScheduleBtn: document.getElementById("newsletterCampaignScheduleBtn"),
@@ -972,6 +973,67 @@ document.addEventListener("DOMContentLoaded", async () => {
       ui.newsletterDiagnosticsSiteStatus.className = "campaign-diagnostics-pill";
       ui.newsletterDiagnosticsSiteStatus.textContent = hasPublicSiteUrl ? "Rendben" : "Ellenőrizendő";
       ui.newsletterDiagnosticsSiteStatus.classList.add(hasPublicSiteUrl ? "is-good" : "is-warning");
+    }
+
+    if (ui.newsletterDiagnosticsChecks) {
+      const checks = [
+        hasExplicitSender
+          ? {
+              tone: "good",
+              icon: "OK",
+              title: "Küldő cím rendben",
+              body: `A kampányok explicit küldővel mennek: ${diagnostics.from}.`
+            }
+          : hasFallbackSender
+            ? {
+                tone: "warning",
+                icon: "!",
+                title: "Fallback küldő aktív",
+                body: "Most a beépített fallback küldő fut. Érdemes külön NEWSLETTER_FROM_EMAIL env-et beállítani a tiszta kampányküldéshez."
+              }
+            : {
+                tone: "warning",
+                icon: "!",
+                title: "Küldő cím hiányzik",
+                body: "A kampányküldéshez nincs használható sender. Ellenőrizd a NEWSLETTER_FROM_EMAIL vagy a többi fallback email env-et."
+              },
+        hasPublicSiteUrl
+          ? {
+              tone: "good",
+              icon: "OK",
+              title: "Publikus URL rendben",
+              body: `A megerősítő és leiratkozó linkek innen épülnek: ${diagnostics.publicSiteUrl}.`
+            }
+          : {
+              tone: "warning",
+              icon: "!",
+              title: "Publikus URL ellenőrizendő",
+              body: "A PUBLIC_SITE_URL hiányzik vagy nem teljes URL. A double opt-in és leiratkozó linkekhez ezt production domainre állítsd."
+            },
+        hasAudience
+          ? {
+              tone: "good",
+              icon: "OK",
+              title: "Audience integráció aktív",
+              body: "A Resend Audience be van kötve, így a feliratkozók contact oldalon is követhetők."
+            }
+          : {
+              tone: "info",
+              icon: "i",
+              title: "Audience nélkül is működik",
+              body: "A küldés most is megy, csak a Resend contact sync nincs bekapcsolva."
+            }
+      ];
+
+      ui.newsletterDiagnosticsChecks.innerHTML = checks.map((check) => `
+        <article class="campaign-check-item is-${escapeHtml(check.tone)}">
+          <span class="campaign-check-icon">${escapeHtml(check.icon)}</span>
+          <div>
+            <h3>${escapeHtml(check.title)}</h3>
+            <p>${escapeHtml(check.body)}</p>
+          </div>
+        </article>
+      `).join("");
     }
 
     if (ui.newsletterScheduledJobsList && ui.newsletterScheduledJobsEmpty) {

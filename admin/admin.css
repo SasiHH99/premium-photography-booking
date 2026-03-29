@@ -629,6 +629,77 @@ body.admin-body {
   margin-top: 8px;
 }
 
+.campaign-checklist {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.campaign-check-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.campaign-check-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.campaign-check-item h3 {
+  margin: 0 0 4px;
+  font-size: 0.96rem;
+}
+
+.campaign-check-item p {
+  margin: 0;
+  color: var(--admin-muted);
+  line-height: 1.55;
+}
+
+.campaign-check-item.is-good {
+  border-color: rgba(113, 208, 141, 0.2);
+  background: rgba(113, 208, 141, 0.05);
+}
+
+.campaign-check-item.is-good .campaign-check-icon {
+  color: #dcffe5;
+  background: rgba(113, 208, 141, 0.14);
+}
+
+.campaign-check-item.is-warning {
+  border-color: rgba(240, 207, 123, 0.2);
+  background: rgba(240, 207, 123, 0.05);
+}
+
+.campaign-check-item.is-warning .campaign-check-icon {
+  color: #fff0bf;
+  background: rgba(240, 207, 123, 0.14);
+}
+
+.campaign-check-item.is-info {
+  border-color: rgba(120, 168, 255, 0.2);
+  background: rgba(120, 168, 255, 0.05);
+}
+
+.campaign-check-item.is-info .campaign-check-icon {
+  color: #d7e8ff;
+  background: rgba(120, 168, 255, 0.14);
+}
+
 .campaign-meta-card,
 .campaign-log-item {
   position: relative;

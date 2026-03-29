@@ -8,7 +8,9 @@
     errorText: "Valami hiba történt az üzenet küldése közben. Próbáld meg újra kicsit később.",
     errorNote: "Ha sürgős, próbáld meg később újra, vagy írj közvetlenül emailben.",
     close: "Bezár",
-    invalid: "Kérlek tölts ki minden mezőt érvényes adatokkal."
+    invalid: "Kérlek tölts ki minden mezőt érvényes adatokkal.",
+    prefill: "A chatbotból érkeztem, és lenne egy további kérdésem a fotózással kapcsolatban.",
+    thanksPage: "koszonjuk-kapcsolat.html"
   },
   de: {
     sending: "Nachricht wird gesendet...",
@@ -19,7 +21,22 @@
     errorText: "Beim Versenden ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
     errorNote: "Wenn es dringend ist, versuche es später erneut oder schreibe direkt per E-Mail.",
     close: "Schließen",
-    invalid: "Bitte alle Felder korrekt ausfüllen."
+    invalid: "Bitte alle Felder korrekt ausfüllen.",
+    prefill: "Ich komme aus dem Chatbot und habe noch eine weitere Frage zum Shooting.",
+    thanksPage: "danke-kontakt.html"
+  },
+  en: {
+    sending: "Sending message...",
+    successTitle: "Message sent",
+    successText: "Thanks for your message. I will get back to you shortly.",
+    successNote: "If the direction is already clear, you can move straight to booking or the portfolio from here.",
+    errorTitle: "Sending failed",
+    errorText: "Something went wrong while sending your message. Please try again a little later.",
+    errorNote: "If it is urgent, try again later or write directly by email.",
+    close: "Close",
+    invalid: "Please fill in every field with valid information.",
+    prefill: "I came from the chatbot and have one more question about the photoshoot.",
+    thanksPage: "thank-you-contact.html"
   }
 };
 
@@ -28,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!form) return;
 
   const tracking = window.BPhotographyTracking;
-  const lang = form.dataset.lang === "de" ? "de" : "hu";
+  const lang = ["hu", "de", "en"].includes(form.dataset.lang) ? form.dataset.lang : "de";
   const copy = CONTACT_TEXT[lang];
   const submitButton = document.getElementById("contactSubmit");
   const status = document.getElementById("contactStatus");
@@ -43,9 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const params = new URLSearchParams(window.location.search);
   if (params.get("source") === "chatbot" && !form.message.value.trim()) {
-    form.message.value = lang === "hu"
-      ? "A chatbotból érkeztem, és lenne egy további kérdésem a fotózással kapcsolatban."
-      : "Ich komme aus dem Chatbot und habe noch eine weitere Frage zum Shooting.";
+    form.message.value = copy.prefill;
   }
 
   function showOverlay(kind) {
@@ -64,8 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function redirectToThanks() {
-    const target = lang === "hu" ? "koszonjuk-kapcsolat.html" : "danke-kontakt.html";
-    window.location.href = target;
+    window.location.href = copy.thanksPage;
   }
 
   function hideOverlay() {
@@ -124,9 +138,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  overlayButton.addEventListener("click", hideOverlay);
-  overlay.addEventListener("click", (event) => {
+  overlayButton?.addEventListener("click", hideOverlay);
+  overlay?.addEventListener("click", (event) => {
     if (event.target === overlay) hideOverlay();
   });
 });
-

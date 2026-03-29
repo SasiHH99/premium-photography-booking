@@ -14,6 +14,14 @@
     success: "Már majdnem kész. Nézd meg a postafiókodat, és erősítsd meg a feliratkozást.",
     alreadyConfirmed: "Ez az e-mail cím már meg van erősítve. Már rajta vagy a listán.",
     error: "A feliratkozást most nem sikerült elindítani. Próbáld meg kicsit később."
+  },
+  en: {
+    invalid: "Please enter a valid email address.",
+    consent: "Please confirm your consent first.",
+    sending: "Preparing your signup...",
+    success: "Almost done. Please check your inbox and confirm your subscription.",
+    alreadyConfirmed: "This email address is already confirmed. You are already on the list.",
+    error: "The signup could not be completed right now. Please try again later."
   }
 };
 
@@ -32,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tracking = window.BPhotographyTracking;
 
   forms.forEach((form) => {
-    const lang = form.dataset.lang === "hu" ? "hu" : "de";
+    const lang = ["hu", "de", "en"].includes(form.dataset.lang) ? form.dataset.lang : "de";
     const copy = NEWSLETTER_TEXT[lang];
     const submitButton = form.querySelector('button[type="submit"]');
 

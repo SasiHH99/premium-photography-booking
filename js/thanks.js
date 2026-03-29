@@ -31,6 +31,10 @@
       actionSecondaryPartial: "Portfólió megtekintése",
       actionNoteSuccess: "Ha közben még pontosítanál valamit, a kapcsolat oldalon bármikor hozzá tudsz írni egy rövid kiegészítést.",
       actionNotePartial: "Az anyag rögzítve van, de itt érdemes most rögtön egy rövid üzenettel is megerősíteni a kérésed.",
+      nextHighlightSuccessTitle: "Javasolt következő lépés",
+      nextHighlightSuccessCopy: "Ha már tudod, milyen vizuális irányt szeretnél, nézd át még egyszer a portfóliót, és készíts 2-3 referencia képet a visszajelzéshez.",
+      nextHighlightPartialTitle: "Most ez a legbiztosabb lépés",
+      nextHighlightPartialCopy: "Nyisd meg a kapcsolat oldalt, és írj egy rövid megerősítést a neveddel és a kívánt dátummal. Így a kérésed biztosan nem akad el.",
       infoDate: "Tervezett dátum",
       infoPackage: "Csomag",
       infoEmail: "Visszajelzési email",
@@ -38,7 +42,8 @@
       newsletterConfirmation:
         "A hírlevélhez is kérted a hozzáférést. Küldtem egy megerősítő emailt, abból tudod véglegesíteni a feliratkozást.",
       newsletterAlreadyConfirmed:
-        "Ez az email cím már aktív hírlevél feliratkozóként szerepel. Az új időpontokról és sorozatokról külön is kapsz majd értesítést."
+        "Ez az email cím már aktív hírlevél feliratkozóként szerepel. Az új időpontokról és sorozatokról külön is kapsz majd értesítést.",
+      newsletterSpamNote: "Ha a megerősítő levelet nem látod rögtön, nézd meg a promóciók vagy spam mappát is."
     },
     contact: {
       titleSuccess: "Az üzeneted megérkezett, innen már átveszem a következő lépést.",
@@ -63,7 +68,9 @@
       stepThreeCopy: "Ha már tiszta a cél, innen közvetlenül át tudsz lépni a foglalási kéréshez.",
       actionPrimary: "Időpontot kérek",
       actionSecondary: "Árak megtekintése",
-      actionNoteSuccess: "Ha már tiszta a cél, innen a foglalás a legerősebb következő lépés. Ha még csomagot választanál, nézd át előbb az árakat."
+      actionNoteSuccess: "Ha már tiszta a cél, innen a foglalás a legerősebb következő lépés. Ha még csomagot választanál, nézd át előbb az árakat.",
+      nextHighlightSuccessTitle: "A legerősebb következő lépés",
+      nextHighlightSuccessCopy: "Ha a cél és a hangulat nagyjából tiszta, innen már a foglalási kérés adja a leggyorsabb előrelépést."
     }
   },
   de: {
@@ -98,6 +105,10 @@
       actionSecondaryPartial: "Portfolio ansehen",
       actionNoteSuccess: "Wenn du zwischenzeitlich noch etwas präzisieren willst, kannst du deine Anfrage jederzeit kurz über die Kontaktseite ergänzen.",
       actionNotePartial: "Die Anfrage ist gespeichert, aber jetzt ist ein kurzer Zusatz über die Kontaktseite der sauberste nächste Schritt.",
+      nextHighlightSuccessTitle: "Sinnvoller nächster Schritt",
+      nextHighlightSuccessCopy: "Wenn dein visueller Stil schon grob klar ist, öffne noch einmal das Portfolio und halte 2 bis 3 Referenzen für die Rückmeldung bereit.",
+      nextHighlightPartialTitle: "Jetzt am saubersten",
+      nextHighlightPartialCopy: "Öffne die Kontaktseite und schick kurz deinen Namen plus Wunschdatum nach. So geht die Anfrage sicher nicht verloren.",
       infoDate: "Wunschdatum",
       infoPackage: "Paket",
       infoEmail: "Rückmeldung an",
@@ -105,7 +116,8 @@
       newsletterConfirmation:
         "Du hast zusätzlich Newsletter-Updates angefragt. Die Anmeldung bestätigst du noch einmal über die E-Mail, die ich dir eben geschickt habe.",
       newsletterAlreadyConfirmed:
-        "Diese Adresse ist bereits aktiv im Newsletter eingetragen. Freie Termine und neue Serien gehen dann künftig auch separat an dich raus."
+        "Diese Adresse ist bereits aktiv im Newsletter eingetragen. Freie Termine und neue Serien gehen dann künftig auch separat an dich raus.",
+      newsletterSpamNote: "Wenn du die Bestätigung nicht sofort siehst, prüfe bitte auch Werbung oder Spam."
     },
     contact: {
       titleSuccess: "Deine Nachricht ist angekommen. Ab hier übernehme ich den nächsten Schritt.",
@@ -130,7 +142,9 @@
       stepThreeCopy: "Wenn dein Ziel schon klar ist, kannst du direkt in die Buchungsanfrage weitergehen.",
       actionPrimary: "Termin anfragen",
       actionSecondary: "Preise ansehen",
-      actionNoteSuccess: "Wenn dein Ziel schon klar ist, ist die Buchungsanfrage jetzt der sauberste nächste Schritt. Wenn du noch zwischen Paketen abwägst, öffne zuerst die Preise."
+      actionNoteSuccess: "Wenn dein Ziel schon klar ist, ist die Buchungsanfrage jetzt der sauberste nächste Schritt. Wenn du noch zwischen Paketen abwägst, öffne zuerst die Preise.",
+      nextHighlightSuccessTitle: "Empfohlener nächster Schritt",
+      nextHighlightSuccessCopy: "Wenn Ziel und Stil schon ungefähr stehen, bringt dich die Buchungsanfrage jetzt am schnellsten weiter."
     }
   }
 };
@@ -153,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const actionPrimary = document.getElementById("thanksActionPrimary");
   const actionSecondary = document.getElementById("thanksActionSecondary");
   const actionNote = document.getElementById("thanksActionNote");
+  const nextHighlight = document.getElementById("thanksNextHighlight");
   const newsletterBox = document.getElementById("thanksNewsletterBox");
   const newsletterLabel = document.getElementById("thanksNewsletterLabel");
   const newsletterCopy = document.getElementById("thanksNewsletterCopy");
@@ -195,6 +210,22 @@ document.addEventListener("DOMContentLoaded", () => {
       actionNote.hidden = false;
     } else {
       actionNote.hidden = true;
+    }
+  }
+
+  if (nextHighlight) {
+    const highlightTitle = type === "booking"
+      ? (isPartialBooking ? copy.nextHighlightPartialTitle : copy.nextHighlightSuccessTitle)
+      : copy.nextHighlightSuccessTitle;
+    const highlightCopy = type === "booking"
+      ? (isPartialBooking ? copy.nextHighlightPartialCopy : copy.nextHighlightSuccessCopy)
+      : copy.nextHighlightSuccessCopy;
+
+    if (highlightTitle && highlightCopy) {
+      nextHighlight.innerHTML = `<strong>${highlightTitle}</strong><p>${highlightCopy}</p>`;
+      nextHighlight.hidden = false;
+    } else {
+      nextHighlight.hidden = true;
     }
   }
 
@@ -246,7 +277,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (newsletterMessage) {
         newsletterLabel.textContent = copy.newsletterLabel;
-        newsletterCopy.textContent = newsletterMessage;
+        newsletterCopy.textContent = newsletterState === "confirmation_sent" && copy.newsletterSpamNote
+          ? `${newsletterMessage} ${copy.newsletterSpamNote}`
+          : newsletterMessage;
         newsletterBox.hidden = false;
       } else {
         newsletterBox.hidden = true;
