@@ -1,4 +1,4 @@
-const CACHE_NAME = "bphoto-static-v2";
+﻿const CACHE_NAME = "bphoto-static-v3";
 const OFFLINE_FALLBACK = "/de/index.html";
 const PRE_CACHE = [
   OFFLINE_FALLBACK,
@@ -107,3 +107,4 @@ async function handleAsset(request) {
     throw new Error("Request failed and no cache fallback exists.");
   }
 }
+
