@@ -28,6 +28,21 @@
     errorText: "A leiratkozást most nem sikerült befejezni. Próbáld meg később, vagy írj a kapcsolat oldalon.",
     primary: "Vissza a főoldalra",
     secondary: "Kapcsolat"
+  },
+  en: {
+    loadingEyebrow: "Newsletter unsubscribe",
+    loadingTitle: "Processing your unsubscribe...",
+    loadingText: "One moment. I am checking your unsubscribe link.",
+    successTitle: "Successfully unsubscribed",
+    successText: "You will no longer receive newsletter updates from now on. If you want to join again later, you can sign up again at any time.",
+    alreadyTitle: "Already unsubscribed",
+    alreadyText: "This email address is already unsubscribed. Nothing else is needed.",
+    invalidTitle: "Link no longer valid",
+    invalidText: "The unsubscribe link is invalid or has expired. You can always use the contact page instead.",
+    errorTitle: "Unsubscribe failed",
+    errorText: "The unsubscribe could not be completed right now. Please try again later or use the contact page.",
+    primary: "Back to home",
+    secondary: "Contact"
   }
 };
 
@@ -52,35 +67,45 @@ function renderUnsubscribeState(lang, state) {
     text.textContent = copy.successText;
     note.textContent = lang === "hu"
       ? "Később bármikor újra feliratkozhatsz, ha új időpontokat vagy friss sorozatokat szeretnél látni."
-      : "Du kannst dich später jederzeit wieder eintragen, wenn du neue Termine oder Serien sehen möchtest.";
+      : lang === "en"
+        ? "You can join again later at any time if you want to hear about free dates or new series."
+        : "Du kannst dich später jederzeit wieder eintragen, wenn du neue Termine oder Serien sehen möchtest.";
   } else if (state === "already") {
     status.textContent = "•";
     title.textContent = copy.alreadyTitle;
     text.textContent = copy.alreadyText;
     note.textContent = lang === "hu"
       ? "Az e-mail címed már nincs aktív feliratkozóként kezelve."
-      : "Deine E-Mail-Adresse wird bereits nicht mehr als aktive Anmeldung geführt.";
+      : lang === "en"
+        ? "Your email address is already no longer treated as an active subscription."
+        : "Deine E-Mail-Adresse wird bereits nicht mehr als aktive Anmeldung geführt.";
   } else if (state === "invalid") {
     status.textContent = "!";
     title.textContent = copy.invalidTitle;
     text.textContent = copy.invalidText;
     note.textContent = lang === "hu"
       ? "Ha inkább személyesen írnál, a kapcsolat oldal ugyanúgy működik."
-      : "Wenn du lieber direkt schreiben möchtest, kannst du jederzeit die Kontaktseite nutzen.";
+      : lang === "en"
+        ? "If you would rather write directly, the contact page works just as well."
+        : "Wenn du lieber direkt schreiben möchtest, kannst du jederzeit die Kontaktseite nutzen.";
   } else if (state === "error") {
     status.textContent = "!";
     title.textContent = copy.errorTitle;
     text.textContent = copy.errorText;
     note.textContent = lang === "hu"
       ? "Ha a hiba később is megmarad, írj a kapcsolat oldalon, és kézzel rendezzük."
-      : "Wenn der Fehler bestehen bleibt, schreib mir über die Kontaktseite, dann kümmere ich mich manuell darum.";
+      : lang === "en"
+        ? "If the issue remains later, write through the contact page and I will handle it manually."
+        : "Wenn der Fehler bestehen bleibt, schreib mir über die Kontaktseite, dann kümmere ich mich manuell darum.";
   } else {
     status.textContent = "…";
     title.textContent = copy.loadingTitle;
     text.textContent = copy.loadingText;
     note.textContent = lang === "hu"
       ? "A leiratkozás után nem kapsz több ilyen értesítést."
-      : "Nach der Abmeldung bekommst du keine weiteren Newsletter-Updates.";
+      : lang === "en"
+        ? "After this, you will not receive further newsletter updates."
+        : "Nach der Abmeldung bekommst du keine weiteren Newsletter-Updates.";
   }
 
   primary.textContent = copy.primary;
@@ -92,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!root) return;
 
   const tracking = window.BPhotographyTracking;
-  const lang = root.dataset.lang === "hu" ? "hu" : "de";
+  const lang = ["hu", "de", "en"].includes(root.dataset.lang) ? root.dataset.lang : "de";
   renderUnsubscribeState(lang, "loading");
 
   const token = new URLSearchParams(window.location.search).get("token");

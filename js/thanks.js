@@ -146,6 +146,80 @@
       nextHighlightSuccessTitle: "Empfohlener nächster Schritt",
       nextHighlightSuccessCopy: "Wenn Ziel und Stil schon ungefähr stehen, bringt dich die Buchungsanfrage jetzt am schnellsten weiter."
     }
+  },
+  en: {
+    booking: {
+      titleSuccess: "Your booking request is in. The next step is now clear.",
+      titlePartial: "Your request was saved, but the admin notification could not be delivered to every recipient.",
+      bodySuccess:
+        "I received your request. I will review the goal, package and date and get back to you personally with the next steps.",
+      bodyPartial:
+        "Your request is saved, but the admin notification did not reach every recipient. If you want to be fully safe, send a short message through the contact page as well.",
+      badgeSuccess: "Request received",
+      badgePartial: "Partially successful",
+      summaryOneLabel: "Reply time",
+      summaryOneValue: "Within 24 hours",
+      summaryOneCopy: "Most booking requests get a clear answer within one working day.",
+      summaryTwoLabel: "Next step",
+      summaryTwoValue: "Short alignment",
+      summaryTwoCopy: "We clarify mood, location and how the images need to work for you.",
+      summaryThreeLabel: "Delivery",
+      summaryThreeValue: "Online gallery",
+      summaryThreeCopy: "Your final images are delivered in a clean, private online gallery.",
+      sectionTitle: "What happens now?",
+      stepOneTitle: "I review your request",
+      stepOneCopy: "Package, date and goal tell me what the strongest direction will be.",
+      stepTwoTitle: "I get back to you",
+      stepTwoCopy: "We align location, mood and the key details properly.",
+      stepThreeTitle: "The shoot runs cleanly",
+      stepThreeCopy: "Once everything is clear, the process becomes calm, guided and efficient.",
+      actionPrimary: "View portfolio",
+      actionSecondary: "Write first",
+      actionPrimaryPartial: "Open contact",
+      actionSecondaryPartial: "View portfolio",
+      actionNoteSuccess: "If you want to refine anything in the meantime, you can always add a short note through the contact page.",
+      actionNotePartial: "The request is recorded, but the cleanest next step now is a short follow-up message through the contact page.",
+      nextHighlightSuccessTitle: "Recommended next step",
+      nextHighlightSuccessCopy: "If your visual direction is already roughly clear, open the portfolio once more and keep 2 to 3 references ready for the reply.",
+      nextHighlightPartialTitle: "Best step right now",
+      nextHighlightPartialCopy: "Open the contact page and send your name plus preferred date once more. That makes sure nothing gets stuck.",
+      infoDate: "Preferred date",
+      infoPackage: "Package",
+      infoEmail: "Reply goes to",
+      newsletterLabel: "Newsletter",
+      newsletterConfirmation:
+        "You also asked for newsletter updates. Confirm the signup through the email I just sent you.",
+      newsletterAlreadyConfirmed:
+        "This email address is already active on the newsletter. Free dates and new series will reach you there as well.",
+      newsletterSpamNote: "If you do not see the confirmation immediately, please check promotions or spam too."
+    },
+    contact: {
+      titleSuccess: "Your message is in. I take over the next step from here.",
+      bodySuccess:
+        "Thanks for reaching out. I will review what you need and come back with a clear, personal reply.",
+      badgeSuccess: "Message received",
+      summaryOneLabel: "Reply time",
+      summaryOneValue: "Usually within 24 hours",
+      summaryOneCopy: "You do not get a generic template, but a concrete reply based on your goal.",
+      summaryTwoLabel: "Focus area",
+      summaryTwoValue: "Vienna and surrounding area",
+      summaryTwoCopy: "That is where I work most often. For the right project, another location is possible too.",
+      summaryThreeLabel: "Next step",
+      summaryThreeValue: "Clarify direction",
+      summaryThreeCopy: "If needed, I will also help you quickly define package, visual direction and the cleanest next step.",
+      sectionTitle: "What makes sense to open now?",
+      stepOneTitle: "View pricing",
+      stepOneCopy: "If the package is still open, this is the quickest way to get clarity on the right starting point.",
+      stepTwoTitle: "View portfolio",
+      stepTwoCopy: "You can immediately see what visual quality and image direction to expect.",
+      stepThreeTitle: "Book a date",
+      stepThreeCopy: "If the goal is already clear, you can move straight into the booking request.",
+      actionPrimary: "Book a date",
+      actionSecondary: "View pricing",
+      actionNoteSuccess: "If the goal is already clear, the booking request is the strongest next step. If you are still weighing packages, open pricing first.",
+      nextHighlightSuccessTitle: "Recommended next step",
+      nextHighlightSuccessCopy: "If the direction and visual style are already roughly clear, the booking request will move things forward fastest."
+    }
   }
 };
 
@@ -153,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const shell = document.querySelector("[data-thanks-page]");
   if (!shell) return;
 
-  const lang = shell.dataset.lang === "hu" ? "hu" : "de";
+  const lang = ["hu", "de", "en"].includes(shell.dataset.lang) ? shell.dataset.lang : "de";
   const type = shell.dataset.thanksType === "contact" ? "contact" : "booking";
   const params = new URLSearchParams(window.location.search);
   const state = params.get("state") === "partial" ? "partial" : "success";
@@ -191,11 +265,15 @@ document.addEventListener("DOMContentLoaded", () => {
   actionSecondary.textContent = isPartialBooking ? (copy.actionSecondaryPartial || copy.actionSecondary) : copy.actionSecondary;
 
   const actionPrimaryHref = type === "booking"
-    ? (isPartialBooking ? (lang === "hu" ? "kapcsolat.html" : "kontakt.html") : "portfolio.html")
-    : (lang === "hu" ? "foglalas.html" : "termin.html");
+    ? (isPartialBooking
+        ? (lang === "hu" ? "kapcsolat.html" : lang === "en" ? "contact.html" : "kontakt.html")
+        : "portfolio.html")
+    : (lang === "hu" ? "foglalas.html" : lang === "en" ? "booking.html" : "termin.html");
   const actionSecondaryHref = type === "booking"
-    ? (isPartialBooking ? "portfolio.html" : (lang === "hu" ? "kapcsolat.html" : "kontakt.html"))
-    : (lang === "hu" ? "arak.html" : "preise.html");
+    ? (isPartialBooking
+        ? "portfolio.html"
+        : (lang === "hu" ? "kapcsolat.html" : lang === "en" ? "contact.html" : "kontakt.html"))
+    : (lang === "hu" ? "arak.html" : lang === "en" ? "pricing.html" : "preise.html");
 
   actionPrimary.href = actionPrimaryHref;
   actionSecondary.href = actionSecondaryHref;

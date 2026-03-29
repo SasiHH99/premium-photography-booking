@@ -1,4 +1,4 @@
-const GALLERY_LOGIN_COPY = {
+﻿const GALLERY_LOGIN_COPY = {
   hu: {
     heroTitle: "A galériád itt érhető el privát és kényelmes formában.",
     heroCopy: "A foglaláskor megadott emaillel és az általunk küldött jelszóval tudsz belépni. Itt tudod végignézni az összes átadott képet és kijelölni a kedvenceidet.",
@@ -26,7 +26,7 @@ const GALLERY_LOGIN_COPY = {
   de: {
     heroTitle: "Deine Galerie ist hier privat und direkt erreichbar.",
     heroCopy: "Melde dich mit der E-Mail-Adresse aus deiner Buchung und dem zugesendeten Passwort an. Danach kannst du alle Bilder ansehen und Favoriten markieren.",
-    cardTitle: "Login zur Online Galerie",
+    cardTitle: "Login zur Online-Galerie",
     cardCopy: "Nach dem Login landest du direkt in deiner privaten Galerie. Wenn du noch keinen Zugang erhalten hast, warte bitte auf unsere E-Mail zur Bildübergabe.",
     home: "Zur Startseite",
     email: "E-Mail",
@@ -46,6 +46,30 @@ const GALLERY_LOGIN_COPY = {
     invalidLogin: "Falsche E-Mail oder falsches Passwort.",
     unexpected: "Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen.",
     note: "Sobald deine Galerie bereit ist, senden wir dir die Zugangsdaten per E-Mail. Bitte melde dich mit derselben E-Mail-Adresse an, die du bei der Buchung verwendet hast."
+  },
+  en: {
+    heroTitle: "Your gallery is available here in a private, direct view.",
+    heroCopy: "Sign in with the email from your booking and the password we sent you. After that, you can review every delivered image and mark favorites.",
+    cardTitle: "Online gallery login",
+    cardCopy: "After login, your private gallery opens immediately. If you have not received access yet, wait for the handover email.",
+    home: "Back to home",
+    email: "Email",
+    password: "Password",
+    submit: "Log in",
+    loading: "Checking...",
+    forgot: "Forgot password",
+    forgotLoading: "Sending...",
+    forgotMissing: "Enter your email address to request a new password.",
+    forgotSuccess: "I sent you a password reset email. Open the link on the same device if possible.",
+    forgotTitle: "Request a new password",
+    forgotCopy: "Enter the email address used for your private gallery account. The system will send a link to set a new password.",
+    forgotSubmit: "Send password link",
+    forgotClose: "Close",
+    missingFields: "Please fill in every field.",
+    invalidEmail: "Please enter a valid email address.",
+    invalidLogin: "Incorrect email or password.",
+    unexpected: "An unexpected error occurred. Please try again.",
+    note: "As soon as your gallery is ready, we send the access details by email. Please sign in with the same email address you used for the booking."
   }
 };
 
@@ -53,14 +77,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const shell = document.querySelector("[data-gallery-login]");
   if (!shell) return;
 
-  const lang = shell.dataset.lang === "de" ? "de" : "hu";
+  const lang = ["hu", "de", "en"].includes(shell.dataset.lang) ? shell.dataset.lang : "de";
   const copy = GALLERY_LOGIN_COPY[lang];
-  const redirectUrl = lang === "de" ? "/de/galeria.html" : "/hu/galeria.html";
-  const homeUrl = lang === "de" ? "/de/index.html" : "/hu/index.html";
+  const redirectUrl = lang === "hu" ? "/hu/galeria.html" : lang === "en" ? "/en/gallery.html" : "/de/galeria.html";
+  const homeUrl = lang === "hu" ? "/hu/index.html" : lang === "en" ? "/en/index.html" : "/de/index.html";
   const siteOrigin = ["localhost", "127.0.0.1"].includes(window.location.hostname)
     ? "https://bphoto.at"
     : window.location.origin;
-  const resetUrl = `${siteOrigin}${lang === "de" ? "/de/galeria-jelszo.html" : "/hu/galeria-jelszo.html"}`;
+  const resetUrl = `${siteOrigin}${lang === "hu" ? "/hu/galeria-jelszo.html" : lang === "en" ? "/en/gallery-password.html" : "/de/galeria-jelszo.html"}`;
   const firstLoginResetUrl = `${resetUrl}?flow=first-login`;
   const supabase = window.supabaseClient;
   if (!supabase) return;

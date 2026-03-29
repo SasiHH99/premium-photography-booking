@@ -28,6 +28,21 @@
     errorText: "A megerősítést most nem sikerült befejezni. Próbáld meg később, vagy írj a kapcsolat oldalon.",
     primary: "Vissza a főoldalra",
     secondary: "Kapcsolat"
+  },
+  en: {
+    loadingEyebrow: "Newsletter confirmation",
+    loadingTitle: "Confirming your signup...",
+    loadingText: "One moment. I am checking your confirmation link.",
+    successTitle: "Subscription confirmed",
+    successText: "Thanks. You will now receive selected updates about free slots, new series and limited opportunities.",
+    alreadyTitle: "Already confirmed",
+    alreadyText: "This email address is already confirmed. Nothing else is needed.",
+    invalidTitle: "Link no longer valid",
+    invalidText: "The confirmation link is invalid or has expired. Start a new signup on the website.",
+    errorTitle: "Confirmation failed",
+    errorText: "The confirmation could not be completed right now. Please try again later or use the contact page.",
+    primary: "Back to home",
+    secondary: "Contact"
   }
 };
 
@@ -52,35 +67,45 @@ function renderConfirmationState(lang, state) {
     text.textContent = copy.successText;
     note.textContent = lang === "hu"
       ? "A következő fontos lépéshez bármikor visszatérhetsz az árakhoz vagy a foglaláshoz."
-      : "Wenn du den nächsten Schritt machen willst, kannst du direkt zu Preisen oder zur Anfrage weitergehen.";
+      : lang === "en"
+        ? "If you want to take the next step, you can go straight to pricing or booking from here."
+        : "Wenn du den nächsten Schritt machen willst, kannst du direkt zu Preisen oder zur Anfrage weitergehen.";
   } else if (state === "already") {
     status.textContent = "•";
     title.textContent = copy.alreadyTitle;
     text.textContent = copy.alreadyText;
     note.textContent = lang === "hu"
       ? "A feliratkozásod aktív maradt, ezért további teendő nincs."
-      : "Deine Anmeldung ist bereits aktiv. Es ist nichts weiter nötig.";
+      : lang === "en"
+        ? "Your subscription is already active. Nothing else needs to be done."
+        : "Deine Anmeldung ist bereits aktiv. Es ist nichts weiter nötig.";
   } else if (state === "invalid") {
     status.textContent = "!";
     title.textContent = copy.invalidTitle;
     text.textContent = copy.invalidText;
     note.textContent = lang === "hu"
       ? "A leggyorsabb megoldás, ha újra feliratkozol a főoldalon."
-      : "Am schnellsten ist es, wenn du dich auf der Startseite erneut einträgst.";
+      : lang === "en"
+        ? "The fastest solution is to sign up again on the homepage."
+        : "Am schnellsten ist es, wenn du dich auf der Startseite erneut einträgst.";
   } else if (state === "error") {
     status.textContent = "!";
     title.textContent = copy.errorTitle;
     text.textContent = copy.errorText;
     note.textContent = lang === "hu"
       ? "Ha a hiba később is megmarad, használd a kapcsolat oldalt."
-      : "Wenn der Fehler später weiter besteht, nutze bitte die Kontaktseite.";
+      : lang === "en"
+        ? "If the error remains later, please use the contact page."
+        : "Wenn der Fehler später weiter besteht, nutze bitte die Kontaktseite.";
   } else {
     status.textContent = "…";
     title.textContent = copy.loadingTitle;
     text.textContent = copy.loadingText;
     note.textContent = lang === "hu"
       ? "A megerősítés után csak válogatott, ritkább frissítéseket kapsz."
-      : "Nach der Bestätigung bekommst du nur kuratierte, seltene Updates.";
+      : lang === "en"
+        ? "After the confirmation, you will only receive curated, occasional updates."
+        : "Nach der Bestätigung bekommst du nur kuratierte, seltene Updates.";
   }
 
   primary.textContent = copy.primary;
@@ -92,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!root) return;
 
   const tracking = window.BPhotographyTracking;
-  const lang = root.dataset.lang === "hu" ? "hu" : "de";
+  const lang = ["hu", "de", "en"].includes(root.dataset.lang) ? root.dataset.lang : "de";
   renderConfirmationState(lang, "loading");
 
   const token = new URLSearchParams(window.location.search).get("token");

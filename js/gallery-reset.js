@@ -1,4 +1,4 @@
-const GALLERY_RESET_COPY = {
+﻿const GALLERY_RESET_COPY = {
   hu: {
     heroTitle: "Itt tudsz új jelszót beállítani a privát galériádhoz.",
     heroCopy: "Nyisd meg az emailben kapott linket ugyanazon az eszközön, majd állíts be egy új jelszót a galériádhoz.",
@@ -44,6 +44,29 @@ const GALLERY_RESET_COPY = {
     invalid: "Der Link zum Zurücksetzen ist abgelaufen oder ungültig. Bitte fordere auf der Login-Seite eine neue E-Mail an.",
     unexpected: "Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen.",
     backToLogin: "Zurück zum Galerie-Login"
+  },
+  en: {
+    heroTitle: "Set a new password for your private gallery here.",
+    heroCopy: "Open the link from the email on the same device if possible, then choose a new password for your gallery.",
+    cardTitle: "Set a new password",
+    cardCopy: "After saving it, you can go straight back to the gallery login.",
+    forceHeroTitle: "Set your own password on the first login.",
+    forceHeroCopy: "The generated password is only meant for the first login. Before continuing, choose a personal password that is easier to use.",
+    forceCardTitle: "Set your own password",
+    forceCardCopy: "After this, you will sign in to the private gallery with your own password only.",
+    home: "Back to home",
+    password: "New password",
+    passwordAgain: "Repeat new password",
+    submit: "Save password",
+    loading: "Saving...",
+    missing: "Please fill in both password fields.",
+    short: "The password must be at least 8 characters long.",
+    mismatch: "The two passwords do not match.",
+    success: "Your new password has been saved. You can log in again now.",
+    forceSuccess: "Your own password has been saved. Opening the gallery now.",
+    invalid: "The reset link is invalid or has expired. Request a new email from the gallery login page.",
+    unexpected: "An unexpected error occurred. Please try again.",
+    backToLogin: "Back to gallery login"
   }
 };
 
@@ -51,11 +74,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const shell = document.querySelector("[data-gallery-reset]");
   if (!shell) return;
 
-  const lang = shell.dataset.lang === "de" ? "de" : "hu";
+  const lang = ["hu", "de", "en"].includes(shell.dataset.lang) ? shell.dataset.lang : "de";
   const copy = GALLERY_RESET_COPY[lang];
-  const loginUrl = lang === "de" ? "/de/galeria-login.html" : "/hu/galeria-login.html";
-  const galleryUrl = lang === "de" ? "/de/galeria.html" : "/hu/galeria.html";
-  const homeUrl = lang === "de" ? "/de/index.html" : "/hu/index.html";
+  const loginUrl = lang === "hu" ? "/hu/galeria-login.html" : lang === "en" ? "/en/gallery-login.html" : "/de/galeria-login.html";
+  const galleryUrl = lang === "hu" ? "/hu/galeria.html" : lang === "en" ? "/en/gallery.html" : "/de/galeria.html";
+  const homeUrl = lang === "hu" ? "/hu/index.html" : lang === "en" ? "/en/index.html" : "/de/index.html";
   const supabase = window.supabaseClient;
   if (!supabase) return;
 

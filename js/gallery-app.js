@@ -1,6 +1,6 @@
-const GALLERY_COPY = {
+﻿const GALLERY_COPY = {
   hu: {
-    heroTitle: "A te képanyagodhoz szabott online galéria.",
+    heroTitle: "A te képanyagodra szabott online galéria.",
     heroCopy:
       "Válogasd át kényelmesen a fotókat, jelöld a kedvenceidet, és nézd meg teljes méretben az összes képet egy letisztult, gyors felületen.",
     totalLabel: "Összes kép",
@@ -52,6 +52,33 @@ const GALLERY_COPY = {
     next: "Weiter",
     download: "Download",
     pageTitle: "Online-Galerie"
+  },
+  en: {
+    heroTitle: "Your online gallery, organised for a clean and easy selection.",
+    heroCopy:
+      "Review every image in full size, mark favorites and move through your selection in a fast, uncluttered space.",
+    totalLabel: "Images total",
+    favoriteLabel: "Favorites",
+    selectionLabel: "Current view",
+    toolbarLabel: "Filter",
+    allImages: "All images",
+    onlyFavorites: "Favorites only",
+    countSuffix: "images",
+    open: "Open",
+    favorite: "Favorite",
+    unfavorite: "Remove favorite",
+    emptyTitle: "No images uploaded yet.",
+    emptyCopy:
+      "As soon as the gallery is ready, every delivered image will appear here. If you already received the email but the gallery is empty, try reloading later.",
+    errorCopy: "The gallery could not be loaded right now. Please try again in a few minutes.",
+    preview: "Preview",
+    logout: "Log out",
+    refresh: "Refresh",
+    close: "Close",
+    previous: "Previous",
+    next: "Next",
+    download: "Download",
+    pageTitle: "Online gallery"
   }
 };
 
@@ -68,9 +95,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const shell = document.querySelector("[data-gallery-app]");
   if (!shell) return;
 
-  const lang = shell.dataset.lang === "de" ? "de" : "hu";
+  const lang = ["hu", "de", "en"].includes(shell.dataset.lang) ? shell.dataset.lang : "de";
   const copy = GALLERY_COPY[lang];
-  const loginUrl = lang === "de" ? "/de/galeria-login.html" : "/hu/galeria-login.html";
+  const loginUrl = lang === "hu" ? "/hu/galeria-login.html" : lang === "en" ? "/en/gallery-login.html" : "/de/galeria-login.html";
   const supabase = window.supabaseClient;
   if (!supabase) return;
 

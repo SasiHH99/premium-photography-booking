@@ -19,7 +19,8 @@
   const successNote = successBox?.querySelector(".success-note");
   const successNextCopy = document.getElementById("bookingSuccessNextCopy");
 
-  const lang = window.location.pathname.startsWith("/hu") ? "hu" : "de";
+  const path = window.location.pathname;
+  const lang = path.startsWith("/hu") ? "hu" : path.startsWith("/en") ? "en" : "de";
 
   const TEXT = {
     hu: {
@@ -51,6 +52,21 @@
         "Deine Buchungsanfrage wurde gespeichert, aber die Admin-Benachrichtigung konnte nicht an alle Empfänger zugestellt werden.",
       partialNote: "Wenn du sicher gehen willst, schreib zusätzlich über die Kontaktseite.",
       partialNext: "Die nächsten Schritte kannst du trotzdem schon vorbereiten und bei Bedarf noch kurz ergänzen."
+    },
+    en: {
+      packagePlaceholder: "After choosing a package, you will see a short note here about what it fits best.",
+      invalidDate: "Please choose a date that is at least two days in the future.",
+      dateEmpty: "No date selected yet.",
+      datePrefix: "Selected date:",
+      successTitle: "Request sent",
+      successText: "Your booking request is in. I will get back to you with the next steps shortly.",
+      successNote: "I usually reply within 24 hours.",
+      successNext: "You can review the portfolio in the meantime, or write if you want to add more details.",
+      partialTitle: "Request saved",
+      partialText:
+        "Your booking request was saved, but the admin notification could not be delivered to every recipient. Your request itself is still recorded.",
+      partialNote: "If you want to be safe, send a short message through the contact page as well.",
+      partialNext: "You can still review the next steps now and add a short follow-up message if needed."
     }
   };
 
@@ -78,10 +94,22 @@
         "Kein starres Paket, sondern ein individuelles Angebot für Event, Firmenanfrage oder besonderes Projekt.",
       Custom:
         "Wenn du noch unsicher bist, beschreibe einfach dein Ziel und ich helfe dir bei der passenden Wahl."
+    },
+    en: {
+      Essence:
+        "A compact, clean shoot for a short portrait or couple series when you want strong, usable images without a long production.",
+      Signature:
+        "The strongest balanced package if you want more variety, more than one look or material that works across multiple uses.",
+      Prestige:
+        "More time, stronger creative direction and more image depth for branding, campaigns or a premium visual presence.",
+      Event:
+        "Not a fixed box package, but a custom quote for events, business coverage or a more individual project.",
+      Custom:
+        "If you are not sure yet which direction fits best, describe the goal and I will help you choose the right package."
     }
   };
 
-  const dateFormatter = new Intl.DateTimeFormat(lang === "hu" ? "hu-HU" : "de-DE", {
+  const dateFormatter = new Intl.DateTimeFormat(lang === "hu" ? "hu-HU" : lang === "en" ? "en-GB" : "de-DE", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -186,7 +214,7 @@
   }
 
   function redirectToThanks(kind, payload, newsletterState = "") {
-    const page = lang === "hu" ? "koszonjuk-foglalas.html" : "danke-termin.html";
+    const page = lang === "hu" ? "koszonjuk-foglalas.html" : lang === "en" ? "thank-you-booking.html" : "danke-termin.html";
     const formattedDate = payload.booking_date
       ? dateFormatter.format(new Date(`${payload.booking_date}T12:00:00`))
       : "";

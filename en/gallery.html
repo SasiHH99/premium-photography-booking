@@ -1,26 +1,25 @@
-<!DOCTYPE html>
-<html lang="de">
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18017270066"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18017270066');
-</script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18017270066"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18017270066');
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" sizes="192x192" href="/images/pwa/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/images/pwa/icon-512.png">
-<link rel="apple-touch-icon" href="/images/pwa/apple-touch-icon.png">
-  <title>Online Galerie | B. Photography</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/pwa/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/images/pwa/icon-512.png">
+  <link rel="apple-touch-icon" href="/images/pwa/apple-touch-icon.png">
+  <title>Online Gallery | B. Photography</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/global.css">
   <link rel="stylesheet" href="../css/gallery.css">
 </head>
-<body class="gallery-page" data-gallery-app data-lang="de">
+<body class="gallery-page" data-gallery-app data-lang="en">
   <div id="site-header"></div>
 
   <main class="gallery-shell">
@@ -64,20 +63,16 @@
           <button type="button" class="gallery-filter-btn" id="galleryFilterFavorites"></button>
         </div>
 
-        <div class="gallery-count" id="galleryCount">0 Bilder</div>
+        <div class="gallery-count" id="galleryCount">0 images</div>
       </div>
 
       <div class="gallery-state" id="galleryEmpty" hidden>
-        <h2 class="gallery-empty-title">Noch keine Bilder verfugbar.</h2>
-        <p class="gallery-empty-copy">
-          Sobald die Galerie fertig ist, erscheinen hier alle Bilder.
-        </p>
+        <h2 class="gallery-empty-title">No images available yet.</h2>
+        <p class="gallery-empty-copy">Once the gallery is ready, all final images will appear here.</p>
       </div>
 
       <div class="gallery-state" id="galleryError" hidden>
-        <p class="gallery-error-copy">
-          Die Galerie konnte gerade nicht geladen werden. Bitte versuche es spater erneut.
-        </p>
+        <p class="gallery-error-copy">The gallery could not be loaded right now. Please try again in a moment.</p>
       </div>
 
       <div class="gallery-grid" id="galleryGrid"></div>
@@ -97,7 +92,7 @@
       </div>
 
       <div class="gallery-lightbox-frame">
-        <img id="lightboxImage" alt="Galeriebild">
+        <img id="lightboxImage" alt="Gallery image">
       </div>
     </div>
   </div>

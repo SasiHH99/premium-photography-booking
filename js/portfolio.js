@@ -92,6 +92,53 @@
       autos: "Auto Shooting Detail: {title}",
       "ejszakai-kreativ": "Kreatives Nachtshooting: {title}"
     }
+  },
+  en: {
+    heroTitle: "Work with visual weight, not generic content.",
+    heroCopy: "Portrait, couple, city, family and creative series in Vienna and the surrounding area with real light and a calm, premium visual direction.",
+    allLabel: "All categories",
+    totalLabel: "Curated images",
+    activeLabel: "Active view",
+    visibleLabel(count) {
+      return `${count} images visible`;
+    },
+    activeFilterLabel(label) {
+      return `Active filter: ${label}`;
+    },
+    ctaTitle: "If you want the same visual quality for your own shoot, this is the right next step.",
+    ctaCopy: "We define the goal, mood and location first, then lock in the strongest package and the cleanest shooting flow.",
+    ctaButton: "Book a shoot",
+    open: "Open",
+    empty: "There are no visible images in this category right now.",
+    lightboxSeparator: " | ",
+    categories: {
+      all: "All",
+      termeszet: "Nature",
+      varos: "City",
+      portre: "Portrait",
+      paros: "Couple",
+      baba: "Baby / Family",
+      autos: "Cars",
+      "ejszakai-kreativ": "Night / Creative"
+    },
+    categoryNotes: {
+      termeszet: "Soft light and a calm outdoor mood",
+      varos: "Urban rhythm and real surroundings",
+      portre: "Clear, direct, present",
+      paros: "Connection, chemistry, real moments",
+      baba: "Warm, quiet and natural",
+      autos: "Lines, light, presence",
+      "ejszakai-kreativ": "Mood, contrast, character"
+    },
+    altTemplates: {
+      termeszet: "Nature photoshoot near Vienna: {title}",
+      varos: "City photoshoot in Vienna: {title}",
+      portre: "Portrait photoshoot in Vienna: {title}",
+      paros: "Couple photoshoot in Vienna: {title}",
+      baba: "Baby and family photoshoot: {title}",
+      autos: "Car photoshoot detail: {title}",
+      "ejszakai-kreativ": "Creative night shoot: {title}"
+    }
   }
 };
 
@@ -124,9 +171,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const shell = document.querySelector("[data-portfolio-app]");
   if (!shell) return;
 
-  const lang = shell.dataset.lang === "de" ? "de" : "hu";
+  const lang = ["hu", "de", "en"].includes(shell.dataset.lang) ? shell.dataset.lang : "de";
   const copy = PORTFOLIO_TEXT[lang];
-  const bookingUrl = lang === "de" ? "termin.html" : "foglalas.html";
+  const bookingUrl = lang === "hu" ? "foglalas.html" : lang === "en" ? "booking.html" : "termin.html";
   const heroTitle = document.getElementById("portfolioHeroTitle");
   const heroCopy = document.getElementById("portfolioHeroCopy");
   const totalLabel = document.getElementById("portfolioTotalLabel");
