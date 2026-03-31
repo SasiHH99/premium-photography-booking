@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -102,6 +102,11 @@
             <div class="booking-field is-full"><div class="booking-date-display" id="bookingDateDisplay" aria-live="polite">No date selected yet.</div></div>
             <label class="booking-field"><span class="booking-field-label">Name</span><input type="text" name="name" required></label>
             <label class="booking-field"><span class="booking-field-label">Email</span><input type="email" name="email" required><small class="form-hint">This is the address I use for the personal reply.</small></label>
+            <label class="booking-field"><span class="booking-field-label">Project type</span><select name="project_type" id="projectType"><option value="">Choose type</option><option value="portrait">Portrait</option><option value="couple">Couple</option><option value="family">Family</option><option value="automotive">Automotive</option><option value="branding">Branding</option><option value="drone">Drone / aerial</option><option value="real_estate">Real estate</option><option value="hospitality">Hotel / hospitality</option><option value="event">Event</option><option value="other">Other</option></select></label>
+            <label class="booking-field"><span class="booking-field-label">Location</span><input type="text" name="project_location" id="projectLocation" placeholder="e.g. Vienna 1010 or a specific address"></label>
+            <label class="booking-field"><span class="booking-field-label">Private or commercial?</span><select name="project_scope" id="projectScope"><option value="">Choose scope</option><option value="private">Private project</option><option value="commercial">Commercial project</option><option value="mixed">Still deciding</option></select></label>
+            <label class="booking-field"><span class="booking-field-label">What is the content for?</span><select name="content_use" id="contentUse"><option value="">Choose use</option><option value="social">Social media</option><option value="website">Website</option><option value="campaign">Campaign / ads</option><option value="real_estate">Real estate / presentation</option><option value="hotel">Hotel / hospitality</option><option value="personal">Personal use</option><option value="other">Other</option></select></label>
+            <label class="booking-field is-full"><span class="booking-field-label">Permission-sensitive location?</span><select name="sensitive_location" id="sensitiveLocation"><option value="">Not sure yet</option><option value="no">No, standard location</option><option value="yes">Yes, please review in advance</option><option value="unsure">Not sure, please advise</option></select><small class="form-hint">Especially useful for drone-based projects or restricted areas.</small></label>
             <label class="booking-field is-full"><span class="booking-field-label">Message</span><textarea name="message" placeholder="Describe the shoot you want, the mood you are after and what you need the images for."></textarea></label>
             <div class="booking-field is-full"><div class="consent-stack"><div class="gdpr-row"><label class="gdpr-checkbox"><input type="checkbox" id="gdpr" required><span class="checkmark"></span><span class="gdpr-text">I accept the <a href="privacy.html" target="_blank" rel="noopener noreferrer">privacy policy</a>.</span></label></div><div class="gdpr-row is-optional"><label class="gdpr-checkbox"><input type="checkbox" id="newsletterOptin"><span class="checkmark"></span><span class="gdpr-text">I want updates about free dates, new series and limited shooting slots.<small class="consent-helper">You will still confirm the sign-up once by email afterwards.</small></span></label></div></div></div>
             <div class="booking-field is-full"><button type="submit" class="cta-btn" id="bookingSubmit" disabled>Send enquiry</button></div>
@@ -133,3 +138,5 @@
   <script src="../js/foglalas.js"></script>
 </body>
 </html>
+
+

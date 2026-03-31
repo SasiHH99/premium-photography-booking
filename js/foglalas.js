@@ -8,6 +8,11 @@
   const newsletterCheck = document.getElementById("newsletterOptin");
   const submitButton = document.getElementById("bookingSubmit");
   const packageSelect = document.getElementById("packageSelect");
+  const projectTypeInput = form.elements["project_type"];
+  const projectLocationInput = form.elements["project_location"];
+  const projectScopeInput = form.elements["project_scope"];
+  const contentUseInput = form.elements["content_use"];
+  const sensitiveLocationInput = form.elements["sensitive_location"];
   const packageInfo = document.getElementById("packageInfo");
   const dateDisplay = document.getElementById("bookingDateDisplay");
   const successBox = document.getElementById("bookingSuccess");
@@ -21,6 +26,7 @@
 
   const path = window.location.pathname;
   const lang = path.startsWith("/hu") ? "hu" : path.startsWith("/en") ? "en" : "de";
+  const params = new URLSearchParams(window.location.search);
 
   const TEXT = {
     hu: {
@@ -257,6 +263,13 @@
   dateInput.min = formatIsoDate(minDate);
   updatePackageInfo();
   updateDateDisplay();
+  if (params.get("project") === "drone" && projectTypeInput) {
+    projectTypeInput.value = "drone";
+    if (!packageSelect.value) {
+      packageSelect.value = "Custom";
+      updatePackageInfo();
+    }
+  }
   updateSubmitState();
 
   gdprCheck.addEventListener("change", updateSubmitState);
@@ -284,6 +297,11 @@
         name: form.name.value.trim(),
         email: form.email.value.trim(),
         package: form.package.value,
+        project_type: projectTypeInput?.value?.trim() || "",
+        project_location: projectLocationInput?.value?.trim() || "",
+        project_scope: projectScopeInput?.value?.trim() || "",
+        content_use: contentUseInput?.value?.trim() || "",
+        sensitive_location: sensitiveLocationInput?.value?.trim() || "",
         message: form.message.value.trim(),
         status: "pending",
         lang

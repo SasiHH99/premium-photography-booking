@@ -165,6 +165,63 @@
               <small class="form-hint">An diese Adresse sende ich dir die Rückmeldung.</small>
             </label>
 
+            <label class="booking-field">
+              <span class="booking-field-label">Projektart</span>
+              <select name="project_type" id="projectType">
+                <option value="">Bitte auswählen</option>
+                <option value="portrait">Portrait</option>
+                <option value="couple">Paar</option>
+                <option value="family">Familie</option>
+                <option value="automotive">Automotive</option>
+                <option value="branding">Branding</option>
+                <option value="drone">Drohne / Aerial</option>
+                <option value="real_estate">Immobilie</option>
+                <option value="hospitality">Hotel / Hospitality</option>
+                <option value="event">Event</option>
+                <option value="other">Sonstiges</option>
+              </select>
+            </label>
+
+            <label class="booking-field">
+              <span class="booking-field-label">Ort / Location</span>
+              <input type="text" name="project_location" id="projectLocation" placeholder="z. B. Wien 1010 oder eine konkrete Adresse">
+            </label>
+
+            <label class="booking-field">
+              <span class="booking-field-label">Privat oder kommerziell?</span>
+              <select name="project_scope" id="projectScope">
+                <option value="">Bitte auswählen</option>
+                <option value="private">Privates Projekt</option>
+                <option value="commercial">Kommerzielles Projekt</option>
+                <option value="mixed">Noch offen / gemischt</option>
+              </select>
+            </label>
+
+            <label class="booking-field">
+              <span class="booking-field-label">Wofür ist das Material gedacht?</span>
+              <select name="content_use" id="contentUse">
+                <option value="">Bitte auswählen</option>
+                <option value="social">Social Media</option>
+                <option value="website">Website</option>
+                <option value="campaign">Kampagne / Anzeige</option>
+                <option value="real_estate">Immobilie / Exposé</option>
+                <option value="hotel">Hotel / Hospitality</option>
+                <option value="personal">Privat / Erinnerung</option>
+                <option value="other">Sonstiges</option>
+              </select>
+            </label>
+
+            <label class="booking-field is-full">
+              <span class="booking-field-label">Genehmigungssensible Location?</span>
+              <select name="sensitive_location" id="sensitiveLocation">
+                <option value="">Noch nicht sicher</option>
+                <option value="no">Nein, normale Location</option>
+                <option value="yes">Ja, bitte vorab prüfen</option>
+                <option value="unsure">Unklar, bitte gemeinsam einschätzen</option>
+              </select>
+              <small class="form-hint">Vor allem bei Drohnenprojekten hilft diese Info für eine saubere Vorprüfung.</small>
+            </label>
+
             <label class="booking-field is-full">
               <span class="booking-field-label">Nachricht</span>
               <textarea name="message" placeholder="Beschreibe kurz, welches Shooting du willst, welche Stimmung du suchst und wofür du die Bilder einsetzen willst."></textarea>

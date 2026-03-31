@@ -1,4 +1,4 @@
-import {
+﻿import {
   CORS_HEADERS,
   json,
   normalizeEmail,
@@ -10,6 +10,10 @@ import {
   createInfoTable,
   createNoteBlock
 } from "./_admin.js";
+
+function normalizeLang(value = "") {
+  return value === "hu" || value === "en" ? value : "de";
+}
 
 function getBookingMailConfig() {
   const from =
@@ -27,47 +31,230 @@ function getBookingMailConfig() {
   return { from, adminRecipients };
 }
 
-function createAdminMailHtml({ heading, intro, name, email, bookingDate, packageName, message }) {
+const COPY = {
+  hu: {
+    adminHeading: "Új foglalási kérés",
+    adminIntro: "Új foglalási kérés érkezett a weboldalról.",
+    clientSubject: "Megérkezett a foglalási kérésed - B. Photography",
+    clientHeading: "Megérkezett a foglalási kérésed",
+    clientIntro: (name) => `Szia ${name}! Megkaptam a foglalási kérésedet. Átnézem a részleteket, és általában 24 órán belül visszajelzek.`,
+    nextLabel: "Mi következik?",
+    nextBody:
+      "Egyeztetjük a pontos irányt, a helyszínt és a részleteket, hogy a fotózás valóban hozzád illő és jól előkészített legyen.",
+    ctaText: "Kapcsolat oldal",
+    ctaUrl: "https://bphoto.at/hu/kapcsolat.html",
+    footerNote: "Ha időközben pontosítanál valamit, nyugodtan válaszolj erre az e-mailre.",
+    labels: {
+      name: "Név",
+      email: "Email",
+      bookingDate: "Dátum",
+      packageName: "Csomag",
+      projectType: "Projekt típusa",
+      projectLocation: "Helyszín",
+      projectScope: "Projekt jellege",
+      contentUse: "Felhasználás",
+      sensitiveLocation: "Érzékeny / engedélyköteles helyszín",
+      message: "Üzenet"
+    },
+    projectType: {
+      portrait: "Portré",
+      couple: "Páros",
+      family: "Családi",
+      automotive: "Autós",
+      branding: "Branding",
+      drone: "Drón / légi anyag",
+      real_estate: "Ingatlan",
+      hospitality: "Hotel / hospitality",
+      event: "Esemény",
+      other: "Egyéb"
+    },
+    projectScope: {
+      private: "Privát projekt",
+      commercial: "Üzleti / kereskedelmi projekt",
+      mixed: "Még nem eldöntött"
+    },
+    contentUse: {
+      social: "Social media",
+      website: "Weboldal",
+      campaign: "Kampány / hirdetés",
+      real_estate: "Ingatlan / bemutató",
+      hotel: "Hotel / hospitality",
+      personal: "Privát használat",
+      other: "Egyéb"
+    },
+    sensitiveLocation: {
+      no: "Nem, normál helyszín",
+      yes: "Igen, előzetes ellenőrzés kell",
+      unsure: "Még bizonytalan"
+    }
+  },
+  de: {
+    adminHeading: "Neue Buchungsanfrage",
+    adminIntro: "Es ist eine neue Buchungsanfrage über die Website eingegangen.",
+    clientSubject: "Deine Buchungsanfrage ist eingegangen - B. Photography",
+    clientHeading: "Deine Buchungsanfrage ist eingegangen",
+    clientIntro: (name) => `Hallo ${name}! Deine Buchungsanfrage ist angekommen. Ich prüfe jetzt die Details und melde mich in der Regel innerhalb von 24 Stunden persönlich zurück.`,
+    nextLabel: "Wie geht es weiter?",
+    nextBody:
+      "Als Nächstes stimmen wir Richtung, Location und Details ab, damit das Shooting wirklich zu dir passt und sauber vorbereitet ist.",
+    ctaText: "Kontaktseite",
+    ctaUrl: "https://bphoto.at/de/kontakt.html",
+    footerNote: "Wenn du in der Zwischenzeit etwas ergänzen möchtest, antworte einfach auf diese E-Mail.",
+    labels: {
+      name: "Name",
+      email: "E-Mail",
+      bookingDate: "Datum",
+      packageName: "Paket",
+      projectType: "Projektart",
+      projectLocation: "Location",
+      projectScope: "Projektumfang",
+      contentUse: "Verwendungszweck",
+      sensitiveLocation: "Genehmigungssensible Location",
+      message: "Nachricht"
+    },
+    projectType: {
+      portrait: "Portrait",
+      couple: "Paar",
+      family: "Familie",
+      automotive: "Automotive",
+      branding: "Branding",
+      drone: "Drohne / Aerial",
+      real_estate: "Immobilie",
+      hospitality: "Hotel / Hospitality",
+      event: "Event",
+      other: "Sonstiges"
+    },
+    projectScope: {
+      private: "Privates Projekt",
+      commercial: "Kommerzielles Projekt",
+      mixed: "Noch offen / gemischt"
+    },
+    contentUse: {
+      social: "Social Media",
+      website: "Website",
+      campaign: "Kampagne / Anzeige",
+      real_estate: "Immobilie / Exposé",
+      hotel: "Hotel / Hospitality",
+      personal: "Privat / Erinnerung",
+      other: "Sonstiges"
+    },
+    sensitiveLocation: {
+      no: "Nein, normale Location",
+      yes: "Ja, bitte vorab prüfen",
+      unsure: "Noch nicht sicher"
+    }
+  },
+  en: {
+    adminHeading: "New booking request",
+    adminIntro: "A new booking request came in through the website.",
+    clientSubject: "Your booking request is in - B. Photography",
+    clientHeading: "Your booking request is in",
+    clientIntro: (name) => `Hi ${name}! Your booking request came through. I will review the details and usually reply within 24 hours.`,
+    nextLabel: "What happens next?",
+    nextBody:
+      "Next we align the direction, location and details so the shoot is genuinely tailored and properly prepared.",
+    ctaText: "Contact page",
+    ctaUrl: "https://bphoto.at/en/contact.html",
+    footerNote: "If you want to add anything in the meantime, just reply to this email.",
+    labels: {
+      name: "Name",
+      email: "Email",
+      bookingDate: "Date",
+      packageName: "Package",
+      projectType: "Project type",
+      projectLocation: "Location",
+      projectScope: "Project scope",
+      contentUse: "Intended use",
+      sensitiveLocation: "Sensitive / permission-based location",
+      message: "Message"
+    },
+    projectType: {
+      portrait: "Portrait",
+      couple: "Couple",
+      family: "Family",
+      automotive: "Automotive",
+      branding: "Branding",
+      drone: "Drone / aerial",
+      real_estate: "Real estate",
+      hospitality: "Hotel / hospitality",
+      event: "Event",
+      other: "Other"
+    },
+    projectScope: {
+      private: "Private project",
+      commercial: "Commercial project",
+      mixed: "Still open / mixed"
+    },
+    contentUse: {
+      social: "Social media",
+      website: "Website",
+      campaign: "Campaign / ads",
+      real_estate: "Real estate / listing",
+      hotel: "Hotel / hospitality",
+      personal: "Personal use",
+      other: "Other"
+    },
+    sensitiveLocation: {
+      no: "No, standard location",
+      yes: "Yes, please review in advance",
+      unsure: "Not sure yet"
+    }
+  }
+};
+
+function resolveMappedValue(copy, group, value) {
+  if (!value) return "-";
+  return copy[group]?.[value] || value;
+}
+
+function buildStoredMessage({ copy, message, projectType, projectLocation, projectScope, contentUse, sensitiveLocation }) {
+  const lines = [
+    `${copy.labels.projectType}: ${resolveMappedValue(copy, "projectType", projectType)}`,
+    `${copy.labels.projectLocation}: ${projectLocation || "-"}`,
+    `${copy.labels.projectScope}: ${resolveMappedValue(copy, "projectScope", projectScope)}`,
+    `${copy.labels.contentUse}: ${resolveMappedValue(copy, "contentUse", contentUse)}`,
+    `${copy.labels.sensitiveLocation}: ${resolveMappedValue(copy, "sensitiveLocation", sensitiveLocation)}`
+  ];
+
+  return [message, "", lines.join("\n")].filter(Boolean).join("\n");
+}
+
+function createAdminMailHtml({ copy, name, email, bookingDate, packageName, projectType, projectLocation, projectScope, contentUse, sensitiveLocation, message }) {
   return createMailLayout({
-    heading,
-    intro,
+    heading: copy.adminHeading,
+    intro: copy.adminIntro,
     sections: `
       ${createInfoTable([
-        { label: "Név / Name", value: name },
-        { label: "Email", value: email },
-        { label: "Dátum / Datum", value: bookingDate },
-        { label: "Csomag / Paket", value: packageName }
+        { label: copy.labels.name, value: name },
+        { label: copy.labels.email, value: email },
+        { label: copy.labels.bookingDate, value: bookingDate },
+        { label: copy.labels.packageName, value: packageName },
+        { label: copy.labels.projectType, value: resolveMappedValue(copy, "projectType", projectType) },
+        { label: copy.labels.projectLocation, value: projectLocation || "-" },
+        { label: copy.labels.projectScope, value: resolveMappedValue(copy, "projectScope", projectScope) },
+        { label: copy.labels.contentUse, value: resolveMappedValue(copy, "contentUse", contentUse) },
+        { label: copy.labels.sensitiveLocation, value: resolveMappedValue(copy, "sensitiveLocation", sensitiveLocation) }
       ])}
-      ${createNoteBlock("Üzenet / Nachricht", message || "-")}
+      ${createNoteBlock(copy.labels.message, message || "-")}
     `
   });
 }
 
-function createClientMailHtml({ lang, name, bookingDate, packageName }) {
-  const isHu = lang === "hu";
-
+function createClientMailHtml({ copy, name, bookingDate, packageName, projectType }) {
   return createMailLayout({
-    heading: isHu ? "Megérkezett a foglalási kérésed" : "Deine Buchungsanfrage ist eingegangen",
-    intro: isHu
-      ? `Szia ${name}! Megkaptam a foglalási kérésedet. Átnézem a részleteket, és általában 24 órán belül visszajelzek.`
-      : `Hallo ${name}! Deine Buchungsanfrage ist angekommen. Ich prüfe jetzt die Details und melde mich in der Regel innerhalb von 24 Stunden persönlich zurück.`,
+    heading: copy.clientHeading,
+    intro: copy.clientIntro(name),
     sections: `
       ${createInfoTable([
-        { label: isHu ? "Dátum" : "Datum", value: bookingDate },
-        { label: isHu ? "Csomag" : "Paket", value: packageName }
+        { label: copy.labels.bookingDate, value: bookingDate },
+        { label: copy.labels.packageName, value: packageName },
+        { label: copy.labels.projectType, value: resolveMappedValue(copy, "projectType", projectType) }
       ])}
-      ${createNoteBlock(
-        isHu ? "Mi következik?" : "Wie geht es weiter?",
-        isHu
-          ? "Egyeztetjük a pontos irányt, a helyszínt és a részleteket, hogy a fotózás valóban hozzád illő és jól előkészített legyen."
-          : "Als Nächstes stimmen wir Richtung, Location und Details ab, damit das Shooting wirklich zu dir passt und sauber vorbereitet ist."
-      )}
+      ${createNoteBlock(copy.nextLabel, copy.nextBody)}
     `,
-    ctaText: isHu ? "Kapcsolat oldal" : "Kontaktseite",
-    ctaUrl: isHu ? "https://bphoto.at/hu/kapcsolat.html" : "https://bphoto.at/de/kontakt.html",
-    footerNote: isHu
-      ? "Ha időközben pontosítanál valamit, nyugodtan válaszolj erre az e-mailre."
-      : "Wenn du in der Zwischenzeit etwas ergänzen möchtest, antworte einfach auf diese E-Mail."
+    ctaText: copy.ctaText,
+    ctaUrl: copy.ctaUrl,
+    footerNote: copy.footerNote
   });
 }
 
@@ -112,12 +299,19 @@ export const handler = async (event) => {
 
   try {
     const data = JSON.parse(event.body || "{}");
-    const lang = data.lang === "hu" ? "hu" : "de";
+    const lang = normalizeLang(data.lang);
+    const copy = COPY[lang];
+
     const bookingDate = String(data.booking_date || "").trim();
     const name = String(data.name || "").trim();
     const email = normalizeEmail(data.email || "");
     const packageName = String(data.package || "").trim();
     const message = String(data.message || "").trim();
+    const projectType = String(data.project_type || "").trim();
+    const projectLocation = String(data.project_location || "").trim();
+    const projectScope = String(data.project_scope || "").trim();
+    const contentUse = String(data.content_use || "").trim();
+    const sensitiveLocation = String(data.sensitive_location || "").trim();
 
     if (!bookingDate || !name || !email || !packageName) {
       return json(400, { error: "Missing required fields" });
@@ -127,11 +321,15 @@ export const handler = async (event) => {
       return json(400, { error: "Invalid email format" });
     }
 
-    const adminHeading = lang === "hu" ? "Új foglalási kérés" : "Neue Buchungsanfrage";
-    const adminIntro =
-      lang === "hu"
-        ? "Érkezett egy új foglalási kérés a weboldalról."
-        : "Es ist eine neue Buchungsanfrage über die Website eingegangen.";
+    const messageForStorage = buildStoredMessage({
+      copy,
+      message,
+      projectType,
+      projectLocation,
+      projectScope,
+      contentUse,
+      sensitiveLocation
+    });
 
     const { data: insertedBooking, error: insertError } = await supabase
       .from("bookings_v2")
@@ -140,7 +338,7 @@ export const handler = async (event) => {
         name,
         email,
         package: packageName,
-        message,
+        message: messageForStorage,
         status: "pending",
         lang
       })
@@ -152,12 +350,16 @@ export const handler = async (event) => {
     }
 
     const adminHtml = createAdminMailHtml({
-      heading: adminHeading,
-      intro: adminIntro,
+      copy,
       name,
       email,
       bookingDate,
       packageName,
+      projectType,
+      projectLocation,
+      projectScope,
+      contentUse,
+      sensitiveLocation,
       message
     });
 
@@ -165,7 +367,7 @@ export const handler = async (event) => {
       from,
       replyTo: email,
       recipients: adminRecipients,
-      subject: `${adminHeading} - ${name}`,
+      subject: `${copy.adminHeading} - ${name}`,
       html: adminHtml
     });
 
@@ -175,15 +377,13 @@ export const handler = async (event) => {
         from,
         to: email,
         replyTo: adminRecipients[0] || process.env.CONTACT_TO_EMAIL || "busi.sandor@bphoto.at",
-        subject:
-          lang === "hu"
-            ? "Megérkezett a foglalási kérésed - B. Photography"
-            : "Deine Buchungsanfrage ist eingegangen - B. Photography",
+        subject: copy.clientSubject,
         html: createClientMailHtml({
-          lang,
+          copy,
           name,
           bookingDate,
-          packageName
+          packageName,
+          projectType
         })
       });
 

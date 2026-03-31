@@ -1,0 +1,584 @@
+.drone-page {
+  background:
+    radial-gradient(circle at top left, rgba(214, 179, 106, 0.12), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(70, 104, 160, 0.14), transparent 28%),
+    linear-gradient(180deg, #090b10 0%, #0d1118 42%, #090b10 100%);
+  color: #f6f2e8;
+}
+
+.drone-main {
+  display: grid;
+  gap: 110px;
+  padding: 148px 0 108px;
+}
+
+.drone-page .container {
+  width: min(1220px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.drone-hero,
+.drone-intro,
+.drone-trust,
+.drone-services,
+.drone-process,
+.drone-usecases,
+.drone-faq,
+.drone-final {
+  position: relative;
+}
+
+.drone-hero-layout,
+.drone-intro-shell,
+.drone-services-grid,
+.drone-process-grid,
+.drone-usecases-grid,
+.drone-faq-grid,
+.drone-final-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.drone-kicker,
+.drone-section-kicker,
+.drone-card-label,
+.drone-trust-label,
+.drone-step-index,
+.drone-usecase-label,
+.drone-faq-label {
+  color: #f5dc9c;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.76rem;
+}
+
+.drone-title,
+.drone-section-title,
+.drone-card-title,
+.drone-step-title,
+.drone-final-title,
+.drone-hero-metric strong,
+.drone-usecase-card strong,
+.drone-faq-item strong {
+  font-family: "Cinzel", Georgia, serif;
+  font-weight: 600;
+}
+
+.drone-title,
+.drone-section-title,
+.drone-final-title {
+  margin: 0;
+  color: #f7ecd0;
+  line-height: 1.02;
+}
+
+.drone-title {
+  font-size: clamp(3rem, 5vw, 5.2rem);
+  max-width: 11ch;
+}
+
+.drone-section-title {
+  font-size: clamp(2rem, 3.4vw, 3.35rem);
+  max-width: 15ch;
+}
+
+.drone-copy,
+.drone-intro-body p,
+.drone-card-copy,
+.drone-step-copy,
+.drone-usecase-card p,
+.drone-faq-item p,
+.drone-final-copy,
+.drone-microcopy,
+.drone-trust-card p,
+.drone-hero-caption,
+.drone-trust-intro,
+.drone-services-intro,
+.drone-process-intro,
+.drone-usecases-intro,
+.drone-faq-intro {
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.72;
+}
+
+.drone-actions,
+.drone-final-actions,
+.drone-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.drone-btn,
+.drone-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 28px;
+  border-radius: 999px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8rem;
+  font-weight: 800;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.drone-btn {
+  border: 1px solid rgba(214, 179, 106, 0.26);
+  background: linear-gradient(135deg, #d6b36a, #f0ca82);
+  color: #16120c;
+  box-shadow: 0 18px 42px rgba(214, 179, 106, 0.24);
+}
+
+.drone-btn-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #f6f2e8;
+}
+
+.drone-btn:hover,
+.drone-btn-secondary:hover {
+  transform: translateY(-2px);
+}
+
+.drone-panel,
+.drone-hero-visual,
+.drone-hero-metric,
+.drone-trust-card,
+.drone-service-card,
+.drone-step,
+.drone-usecase-card,
+.drone-faq-item,
+.drone-final-shell {
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(14px);
+}
+
+.drone-hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.96fr);
+  gap: 32px;
+  align-items: center;
+}
+
+.drone-hero-copy {
+  display: grid;
+  gap: 22px;
+}
+
+.drone-hero-copy .drone-copy {
+  max-width: 54ch;
+  font-size: 1.04rem;
+}
+
+.drone-hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.drone-hero-pills span,
+.drone-note-strip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 179, 106, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.8rem;
+}
+
+.drone-hero-visual {
+  overflow: hidden;
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.drone-hero-visual figure {
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  aspect-ratio: 1.04;
+}
+
+.drone-hero-visual img,
+.drone-usecase-card img,
+.drone-intro-visual img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.drone-hero-visual figure::after,
+.drone-usecase-card figure::after,
+.drone-intro-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 8, 12, 0.06), rgba(6, 8, 12, 0.48));
+}
+
+.drone-hero-caption {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 18px;
+  z-index: 1;
+  font-size: 0.94rem;
+}
+
+.drone-hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.drone-hero-metric {
+  padding: 18px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.drone-hero-metric strong {
+  font-size: 1.16rem;
+  color: #f7ecd0;
+}
+
+.drone-intro-shell {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.92fr) minmax(0, 1.08fr);
+  gap: 26px;
+  align-items: stretch;
+}
+
+.drone-intro-visual {
+  position: relative;
+  overflow: hidden;
+  min-height: 420px;
+}
+
+.drone-intro-body {
+  display: grid;
+  gap: 18px;
+  padding: 34px;
+}
+
+.drone-note-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.drone-trust-shell,
+.drone-process-shell,
+.drone-usecases-shell,
+.drone-faq-shell {
+  display: grid;
+  gap: 28px;
+}
+
+.drone-trust-head,
+.drone-services-head,
+.drone-process-head,
+.drone-usecases-head,
+.drone-faq-head {
+  display: grid;
+  gap: 14px;
+  max-width: 760px;
+}
+
+.drone-trust-grid,
+.drone-services-grid,
+.drone-process-grid,
+.drone-faq-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.drone-trust-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.drone-trust-card {
+  padding: 28px;
+  display: grid;
+  gap: 12px;
+}
+
+.drone-trust-card strong {
+  color: #f7ecd0;
+  font-size: 1.26rem;
+}
+
+.drone-services-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.drone-service-card {
+  padding: 26px;
+  display: grid;
+  gap: 14px;
+  min-height: 100%;
+  transition: transform 0.22s ease, border-color 0.22s ease;
+}
+
+.drone-service-card:hover,
+.drone-step:hover,
+.drone-usecase-card:hover,
+.drone-faq-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(214, 179, 106, 0.24);
+}
+
+.drone-card-title {
+  margin: 0;
+  color: #f7ecd0;
+  font-size: 1.48rem;
+}
+
+.drone-card-meta {
+  color: #f5dc9c;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.drone-process-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.drone-step {
+  padding: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.drone-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(214, 179, 106, 0.12);
+  border: 1px solid rgba(214, 179, 106, 0.16);
+}
+
+.drone-step-title {
+  margin: 0;
+  color: #f7ecd0;
+  font-size: 1.32rem;
+}
+
+.drone-usecases-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.drone-usecase-card {
+  overflow: hidden;
+  display: grid;
+}
+
+.drone-usecase-card figure {
+  margin: 0;
+  position: relative;
+  aspect-ratio: 1.08;
+}
+
+.drone-usecase-card-body {
+  display: grid;
+  gap: 12px;
+  padding: 24px;
+}
+
+.drone-usecase-card strong {
+  color: #f7ecd0;
+  font-size: 1.28rem;
+}
+
+.drone-usecase-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.84rem;
+}
+
+.drone-portfolio-cta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 22px 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(214, 179, 106, 0.16);
+  background: rgba(214, 179, 106, 0.06);
+}
+
+.drone-portfolio-cta p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.drone-faq-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.drone-faq-item {
+  padding: 24px;
+  display: grid;
+  gap: 10px;
+}
+
+.drone-faq-item strong {
+  color: #f7ecd0;
+  font-size: 1.2rem;
+}
+
+.drone-final-shell {
+  padding: 36px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+  gap: 28px;
+  background: linear-gradient(135deg, rgba(214, 179, 106, 0.1), rgba(255, 255, 255, 0.04));
+  border-color: rgba(214, 179, 106, 0.22);
+}
+
+.drone-final-copy-block {
+  display: grid;
+  gap: 16px;
+}
+
+.drone-final-title {
+  font-size: clamp(2.1rem, 4vw, 3.6rem);
+}
+
+.drone-final-side {
+  display: grid;
+  gap: 18px;
+}
+
+.drone-cta-panel {
+  padding: 22px 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: grid;
+  gap: 10px;
+}
+
+.drone-cta-panel strong {
+  color: #f7ecd0;
+  font-size: 1.08rem;
+}
+
+.drone-footer {
+  width: min(1220px, calc(100% - 40px));
+  margin: 0 auto 40px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.88rem;
+}
+
+.drone-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.drone-footer a {
+  color: rgba(255, 255, 255, 0.76);
+  text-decoration: none;
+}
+
+.drone-footer a:hover {
+  color: #f5dc9c;
+}
+
+@media (max-width: 1180px) {
+  .drone-hero-layout,
+  .drone-intro-shell,
+  .drone-final-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .drone-trust-grid,
+  .drone-services-grid,
+  .drone-usecases-grid,
+  .drone-process-grid,
+  .drone-faq-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .drone-main {
+    gap: 84px;
+    padding: 118px 0 84px;
+  }
+
+  .drone-page .container,
+  .drone-footer {
+    width: min(100% - 24px, 1220px);
+  }
+
+  .drone-title {
+    font-size: 2.36rem;
+  }
+
+  .drone-section-title,
+  .drone-final-title {
+    font-size: 2rem;
+  }
+
+  .drone-trust-grid,
+  .drone-services-grid,
+  .drone-usecases-grid,
+  .drone-process-grid,
+  .drone-faq-grid,
+  .drone-hero-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .drone-actions,
+  .drone-final-actions,
+  .drone-cta-group,
+  .drone-portfolio-cta,
+  .drone-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .drone-btn,
+  .drone-btn-secondary {
+    width: 100%;
+  }
+
+  .drone-hero-visual,
+  .drone-trust-card,
+  .drone-service-card,
+  .drone-step,
+  .drone-usecase-card-body,
+  .drone-faq-item,
+  .drone-final-shell,
+  .drone-intro-body {
+    padding: 24px;
+  }
+}

@@ -165,6 +165,63 @@
               <small class="form-hint">Erre az emailre küldöm a visszajelzést.</small>
             </label>
 
+            <label class="booking-field">
+              <span class="booking-field-label">Projekt típusa</span>
+              <select name="project_type" id="projectType">
+                <option value="">Válassz típust</option>
+                <option value="portrait">Portré</option>
+                <option value="couple">Páros</option>
+                <option value="family">Családi</option>
+                <option value="automotive">Autós</option>
+                <option value="branding">Branding</option>
+                <option value="drone">Drón / légi anyag</option>
+                <option value="real_estate">Ingatlan</option>
+                <option value="hospitality">Hotel / hospitality</option>
+                <option value="event">Esemény</option>
+                <option value="other">Egyéb</option>
+              </select>
+            </label>
+
+            <label class="booking-field">
+              <span class="booking-field-label">Helyszín</span>
+              <input type="text" name="project_location" id="projectLocation" placeholder="pl. Bécs 1010 vagy pontos cím">
+            </label>
+
+            <label class="booking-field">
+              <span class="booking-field-label">Privát vagy üzleti?</span>
+              <select name="project_scope" id="projectScope">
+                <option value="">Válassz típust</option>
+                <option value="private">Privát projekt</option>
+                <option value="commercial">Üzleti / kereskedelmi projekt</option>
+                <option value="mixed">Még nem eldöntött</option>
+              </select>
+            </label>
+
+            <label class="booking-field">
+              <span class="booking-field-label">Mire kell az anyag?</span>
+              <select name="content_use" id="contentUse">
+                <option value="">Válassz célt</option>
+                <option value="social">Social media</option>
+                <option value="website">Weboldal</option>
+                <option value="campaign">Kampány / hirdetés</option>
+                <option value="real_estate">Ingatlan / bemutató</option>
+                <option value="hotel">Hotel / hospitality</option>
+                <option value="personal">Privát emlék</option>
+                <option value="other">Egyéb</option>
+              </select>
+            </label>
+
+            <label class="booking-field is-full">
+              <span class="booking-field-label">Engedélyköteles vagy érzékeny helyszín?</span>
+              <select name="sensitive_location" id="sensitiveLocation">
+                <option value="">Még nem tudom</option>
+                <option value="no">Nem, normál helyszín</option>
+                <option value="yes">Igen, érdemes előre ellenőrizni</option>
+                <option value="unsure">Bizonytalan, segíts az egyeztetésben</option>
+              </select>
+              <small class="form-hint">Főleg drónprojektnél segít, ha ezt előre látom.</small>
+            </label>
+
             <label class="booking-field is-full">
               <span class="booking-field-label">Üzenet</span>
               <textarea name="message" placeholder="Írj pár mondatot arról, milyen fotózást szeretnél, milyen hangulatot keresel, és mire szeretnéd használni a képeket."></textarea>

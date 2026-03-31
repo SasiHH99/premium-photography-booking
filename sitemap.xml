@@ -1,13 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://bphoto.at/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://bphoto.at/de/portfolio</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://bphoto.at/de/preise</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://bphoto.at/de/kontakt</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://bphoto.at/de/termin</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bphoto.at/de/drohne</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://bphoto.at/hu/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://bphoto.at/hu/portfolio</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://bphoto.at/hu/arak</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://bphoto.at/hu/kapcsolat</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://bphoto.at/hu/foglalas</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bphoto.at/hu/dron</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bphoto.at/en/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://bphoto.at/en/portfolio</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bphoto.at/en/pricing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://bphoto.at/en/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://bphoto.at/en/booking</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bphoto.at/en/drone</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

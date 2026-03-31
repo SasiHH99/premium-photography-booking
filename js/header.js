@@ -2,6 +2,7 @@
   hu: {
     index: 'index.html',
     portfolio: 'portfolio.html',
+    drone: 'dron.html',
     pricing: 'arak.html',
     booking: 'foglalas.html',
     contact: 'kapcsolat.html',
@@ -19,6 +20,7 @@
   de: {
     index: 'index.html',
     portfolio: 'portfolio.html',
+    drone: 'drohne.html',
     pricing: 'preise.html',
     booking: 'termin.html',
     contact: 'kontakt.html',
@@ -36,6 +38,7 @@
   en: {
     index: 'index.html',
     portfolio: 'portfolio.html',
+    drone: 'drone.html',
     pricing: 'pricing.html',
     booking: 'booking.html',
     contact: 'contact.html',
@@ -63,6 +66,7 @@ const HEADER_COPY = {
   hu: {
     home: 'Kezdőlap',
     portfolio: 'Portfólió',
+    drone: 'Drón',
     pricing: 'Árak',
     booking: 'Foglalás',
     contact: 'Kapcsolat',
@@ -81,6 +85,7 @@ const HEADER_COPY = {
   de: {
     home: 'Startseite',
     portfolio: 'Portfolio',
+    drone: 'Drohne',
     pricing: 'Preise',
     booking: 'Termin',
     contact: 'Kontakt',
@@ -99,6 +104,7 @@ const HEADER_COPY = {
   en: {
     home: 'Home',
     portfolio: 'Portfolio',
+    drone: 'Drone',
     pricing: 'Pricing',
     booking: 'Booking',
     contact: 'Contact',
@@ -157,6 +163,7 @@ function buildHeaderMarkup(lang) {
     <nav class="main-nav" aria-label="${copy.ariaNav}">
       <a class="${isActive('index')}" href="${getPageHref(lang, 'index')}">${copy.home}</a>
       <a class="${isActive('portfolio')}" href="${getPageHref(lang, 'portfolio')}">${copy.portfolio}</a>
+      <a class="${isActive('drone')}" href="${getPageHref(lang, 'drone')}">${copy.drone}</a>
       <a class="${isActive('pricing')}" href="${getPageHref(lang, 'pricing')}">${copy.pricing}</a>
       <a class="${isActive('contact')}" href="${getPageHref(lang, 'contact')}">${copy.contact}</a>
       <a class="${isActive('galleryLogin') || isActive('gallery') ? 'active' : ''}" href="${getPageHref(lang, 'galleryLogin')}">${copy.gallery}</a>
@@ -205,6 +212,7 @@ function buildHeaderMarkup(lang) {
     <nav class="mobile-menu-nav" aria-label="${copy.mobileNav}">
       <a class="${isActive('index')}" href="${getPageHref(lang, 'index')}">${copy.home}</a>
       <a class="${isActive('portfolio')}" href="${getPageHref(lang, 'portfolio')}">${copy.portfolio}</a>
+      <a class="${isActive('drone')}" href="${getPageHref(lang, 'drone')}">${copy.drone}</a>
       <a class="${isActive('pricing')}" href="${getPageHref(lang, 'pricing')}">${copy.pricing}</a>
       <a class="${isActive('booking')}" href="${getPageHref(lang, 'booking')}">${copy.booking}</a>
       <a class="${isActive('contact')}" href="${getPageHref(lang, 'contact')}">${copy.contact}</a>
