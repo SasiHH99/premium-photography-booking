@@ -1,8 +1,11 @@
-﻿const CACHE_NAME = "bphoto-static-v3";
+﻿const CACHE_NAME = "bphoto-static-v4";
 const OFFLINE_FALLBACK = "/de/index.html";
 const PRE_CACHE = [
   OFFLINE_FALLBACK,
   "/hu/index.html",
+  "/de/drohne.html",
+  "/hu/dron.html",
+  "/en/drone.html",
   "/manifest.webmanifest",
   "/favicon.png",
   "/images/pwa/icon-192.png",
