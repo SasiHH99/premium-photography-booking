@@ -110,6 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     contactAdminNote: document.getElementById("contactAdminNote"),
     contactSaveBtn: document.getElementById("contactSaveBtn"),
     contactReviewedBtn: document.getElementById("contactReviewedBtn"),
+    contactResendBtn: document.getElementById("contactResendBtn"),
     contactCreateGalleryBtn: document.getElementById("contactCreateGalleryBtn"),
     contactReplyLink: document.getElementById("contactReplyLink"),
     galleryCreateEmail: document.getElementById("galleryCreateEmail"),
@@ -1242,6 +1243,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateStats();
   }
 
+  async function resendContactNotification() {
+    const contact = getSelectedContact();
+    if (!contact) return;
+
+    const data = await callAdmin("/.netlify/functions/admin-contact-messages", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "resend_notification",
+        id: contact.id
+      })
+    });
+
+    const sentCount = Number(data.sentCount || 0);
+    const failedCount = Number(data.failedCount || 0);
+
+    if (sentCount > 0) {
+      showFeedback(
+        `Kapcsolati értesítő email újraküldve. Sikeres: ${sentCount}, hiba: ${failedCount}.`
+      );
+      return;
+    }
+
+    throw new Error(
+      data.message ||
+      "Az értesítő email újraküldése nem sikerült egyetlen címre sem."
+    );
+  }
+
   async function createGalleryUser(email, lang, note) {
     const data = await callAdmin("/.netlify/functions/admin-gallery-users", {
       method: "POST",
@@ -1839,6 +1868,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error(error);
         showFeedback(error.message || "Nem sikerült menteni a kapcsolatfelvételt.", "error");
+      }
+    });
+
+    ui.contactResendBtn?.addEventListener("click", async () => {
+      try {
+        await runBusyAction(ui.contactResendBtn, "Küldés...", () => resendContactNotification());
+      } catch (error) {
+        console.error(error);
+        showFeedback(error.message || "Nem sikerült újraküldeni a kapcsolati értesítő emailt.", "error");
       }
     });
 

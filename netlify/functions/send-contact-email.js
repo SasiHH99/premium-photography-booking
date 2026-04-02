@@ -1,4 +1,4 @@
-import {
+﻿import {
   CORS_HEADERS,
   json,
   normalizeEmail,
@@ -10,6 +10,22 @@ import {
   createInfoTable,
   createNoteBlock
 } from "./_admin.js";
+
+function getContactMailConfig() {
+  const from =
+    process.env.CONTACT_FROM_EMAIL ||
+    process.env.BOOKING_FROM_EMAIL ||
+    process.env.GALLERY_FROM_EMAIL ||
+    "B. Photography <noreply@bphoto.at>";
+
+  const adminRecipients = parseEmailRecipients(
+    process.env.CONTACT_TO_EMAIL,
+    process.env.BOOKING_TO_EMAIL,
+    "busi.sandor@bphoto.at"
+  );
+
+  return { from, adminRecipients };
+}
 
 function createMailHtml({ heading, intro, name, email, message }) {
   return createMailLayout({
@@ -25,6 +41,33 @@ function createMailHtml({ heading, intro, name, email, message }) {
   });
 }
 
+async function notifyContactAdmins({ from, replyTo, recipients, subject, html }) {
+  const results = [];
+
+  for (const recipient of recipients) {
+    try {
+      await sendResendMail({
+        from,
+        to: recipient,
+        replyTo,
+        subject,
+        html
+      });
+
+      results.push({ recipient, ok: true });
+    } catch (mailError) {
+      console.error(`contact email failed for ${recipient}:`, mailError);
+      results.push({
+        recipient,
+        ok: false,
+        error: String(mailError?.message || mailError).slice(0, 400)
+      });
+    }
+  }
+
+  return results;
+}
+
 export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 204, headers: CORS_HEADERS, body: "" };
@@ -34,13 +77,12 @@ export const handler = async (event) => {
     return json(405, { error: "Method not allowed" });
   }
 
-  const from = process.env.CONTACT_FROM_EMAIL || "B. Photography <noreply@bphoto.at>";
-  const recipients = parseEmailRecipients(process.env.CONTACT_TO_EMAIL, "busi.sandor@bphoto.at");
+  const { from, adminRecipients } = getContactMailConfig();
   const supabase = createServiceClient();
 
   try {
     const data = JSON.parse(event.body || "{}");
-    const lang = data.lang === "hu" ? "hu" : "de";
+    const lang = data.lang === "hu" ? "hu" : data.lang === "en" ? "en" : "de";
     const name = String(data.name || "").trim();
     const email = normalizeEmail(data.email || "");
     const message = String(data.message || "").trim();
@@ -53,11 +95,19 @@ export const handler = async (event) => {
       return json(400, { error: "Invalid email format" });
     }
 
-    const heading = lang === "hu" ? "Új kapcsolatfelvétel" : "Neue Kontaktanfrage";
+    const heading =
+      lang === "hu"
+        ? "Új kapcsolatfelvétel"
+        : lang === "en"
+          ? "New contact request"
+          : "Neue Kontaktanfrage";
+
     const intro =
       lang === "hu"
         ? "Érkezett egy új üzenet a kapcsolat oldalról."
-        : "Es ist eine neue Nachricht über das Kontaktformular eingegangen.";
+        : lang === "en"
+          ? "A new message came in through the contact page."
+          : "Es ist eine neue Nachricht über das Kontaktformular eingegangen.";
 
     const { error: insertError } = await supabase.from("contact_messages").insert({
       name,
@@ -72,33 +122,27 @@ export const handler = async (event) => {
       console.error("contact_messages insert failed", insertError);
     }
 
-    const results = [];
+    const notifications = await notifyContactAdmins({
+      from,
+      replyTo: email,
+      recipients: adminRecipients,
+      subject: `${heading} - ${name}`,
+      html: createMailHtml({ heading, intro, name, email, message })
+    });
 
-    for (const recipient of recipients) {
-      try {
-        await sendResendMail({
-          from,
-          to: recipient,
-          replyTo: email,
-          subject: `${heading} - ${name}`,
-          html: createMailHtml({ heading, intro, name, email, message })
-        });
-
-        results.push({ recipient, ok: true });
-      } catch (mailError) {
-        console.error(`contact email failed for ${recipient}:`, mailError);
-        results.push({
-          recipient,
-          ok: false,
-          error: String(mailError?.message || mailError).slice(0, 400)
-        });
-      }
-    }
+    const sentCount = notifications.filter((item) => item.ok).length;
+    const failedCount = notifications.length - sentCount;
 
     return json(200, {
       success: true,
       stored: !insertError,
-      notifications: results
+      adminNotified: sentCount > 0,
+      partial: failedCount > 0,
+      sender: from,
+      recipients: adminRecipients,
+      notificationCount: sentCount,
+      failedCount,
+      notifications
     });
   } catch (error) {
     return json(500, {
